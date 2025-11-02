@@ -1,0 +1,54 @@
+{
+  "attributes": {
+    "birthDate": "1963-12-11",
+    "birthPlace": "Kathmandu District, Nepal",
+    "nationality": "Nepali",
+    "politicalParty": "Nepali Congress"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": null,
+  "createdAt": "2025-11-02 10:49:04.294576",
+  "description": "Ramesh Lekhak is a Nepalese politician affiliated with the Nepali Congress party. He has held several ministerial positions, including Minister of Home Affairs, Minister of Physical Infrastructure & Transport, and Minister of State for Labour and Transport Management. Lekhak has been elected multiple times to the Pratinidhi Sabha, representing Kanchanpur constituencies.",
+  "id": "entity:person/ramesh-lekhak",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Ramesh_Lekhak"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Ramesh Lekhak"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "रमेश लेखक"
+    }
+  ],
+  "short_description": "Nepali politician and former Minister of Home Affairs of Nepal.",
+  "slug": "ramesh-lekhak",
+  "subType": null,
+  "tags": [
+    "Nepali politician",
+    "Nepali Congress",
+    "Minister of Home Affairs",
+    "Member of Parliament"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 10:49:04.294576",
+    "entityOrRelationshipId": "entity:person/ramesh-lekhak",
+    "id": "version:entity:person/ramesh-lekhak:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

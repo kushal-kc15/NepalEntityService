@@ -1,0 +1,76 @@
+{
+  "attributes": {
+    "awards": [
+      "Maha Ujjwal Rashtradip"
+    ],
+    "dateOfBirth": "1944",
+    "dateOfDeath": "2009-06-12",
+    "nationality": "Nepalese",
+    "placeOfDeath": "T.U.Teaching Hospital, Kathmandu",
+    "politicalParty": "Nepali Congress",
+    "relatives": {
+      "cousin": [
+        "Sujata Koirala",
+        "Shashanka Koirala",
+        "Shekhar Koirala",
+        "Prakash Koirala"
+      ],
+      "nephew": [
+        "Siddharth Koirala"
+      ],
+      "niece": [
+        "Manisha Koirala"
+      ],
+      "uncle": [
+        "Matrika Prasad Koirala",
+        "BP Koirala",
+        "Girija Prasad Koirala",
+        "Tarini Prasad Koirala"
+      ]
+    }
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": null,
+  "createdAt": "2025-11-02 09:15:20.648770",
+  "description": "Shailaja Acharya (1944 – 12 June 2009) was a Nepali politician, revolutionary, and diplomat. A prominent member of the Nepali Congress and the influential Koirala family, she was a key figure in the struggle for democracy against the Panchayat system. She was imprisoned for a total of five years for her activism, including for showing a black flag to King Mahendra in 1961. After the reinstitution of democracy, she was elected to parliament twice and served as Minister for Agriculture and Forests (1991-1993), Minister for Water Resources (1997), and became the first woman Deputy Prime Minister of Nepal in 1998, also serving as acting Prime Minister the same year. She was later appointed Nepal's ambassador to India in 2007.",
+  "id": "entity:person/shailaja-acharya",
+  "identifiers": null,
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Shailaja Acharya"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "शैलजा आचार्य"
+    }
+  ],
+  "short_description": "Nepali revolutionary, politician and diplomat. She served as acting Prime Minister of Nepal in 1998 and was the first woman to become Deputy Prime Minister of Nepal.",
+  "slug": "shailaja-acharya",
+  "subType": null,
+  "tags": [
+    "politician",
+    "diplomat",
+    "activist",
+    "revolutionary"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 09:15:20.648770",
+    "entityOrRelationshipId": "entity:person/shailaja-acharya",
+    "id": "version:entity:person/shailaja-acharya:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

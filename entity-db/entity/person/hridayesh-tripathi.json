@@ -1,0 +1,65 @@
+{
+  "attributes": {
+    "birthDate": "1959-06-18",
+    "birthPlace": "Parsauni, Nawalparasi, Nepal",
+    "family": {
+      "children": "two daughters and a son",
+      "spouse": "Shobha Tripathi"
+    },
+    "nationality": "Nepalese",
+    "political_affiliations": [
+      "People's Progressive Party (2021-present)",
+      "CPN (UML) (2017-2021)",
+      "Terai Madhesh Loktantrik Party (2007-2017)",
+      "Nepal Sadbhawana Party (1991-2006)",
+      "Communist Party of Nepal (Rayamajhi)"
+    ]
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": null,
+  "createdAt": "2025-11-02 12:14:23.590704",
+  "description": "Hridayesh Tripathi is a Nepalese politician, from the People's Progressive Party, which he founded and chairs since December 2021. He has served in numerous ministerial roles, including Minister of Health and Population, Minister of Federal Affairs and General Administration, Minister of Law, Justice and Parliamentary Affairs, and Minister of Industry, Commerce and Supplies. His political career began with the Communist Party of Nepal (Rayamajhi), and he was subsequently a key figure in the Nepal Sadbhawana Party and the Terai Madhesh Loktantrik Party. He has been elected to the Nepalese parliament multiple times from Nawalparasi.",
+  "id": "entity:person/hridayesh-tripathi",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Hridayesh_Tripathi"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Hridayesh Tripathi"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "हृदयेश त्रिपाठी"
+    }
+  ],
+  "short_description": "Nepalese politician and the current chairman of the People's Progressive Party.",
+  "slug": "hridayesh-tripathi",
+  "subType": null,
+  "tags": [
+    "Nepalese politician",
+    "People's Progressive Party",
+    "Chairman",
+    "Minister of Health and Population",
+    "Member of Parliament"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 12:14:23.590704",
+    "entityOrRelationshipId": "entity:person/hridayesh-tripathi",
+    "id": "version:entity:person/hridayesh-tripathi:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

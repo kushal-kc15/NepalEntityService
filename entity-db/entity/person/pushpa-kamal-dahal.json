@@ -1,0 +1,79 @@
+{
+  "attributes": {
+    "birth_date": "1954-12-11",
+    "birth_place": "Lewade, Dhikur Pokhari VDC, Pokhara, Nepal",
+    "children_count": 4,
+    "nationality": "Nepalese",
+    "religion": "Atheist",
+    "spouse": "Sita Poudel (m. 1969; died 2023)"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": [
+    {
+      "label": "Official",
+      "type": "Website",
+      "value": "cmprachanda.com"
+    }
+  ],
+  "createdAt": "2025-11-02 10:05:19.465721",
+  "description": "Pushpa Kamal Dahal (born Ghanashyam Dahal; 11 December 1954), commonly known as Prachanda, is a prominent Nepalese politician. He has served as Prime Minister of Nepal on three occasions: from 2008 to 2009, 2016 to 2017, and from December 2022 to July 2024. He was the leader of the Communist Party of Nepal (Maoist) during the country's civil war (1996-2006). Following the war, his party became the largest in the 2008 Constituent Assembly election, leading to his first term as prime minister. He is the chairman of the CPN (Maoist Centre) and has held various other high-ranking political and parliamentary positions throughout his career.",
+  "id": "entity:person/pushpa-kamal-dahal",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Pushpa_Kamal_Dahal",
+    "wikipedia_ne": "https://ne.wikipedia.org/wiki/%E0%A4%A6%E0%A5%8B%E0%A4%B8%E0%A5%8D%E0%A4%B0%E0%A5%8B_%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%9A%E0%A4%A3%E0%A5%8D%E0%A4%A1_%E0%A4%AE%E0%A4%A8%E0%A5%8D%E0%A4%A4%E0%A5%8D%E0%A4%B0%E0%A4%BF%E0%A4%AA%E0%A4%B0%E0%A4%BF%E0%A4%B7%E0%A4%A6%E0%A5%8D"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Pushpa Kamal Dahal"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "पुष्पकमल दाहाल"
+    },
+    {
+      "kind": "NICKNAME",
+      "lang": "en",
+      "value": "Prachanda"
+    },
+    {
+      "kind": "NICKNAME",
+      "lang": "ne",
+      "value": "प्रचण्ड"
+    },
+    {
+      "kind": "BIRTH_NAME",
+      "lang": "en",
+      "value": "Ghanashyam Dahal"
+    }
+  ],
+  "short_description": "Pushpa Kamal Dahal, also known as Prachanda, is a Nepalese politician who has served as the Prime Minister of Nepal three times and was a major figure in the Nepalese Civil War.",
+  "slug": "pushpa-kamal-dahal",
+  "subType": null,
+  "tags": [
+    "Politician",
+    "Prime Minister of Nepal",
+    "Communist leader",
+    "Chairman of the CPN (Maoist Centre)",
+    "Nepalese Civil War leader"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 10:05:19.465721",
+    "entityOrRelationshipId": "entity:person/pushpa-kamal-dahal",
+    "id": "version:entity:person/pushpa-kamal-dahal:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

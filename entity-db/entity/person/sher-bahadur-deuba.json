@@ -1,0 +1,69 @@
+{
+  "attributes": {
+    "children": [
+      "Jaybir Sing Deuba"
+    ],
+    "date_of_birth": "1946-06-13",
+    "place_of_birth": "Ashigram, Kingdom of Nepal",
+    "political_affiliations": [
+      "Nepali Congress (2007–present)",
+      "Nepali Congress (before 2002)",
+      "Nepali Congress (Democratic) (2002–2007)"
+    ],
+    "spouse": "Arzu Rana Deuba"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": [
+    {
+      "label": null,
+      "type": "website",
+      "value": "sherbahadurdeuba.com"
+    }
+  ],
+  "createdAt": "2025-11-02 10:01:31.093766",
+  "description": "Sher Bahadur Deuba (born 13 June 1946) is a Nepalese politician who served as the 32nd prime minister of Nepal for five terms (1995–1997, 2001–2002, 2004–2005, 2017–2018 and 2021–2022). He has been the president of the Nepali Congress since 2016 and was the Member of Parliament for the parliamentary constituency of Dadeldhura 1. Deuba has also served as Minister of Home Affairs and Leader of the Opposition.",
+  "id": "entity:person/sher-bahadur-deuba",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Sher_Bahadur_Deuba",
+    "wikipedia_ne": "https://ne.wikipedia.org/wiki/%E0%A4%9C%E0%A5%8D%E0%A4%9E%E0%A4%BE%E0%A4%A8%E0%A5%87%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%8D%E0%A4%B0%E0%A4%AC%E0%A4%B9%E0%A4%BE%E0%A4%A6%E0%A5%81%E0%A4%B0_%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%95%E0%A5%80"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Sher Bahadur Deuba"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "शेर बहादुर देउवा"
+    }
+  ],
+  "short_description": "Nepalese politician who served as the 32nd prime minister of Nepal for five terms and has been the president of the Nepali Congress since 2016.",
+  "slug": "sher-bahadur-deuba",
+  "subType": null,
+  "tags": [
+    "Prime Minister of Nepal",
+    "Nepali Congress",
+    "Politician",
+    "Leader of the Opposition",
+    "Minister of Home Affairs"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 10:01:31.093766",
+    "entityOrRelationshipId": "entity:person/sher-bahadur-deuba",
+    "id": "version:entity:person/sher-bahadur-deuba:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

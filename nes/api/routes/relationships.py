@@ -4,7 +4,7 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException, Path
 
-from nes.models import Relationship
+from nes.core.models import Relationship
 
 router = APIRouter(tags=["Relationships"])
 

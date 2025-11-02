@@ -1,0 +1,75 @@
+{
+  "attributes": {
+    "awards": [
+      "Best Finance Minister",
+      "Francis Humbert Humphrey Award for Leadership Role in the Public Service",
+      "Honorary fellow of the University of Connecticut/Bridgeport"
+    ],
+    "birthDate": "1951-01-01",
+    "birthPlace": "Kabilas–8, Nuwakot, Nepal",
+    "children": [
+      "Raxak Mahat",
+      "Agya Mahat"
+    ],
+    "parents": [
+      "Khadga Bahadur Mahat",
+      "Tol Kumari Mahat"
+    ],
+    "politicalParty": "Nepali Congress",
+    "publications": [
+      "In Defence of Democracy: Dynamics and Fault lines of Nepal's Political Economy (2005)"
+    ],
+    "residence": "Maharajgunj kathmandu",
+    "spouse": "Roshana Mahat"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": null,
+  "createdAt": "2025-11-02 10:55:10.832326",
+  "description": "Ram Sharan Mahat is a Nepali politician, technocrat, and a senior leader of the Nepali Congress party. Born in rural Nuwakot, he was politically active from his student days. He holds a Ph.D. in Economics and worked for the UNDP in various roles before entering electoral politics in 1990. Mahat has served as Nepal's Finance Minister on several occasions, including in the government led by Sushil Koirala, and was named 'Best Finance Minister' in 2016 by The Banker magazine. He also served as Minister of Foreign Affairs and was a member of parliament for four consecutive terms.",
+  "id": "entity:person/ram-saran-mahat",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Ram_Sharan_Mahat"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Ram Saran Mahat"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "रामशरण महत"
+    },
+    {
+      "kind": "ALIAS",
+      "lang": "en",
+      "value": "Ram Sharan Mahat"
+    }
+  ],
+  "short_description": "Nepali politician and a senior leader of the Nepali Congress party who has served multiple times as the Finance Minister of Nepal.",
+  "slug": "ram-saran-mahat",
+  "subType": null,
+  "tags": [
+    "Politician",
+    "Finance Minister",
+    "Nepali Congress"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 10:55:10.832326",
+    "entityOrRelationshipId": "entity:person/ram-saran-mahat",
+    "id": "version:entity:person/ram-saran-mahat:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

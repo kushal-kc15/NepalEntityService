@@ -1,0 +1,63 @@
+{
+  "attributes": {
+    "dateOfBirth": "1950-05-20",
+    "nationality": "Nepalese",
+    "placeOfBirth": {
+      "city": "Sakhejung",
+      "country": "Nepal",
+      "state": "Ilam District"
+    },
+    "spouse": {
+      "death_date": "2025-09-09",
+      "name": "Ravi Laxmi Chitrakar",
+      "status": "deceased"
+    }
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": null,
+  "createdAt": "2025-11-02 10:40:33.559427",
+  "description": "Jhala Nath Khanal (born 20 May 1950) is a Nepalese politician who was the 35th Prime Minister of Nepal from February 2011 to August 2011. He was previously the chairman of the CPN (UML) and Leader of the Constituent Assembly Parliamentary Party of the CPN (UML). Since 18 August 2021, he has been serving as the senior leader of the CPN (Unified Socialist), a new party formed through a split in CPN (UML).",
+  "id": "entity:person/jhala-nath-khanal",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Jhala_Nath_Khanal"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Jhala Nath Khanal"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "झलनाथ खनाल"
+    }
+  ],
+  "short_description": "Nepalese politician who served as the 35th Prime Minister of Nepal from February to August 2011.",
+  "slug": "jhala-nath-khanal",
+  "subType": null,
+  "tags": [
+    "Politician",
+    "Prime Minister of Nepal",
+    "CPN (UML)",
+    "CPN (Unified Socialist)",
+    "Member of Parliament"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 10:40:33.559427",
+    "entityOrRelationshipId": "entity:person/jhala-nath-khanal",
+    "id": "version:entity:person/jhala-nath-khanal:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

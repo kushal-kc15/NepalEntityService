@@ -1,0 +1,58 @@
+{
+  "attributes": {
+    "birthDate": "1956-09-25",
+    "birthPlace": "Janakpur, Dhanusa, Nepal",
+    "children": [
+      "Abiral Nidhi",
+      "Anukul Nidhi"
+    ],
+    "father": "Mahendra Narayan Nidhi",
+    "mother": "Prem Sagari Nidhi",
+    "nationality": "Nepalese",
+    "politicalParty": "Nepali Congress",
+    "residence": "Nagarain, Janakpur, Nepal",
+    "spouse": "Anamika Upasak Nidhi"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": null,
+  "createdAt": "2025-11-02 11:06:01.285698",
+  "description": "Bimalendra Nidhi is a Nepali politician who previously served as a Deputy Prime Minister and Home Minister of Nepal. He has also been the Minister of Physical Infrastructure and Transport. Nidhi has served as the Vice-president and General secretary of the Nepali Congress party, and has been elected as a Member of Parliament multiple times.",
+  "id": "entity:person/bimalendra-nidhi",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Bimalendra_Nidhi",
+    "wikipedia_ne": "https://ne.wikipedia.org/wiki/%E0%A4%B5%E0%A4%BF%E0%A4%AE%E0%A4%B2%E0%A5%87%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%8D%E0%A4%B0_%E0%A4%A8%E0%A4%BF%E0%A4%A7%E0%A4%BF"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Bimalendra Nidhi"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "विमलेन्द्र निधि"
+    }
+  ],
+  "short_description": "Nepali politician and Former Deputy PM of Nepal.",
+  "slug": "bimalendra-nidhi",
+  "subType": null,
+  "tags": null,
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 11:06:01.285698",
+    "entityOrRelationshipId": "entity:person/bimalendra-nidhi",
+    "id": "version:entity:person/bimalendra-nidhi:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

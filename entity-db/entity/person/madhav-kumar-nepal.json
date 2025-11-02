@@ -1,0 +1,70 @@
+{
+  "attributes": {
+    "children": [
+      "Saurav Nepal",
+      "Suman Nepal"
+    ],
+    "dateOfBirth": "1953-03-06",
+    "placeOfBirth": "Gaur, Nepal",
+    "politicalAffiliations": [
+      "CPN (Unified Socialist) (2021-present)",
+      "Nepal Communist Party (2018-2021)",
+      "CPN (UML) (until 2018; 2021)"
+    ],
+    "spouse": "Gayatri Acharya"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": [
+    {
+      "label": "Official website",
+      "type": "Website",
+      "value": "https://cpnus.org/comrade-madhav-kumar-nepal/"
+    }
+  ],
+  "createdAt": "2025-11-02 11:08:53.310172",
+  "description": "Madhav Kumar Nepal (born 6 March 1953) is a Nepalese politician who served as the 34th Prime Minister of Nepal from May 2009 to February 2011. He previously served as the Deputy Prime Minister and has held key ministerial positions, including Foreign Affairs and Defence. A long-time leader in Nepal's communist movement, he was the General Secretary of the Communist Party of Nepal (Unified Marxist–Leninist) for 15 years. In August 2021, he formed and became chairman of the CPN (Unified Socialist) following a split in the CPN (UML).",
+  "id": "entity:person/madhav-kumar-nepal",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Madhav_Kumar_Nepal",
+    "wikipedia_ne": "https://ne.wikipedia.org/wiki/%E0%A4%AE%E0%A4%BE%E0%A4%A7%E0%A4%B5%E0%A4%95%E0%A5%81%E0%A4%AE%E0%A4%BE%E0%A4%B0_%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2_%E0%A4%AE%E0%A4%A8%E0%A5%8D%E0%A4%A4%E0%A5%8D%E0%A4%B0%E0%A4%BF%E0%A4%AA%E0%A4%B0%E0%A4%BF%E0%A4%B7%E0%A4%A6%E0%A5%8D"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Madhav Kumar Nepal"
+    },
+    {
+      "kind": "NATIVE",
+      "lang": "ne",
+      "value": "माधवकुमार नेपाल"
+    }
+  ],
+  "short_description": "Nepalese politician and former Prime Minister of Nepal, currently serving as the chairman of the CPN (Unified Socialist).",
+  "slug": "madhav-kumar-nepal",
+  "subType": null,
+  "tags": [
+    "Politician",
+    "Prime Minister of Nepal",
+    "CPN (Unified Socialist)",
+    "Communist Party of Nepal (Unified Marxist–Leninist)",
+    "Nepalese Politician"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 11:08:53.310172",
+    "entityOrRelationshipId": "entity:person/madhav-kumar-nepal",
+    "id": "version:entity:person/madhav-kumar-nepal:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

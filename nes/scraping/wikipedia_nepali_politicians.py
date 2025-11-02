@@ -1,11 +1,33 @@
 """Wikipedia Nepali politicians scraper."""
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="vertexai")
+
+from datetime import datetime
 import wikipedia
 from bs4 import BeautifulSoup
 
-from nes.models import Person
+from nes.core.identifiers.builders import build_entity_id
+from nes.core.models import Person
+from nes.core.models.entity import Entity
+from nes.core.models.version import Actor, Version
+from nes.scraping.llm.google_cloud import GoogleCloudEntityScraper
 
 skip_tags = {"sup", "cite"}
+
+
+def get_entity_schema() -> dict:
+    """Get the schema for the Person entity."""
+    schema = Person.model_json_schema()
+
+    del schema['$defs']['Actor']
+    del schema['$defs']['Version']
+    del schema['properties']['type']
+    del schema['properties']['subType']
+    del schema['properties']['versionInfo']
+    del schema['properties']['createdAt']
+
+    return schema
 
 
 def is_bad_anchor(element):
@@ -48,32 +70,91 @@ def clean_content(content):
     return content
 
 
-def traverse_politician_page(name, href):
+def unstructured_to_entity(content, metadata):
+    message = f"""
+I am extracting people information from Wikipedia into a structured JSON database with high quality and accuracy rather than completeness.
+Extract the person from the following text and return them in JSON.
+
+The person schema: {get_entity_schema()}
+
+Metadata: {metadata}
+
+The person bio: {content}
+"""
+
+    scraper = GoogleCloudEntityScraper()
+
+    result = scraper.extract_single_entity(message, "person")
+    person_slug = result["slug"]
+    entity_type = "person"
+    entity_subtype = None
+    created_at = datetime.now()
+    entity_id = build_entity_id(
+        type=entity_type, subtype=entity_subtype, slug=person_slug
+    )
+
+    version = Version(
+        entityOrRelationshipId=entity_id,
+        type="ENTITY",
+        versionNumber=1,
+        actor=Actor(slug="system", name="System user"),
+        changeDescription="Initial version",
+        createdAt=created_at,
+        changes=result,
+    )
+
+    result["versionInfo"] = version
+    result["type"] = entity_type
+    result["subtype"] = entity_subtype
+    result["createdAt"] = created_at
+
+    entity = Entity(**result)
+
+    if entity.identifiers is None:
+        entity.identifiers = {}
+
+    entity.identifiers["wikipedia"] = metadata["Wikipedia links"]
+
+    return entity
+
+
+async def traverse_politician_page(name, href):
     """Traverse a politician page by processing the href and making a Wikipedia lookup."""
     # Remove /wiki/ prefix and replace _ with spaces
-    page_title = href.replace("/wiki/", "").replace("_", " ")
+    page_title = href.replace("/wiki/", "")
 
-    try:
-        page = wikipedia.page(page_title)
-        return Person(
-            id=page.pageid,
-            names={"en": page.title},
-            attributes={"url": page.url},
-            summary=page.summary,
-            description=clean_content(page.content),
-        )
-    except wikipedia.exceptions.DisambiguationError as e:
-        # Try the first option if disambiguation
-        page = wikipedia.page(e.options[0])
-        return Person(
-            id=page.pageid,
-            names={"en": page.title},
-            attributes={"url": page.url},
-            summary=page.summary,
-            description=clean_content(page.content),
-        )
-    except wikipedia.exceptions.PageError as e:
+    contents = []
+    urls = []
+    
+    # Extract content from both English and Nepali
+    for lang in ['en', 'ne']:
+        try:
+            wikipedia.set_lang(lang)
+            page = wikipedia.page(page_title)
+            content = BeautifulSoup(page.html(), "html.parser").text
+            contents.append(f"=== {lang.upper()} Content ===\n{content}")
+            urls.append(page.url)
+        except wikipedia.exceptions.DisambiguationError as e:
+            # Try the first option if disambiguation
+            try:
+                page = wikipedia.page(e.options[0])
+                content = BeautifulSoup(page.html(), "html.parser").text
+                contents.append(f"=== {lang.upper()} Content ===\n{content}")
+                urls.append(page.url)
+            except:
+                raise
+        except wikipedia.exceptions.PageError:
+            # Page not found
+            continue
+    
+    if not contents:
         return None
+        
+    combined_content = "\n\n".join(contents)
+    entity = unstructured_to_entity(
+        combined_content, {"Politician name": name, "Wikipedia links": urls}
+    )
+    return entity
 
 
 def get_nepali_politician_page_links():
@@ -110,12 +191,27 @@ def get_nepali_politician_page_links():
 
 
 if __name__ == "__main__":
-    links = get_nepali_politician_page_links()
-    print(f"Found {len(links)} politician links")
+    import asyncio
+    from nes.database.file_database import FileDatabase
 
-    for link in links[:5]:  # Process first 5 links
-        person = traverse_politician_page(link["name"], link["href"])
-        if person:
-            print(f"Successfully loaded: {person.names['en']}")
-        else:
-            print(f"Failed to load: {link['name']}")
+    async def main():
+        db = FileDatabase()
+        links = get_nepali_politician_page_links()
+        print(f"Found {len(links)} politician links")
+
+        for i, link in enumerate(links):
+            if i < 25:
+                continue
+            print(f"Processing {i}/{len(links)}: {link['name']}")
+            try:
+                entity = await traverse_politician_page(link["name"], link["href"])
+                if entity:
+                    await db.put_entity(entity)
+                    print(f"Successfully saved: {entity.id}")
+                else:
+                    print(f"Failed to load: {link['name']}")
+            except Exception as e:
+                print(f"Error processing {link['name']}: {e}")
+            # break
+
+    asyncio.run(main())

@@ -1,0 +1,52 @@
+{
+  "attributes": {
+    "birthDate": "1959-04-27",
+    "birthPlace": "Toliya–6, Dhankuta",
+    "father": "Bala Prasad Acharya",
+    "mother": "Laxmi Devi Acharya",
+    "nationality": "Nepali",
+    "politicalParty": "CPN (UML)",
+    "spouse": "Nira Devi Khanal Acharya"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": null,
+  "createdAt": "2025-11-02 09:08:14.252003",
+  "description": "Bhim Acharya (born 27 April 1959) is a secretary of the Communist Party of Nepal (Unified Marxist-Leninist) and a Nepali politician. He served as the Chief Minister of Province No. 1 from 26 August 2021 to 1 November 2021. He was also the Minister for Culture, Tourism and Civil Aviation of Nepal in 2014 under the Sushil Koirala-led government. Acharya has held several parliamentary positions, including being a member of the 2nd Nepalese Constituent Assembly and an incumbent member of the House of Representatives of Nepal for the Sunsari 2 constituency since December 2022.",
+  "id": "entity:person/bhim-acharya",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Bhim_Acharya"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Bhim Acharya"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "भिम आचार्य"
+    }
+  ],
+  "short_description": "Bhim Acharya is a Nepali politician, secretary of the Communist Party of Nepal (Unified Marxist-Leninist), and former Chief Minister of Province No. 1.",
+  "slug": "bhim-acharya",
+  "subType": null,
+  "tags": null,
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 09:08:14.252003",
+    "entityOrRelationshipId": "entity:person/bhim-acharya",
+    "id": "version:entity:person/bhim-acharya:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

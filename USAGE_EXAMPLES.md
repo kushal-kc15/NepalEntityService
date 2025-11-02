@@ -8,7 +8,7 @@ pip install nepal-entity-service
 ```
 
 ```python
-from nes.models import Entity, Person, Relationship
+from nes.core.models import Entity, Person, Relationship
 
 person = Person(
     id="123",

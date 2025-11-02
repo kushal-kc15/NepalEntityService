@@ -1,0 +1,71 @@
+{
+  "attributes": {
+    "birthDate": "1969-05-11",
+    "birthPlace": "Kalegaun, Bheri, Jajarkot, Nepal",
+    "nationality": "Nepalese",
+    "other_political_affiliations": [
+      "CPN (Mashal)",
+      "CPN (Unity Centre)"
+    ],
+    "parents": {
+      "father": "Danda Bir Basnet",
+      "mother": "Dharma Kumari Basnet"
+    },
+    "political_party": "CPN (Maoist Centre)",
+    "spouse": "Satya Pahadi"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": null,
+  "createdAt": "2025-11-02 09:28:00.766870",
+  "description": "Shakti Bahadur Basnet (born 11 May 1969) is a Nepalese politician and former Minister of Forest and Environment. He is a Central Committee Member of Nepal Communist Party. He has served as Minister of Energy, Water Resources and Irrigation, Minister of Home Affairs, and Minister of Health and Population under different governments. He was elected in the 2017 Nepalese legislative election from Jajarkot district. His political career began in 1990 under the alias Suresh Singh.",
+  "id": "entity:person/shakti-bahadur-basnet",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Shakti_Bahadur_Basnet"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Shakti Bahadur Basnet"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "शक्ति बहादुर बस्नेत"
+    },
+    {
+      "kind": "NICKNAME",
+      "lang": "en",
+      "value": "Suresh Singh"
+    }
+  ],
+  "short_description": "Shakti Bahadur Basnet is a Nepalese politician, a Central Committee Member of the Nepal Communist Party, and has served in various ministerial roles.",
+  "slug": "shakti-bahadur-basnet",
+  "subType": null,
+  "tags": [
+    "Nepalese politician",
+    "Minister of Energy, Water Resources and Irrigation",
+    "Minister of Forest and Environment",
+    "Minister of Home Affairs",
+    "Minister of Health and Population",
+    "Member of Parliament",
+    "CPN (Maoist Centre)"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 09:28:00.766870",
+    "entityOrRelationshipId": "entity:person/shakti-bahadur-basnet",
+    "id": "version:entity:person/shakti-bahadur-basnet:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

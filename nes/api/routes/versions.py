@@ -5,13 +5,13 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Path, Query
 from pydantic import BaseModel
 
-from nes.models import CursorPage, VersionDetails
+from nes.core.models import CursorPage, Version
 
 router = APIRouter(tags=["Versions"])
 
 
 class VersionListResponse(BaseModel):
-    results: List[VersionDetails]
+    results: List[Version]
     page: CursorPage
 
 

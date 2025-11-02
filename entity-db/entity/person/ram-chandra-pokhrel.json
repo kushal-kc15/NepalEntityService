@@ -1,0 +1,52 @@
+{
+  "attributes": {
+    "birthDate": "1945-01-01",
+    "nationality": "Nepali",
+    "political_party": "Nepali Congress"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": null,
+  "createdAt": "2025-11-02 11:27:03.187672",
+  "description": "Ram Chandra Pokhrel (born January 1, 1945) is a politician and journalist in Nepal, affiliated with the Nepali Congress party. He is the eldest son of veteran freedom fighter Govardhan Sharma Pokhrel. Pokhrel has been heavily involved in Nepal's democratic movement, leading to numerous arrests. He has held several significant roles, including Chairman of the Tanahu District Development Committee, a member of the Constituent Assembly, and Chief Party Secretary of the Nepali Congress. His journalism career from 1973 to 1980 with the national news agency RSS included interviews with prominent figures like Indira Gandhi and Mother Teresa. He is also an author of several books on politics and other topics.",
+  "id": "entity:person/ram-chandra-pokhrel",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Ram_Chandra_Pokhrel"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Ram Chandra Pokhrel"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Ram Chandra Pokharel"
+    }
+  ],
+  "short_description": "Ram Chandra Pokhrel is a Nepali politician and journalist affiliated with the Nepali Congress party, who has served as a member of the Constituent Assembly and held various party and government positions.",
+  "slug": "ram-chandra-pokhrel",
+  "subType": null,
+  "tags": [
+    "politician",
+    "journalist",
+    "author"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 11:27:03.187672",
+    "entityOrRelationshipId": "entity:person/ram-chandra-pokhrel",
+    "id": "version:entity:person/ram-chandra-pokhrel:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

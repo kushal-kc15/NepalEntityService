@@ -3,7 +3,7 @@
 __version__ = "0.1.0"
 
 # Core exports
-from .models import *
+from .core.models import *
 
 # Conditional imports based on available extras
 try:

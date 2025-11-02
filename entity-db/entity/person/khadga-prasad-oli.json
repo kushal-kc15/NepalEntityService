@@ -1,0 +1,80 @@
+{
+  "attributes": {
+    "birthDate": "1952-02-22",
+    "birthPlace": "Iwa, Kingdom of Nepal",
+    "nationality": "Nepalese",
+    "otherPoliticalAffiliations": [
+      "CPN (ML) (1978–1991)",
+      "NCP (2018–2021)"
+    ],
+    "parents": [
+      "Mohan Prasad Oli",
+      "Madhumaya Oli"
+    ],
+    "politicalParty": "CPN (UML)",
+    "spouse": "Radhika Shakya"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": [
+    {
+      "label": null,
+      "type": "website",
+      "value": "kpsharmaoli.com"
+    }
+  ],
+  "createdAt": "2025-11-02 11:13:25.658709",
+  "description": "Khadga Prasad Sharma Oli (born 22 February 1952), commonly known as K. P. Sharma Oli, is a Nepalese politician who thrice served as the 38th prime minister of Nepal from 2015 to 2016, 2018 to 2021, and 2024 to 2025. He has served as the chairman of the Communist Party of Nepal (Unified Marxist–Leninist) since 2014. Oli has been Member of Parliament for Jhapa 5 since 2017. He previously served as an MP for Jhapa 6, Jhapa 2, and Jhapa 7.",
+  "id": "entity:person/khadga-prasad-oli",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/K._P._Sharma_Oli",
+    "wikipedia_ne": "https://ne.wikipedia.org/wiki/%E0%A4%85%E0%A4%B0%E0%A5%8D%E0%A4%9C%E0%A5%81%E0%A4%A8_%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%95%E0%A5%80"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Khadga Prasad Sharma Oli"
+    },
+    {
+      "kind": "ALIAS",
+      "lang": "en",
+      "value": "K. P. Sharma Oli"
+    },
+    {
+      "kind": "ALIAS",
+      "lang": "en",
+      "value": "K. P. Oli"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "खड्ग प्रसाद शर्मा ओली"
+    },
+    {
+      "kind": "ALIAS",
+      "lang": "ne",
+      "value": "के.पी. शर्मा ओली"
+    }
+  ],
+  "short_description": "Nepalese politician who served as the 38th Prime Minister of Nepal three times and has been the chairman of the Communist Party of Nepal (Unified Marxist–Leninist) since 2014.",
+  "slug": "khadga-prasad-oli",
+  "subType": null,
+  "tags": null,
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 11:13:25.658709",
+    "entityOrRelationshipId": "entity:person/khadga-prasad-oli",
+    "id": "version:entity:person/khadga-prasad-oli:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

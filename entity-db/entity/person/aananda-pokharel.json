@@ -1,0 +1,57 @@
+{
+  "attributes": {
+    "date_of_birth": "1960-03-12",
+    "nationality": "Nepali",
+    "place_of_birth": "Dolakha District"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": null,
+  "createdAt": "2025-11-02 11:24:38.562863",
+  "description": "Ananda Prasad Pokharel (born 12 March 1960) is a Nepali politician who served as Minister for Culture, Tourism and Civil Aviation of Nepal from 2015 to 2016. He is a Central Committee Member and Bagmati Province Committee Secretary of the Nepal Communist Party (NCP). He was also elected as a Member of Parliament and a Member of the Second Constitutional Assembly. Additionally, he serves as the chairman of the Nepal China Himalayan Friendship Society (NeCHiFS) Nepal.",
+  "id": "entity:person/aananda-pokharel",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Aananda_Pokharel"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Ananda Prasad Pokharel"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "आनन्द प्रसाद पोखरेल"
+    },
+    {
+      "kind": "ALIAS",
+      "lang": "en",
+      "value": "Aananda Pokharel"
+    }
+  ],
+  "short_description": "Nepalese politician and former Minister for Culture, Tourism and Civil Aviation of Nepal.",
+  "slug": "aananda-pokharel",
+  "subType": null,
+  "tags": [
+    "politician",
+    "minister",
+    "nepali"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 11:24:38.562863",
+    "entityOrRelationshipId": "entity:person/aananda-pokharel",
+    "id": "version:entity:person/aananda-pokharel:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

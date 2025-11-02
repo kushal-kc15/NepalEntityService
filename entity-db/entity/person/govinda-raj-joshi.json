@@ -1,0 +1,66 @@
+{
+  "attributes": {
+    "children": 3,
+    "dateOfBirth": "1949-08-12",
+    "nationality": "Nepalese",
+    "placeOfBirth": "Khalte Village, Tanahun, Nepal",
+    "politicalParty": "Nepali Congress",
+    "publications": [
+      "Mera Anubhatiharu Part one",
+      "Mera Anubhatiharu Part Two",
+      "Mera Anubhatiharu Part Three",
+      "Sabdachitrama Nepal",
+      "Nepali Congress (Bigat, Bartaman ra Bhabisya)",
+      "Nepalma Shanghiya Shasan Pranali)"
+    ],
+    "residence": "Kathmandu, Nepal",
+    "spouse": "Hem K Joshi"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": [
+    {
+      "label": "Personal",
+      "type": "website",
+      "value": "www.grjoshi.com.np"
+    }
+  ],
+  "createdAt": "2025-11-02 10:27:17.039865",
+  "description": "Govinda Raj Joshi is a Nepalese politician who has held multiple significant roles in the government and the Nepali Congress party. He began his career as a teacher and school founder before entering politics in 1964. Joshi was elected to parliament multiple times (1991, 1994, 1999) and served as a minister in various capacities, including Minister for Home Affairs, Education, and Water Resources. He also held key party positions like Joint General Secretary and was actively involved in Nepal's pro-democracy movements, facing imprisonment on several occasions. He is also the author of several books.",
+  "id": "entity:person/govinda-raj-joshi",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Govinda_Raj_Joshi"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Govinda Raj Joshi"
+    }
+  ],
+  "short_description": "Nepali politician, former government minister, and a prominent member of the Nepali Congress party.",
+  "slug": "govinda-raj-joshi",
+  "subType": null,
+  "tags": [
+    "Nepali Politician",
+    "Nepali Congress",
+    "Former Minister",
+    "Member of Parliament"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 10:27:17.039865",
+    "entityOrRelationshipId": "entity:person/govinda-raj-joshi",
+    "id": "version:entity:person/govinda-raj-joshi:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

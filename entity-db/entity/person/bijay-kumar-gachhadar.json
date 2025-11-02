@@ -1,0 +1,63 @@
+{
+  "attributes": {
+    "birthDate": "1954-02-01",
+    "birthPlace": "Sunsari, Nepal",
+    "ethnicity": "Tharu",
+    "nationality": "Nepali",
+    "occupation": "Politician",
+    "political_affiliations": [
+      "Nepali Congress (before 2008)",
+      "Madhesi Jana Adhikar Forum, Nepal (2008-2009)",
+      "Madheshi Jana Adhikar Forum, Nepal (Democratic) (2009-2017)",
+      "Nepal Democratic Forum",
+      "Nepali Congress (17 October 2017 – present)"
+    ],
+    "spouse": "Nirmala Gachchhadar"
+  },
+  "attributions": [
+    "Wikipedia"
+  ],
+  "contacts": null,
+  "createdAt": "2025-11-02 10:06:51.833679",
+  "description": "Bijay Kumar Gachhadar (born 1 February 1954) is a Nepalese politician and leader of the Nepali Congress. He has served five terms as Deputy Prime Minister of Nepal and held various other ministerial portfolios, including Minister of Home Affairs. He has been a prominent figure in Nepali politics, leading and merging several political parties before rejoining the Nepali Congress, where he served as Vice-President.",
+  "id": "entity:person/bijay-kumar-gachhadar",
+  "identifiers": {
+    "wikipedia_en": "https://en.wikipedia.org/wiki/Bijay_Kumar_Gachhadar"
+  },
+  "misspelledNames": null,
+  "names": [
+    {
+      "kind": "DEFAULT",
+      "lang": "en",
+      "value": "Bijay Kumar Gachhadar"
+    },
+    {
+      "kind": "DEFAULT",
+      "lang": "ne",
+      "value": "विजय कुमार गच्छदार"
+    }
+  ],
+  "short_description": "Nepali politician and leader of the Nepali Congress.",
+  "slug": "bijay-kumar-gachhadar",
+  "subType": null,
+  "tags": [
+    "Politician",
+    "Nepali Politician",
+    "Deputy Prime Minister of Nepal",
+    "Nepali Congress"
+  ],
+  "type": "person",
+  "versionSummary": {
+    "actor": {
+      "id": "actor:system",
+      "name": "System user",
+      "slug": "system"
+    },
+    "changeDescription": "Initial version",
+    "createdAt": "2025-11-02 10:06:51.833679",
+    "entityOrRelationshipId": "entity:person/bijay-kumar-gachhadar",
+    "id": "version:entity:person/bijay-kumar-gachhadar:1",
+    "type": "ENTITY",
+    "versionNumber": 1
+  }
+}

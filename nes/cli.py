@@ -1,8 +1,8 @@
 def main():
-    """Entry point for api command."""
+    """Entry point for api command for production use case."""
     import uvicorn
 
-    uvicorn.run("nes.api.app:app", host="localhost", port=8000, reload=True)
+    uvicorn.run("nes.api.app:app", host="0.0.0.0", port=8000)
 
 
 def dev():

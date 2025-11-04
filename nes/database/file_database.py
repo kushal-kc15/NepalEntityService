@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 
 from nes.core.models.entity import ENTITY_TYPE_MAP, Entity
 from nes.core.models.relationship import Relationship
@@ -65,6 +65,7 @@ class FileDatabase(EntityDatabase):
         offset: int = 0,
         type: Optional[str] = None,
         subtype: Optional[str] = None,
+        attr_filters: Optional[Dict[str, Union[str, int, float]]] = None,
     ) -> List[Entity]:
         # Build search path based on type/subtype
         if subtype and type:
@@ -79,6 +80,12 @@ class FileDatabase(EntityDatabase):
             with open(file_path, "r") as f:
                 data = json.load(f)
             if "type" in data:
+                # Check attribute filters
+                if attr_filters:
+                    attributes = data.get("attributes") or {}
+                    if not all(attributes.get(k) == v for k, v in attr_filters.items()):
+                        continue
+
                 entity_type = data.get("type")
                 entity_subtype = data.get("subType")
                 type_map = ENTITY_TYPE_MAP.get(entity_type, {})

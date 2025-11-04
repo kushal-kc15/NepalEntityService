@@ -10,6 +10,7 @@ class CursorPage(BaseModel):
 
     hasMore: bool
     offset: int = 0
+    count: int
 
 
 class Name(BaseModel):

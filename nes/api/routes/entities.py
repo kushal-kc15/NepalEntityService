@@ -1,6 +1,7 @@
 """Entity endpoints."""
 
-from typing import List, Optional
+import json
+from typing import Dict, List, Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from pydantic import BaseModel
@@ -38,6 +39,10 @@ async def entities(
     subtype: Optional[str] = Query(
         None, description="Filter by entity subtype (e.g., 'politician', 'party')"
     ),
+    attributes: Optional[str] = Query(
+        None,
+        description='Filter by attributes as JSON string with key-value pairs. Multiple attributes are combined using AND logic (e.g., `{"sys:governmentType":"state","sys:status":"active"}`)',
+    ),
     limit: int = Query(20, ge=1, le=100, description="Page size"),
     offset: int = Query(0, ge=0, description="Offset (Number of items to skip)"),
     db: EntityDatabase = Depends(get_database),
@@ -60,15 +65,32 @@ async def entities(
             if not entity:
                 raise HTTPException(status_code=404, detail="Entity not found")
         return EntityListResponse(
-            results=[entity], page=CursorPage(hasMore=False, offset=0)
+            results=[entity], page=CursorPage(hasMore=False, offset=0, count=1)
         )
 
     if q:
         raise HTTPException(status_code=501, detail="Search query not implemented")
 
+    # Parse attribute filters
+    attr_filters = None
+    if attributes:
+        try:
+            attr_filters = json.loads(attributes)
+        except json.JSONDecodeError:
+            raise HTTPException(
+                status_code=400, detail="Invalid JSON format for attributes"
+            )
+
     entities = await db.list_entities(
-        limit=limit, offset=offset, type=type, subtype=subtype
+        limit=limit,
+        offset=offset,
+        type=type,
+        subtype=subtype,
+        attr_filters=attr_filters,
     )
     return EntityListResponse(
-        results=entities, page=CursorPage(hasMore=len(entities) == limit, offset=offset)
+        results=entities,
+        page=CursorPage(
+            hasMore=len(entities) == limit, offset=offset, count=len(entities)
+        ),
     )

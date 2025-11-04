@@ -1,7 +1,7 @@
 """Abstract EntityDatabase class for CRUD operations."""
 
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 
 from nes.core.models.entity import Entity, EntityType
 from nes.core.models.relationship import Relationship
@@ -30,6 +30,7 @@ class EntityDatabase(ABC):
         offset: int = 0,
         type: Optional[EntityType] = None,
         subtype: Optional[str] = None,
+        attr_filters: Optional[Dict[str, Union[str, int, float]]] = None,
     ) -> List[Entity]:
         pass
 

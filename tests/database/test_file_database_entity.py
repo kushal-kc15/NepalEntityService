@@ -6,10 +6,12 @@ from datetime import datetime
 
 import pytest
 
-from nes.core.models.base import Name
-from nes.core.models.entity import Entity, Organization, Person
-from nes.core.models.person import Education
-from nes.core.models.version import Actor, VersionSummary
+from nes.core.models.base import (LangText, LangTextValue, Name, NameKind,
+                                  NameParts)
+from nes.core.models.entity import Entity
+from nes.core.models.organization import Organization
+from nes.core.models.person import Education, Person
+from nes.core.models.version import Actor, VersionSummary, VersionType
 from nes.database import get_database
 
 
@@ -32,12 +34,12 @@ def sample_actor():
 def sample_version_summary(sample_actor):
     """Create a sample version summary for testing."""
     return VersionSummary(
-        entityOrRelationshipId="entity:person/harka-sampang",
-        type="ENTITY",
-        versionNumber=1,
+        entity_or_relationship_id="entity:person/harka-sampang",
+        type=VersionType.ENTITY,
+        version_number=1,
         actor=sample_actor,
-        changeDescription="Initial creation",
-        createdAt=datetime.now(),
+        change_description="Initial creation",
+        created_at=datetime.now(),
     )
 
 
@@ -46,9 +48,9 @@ def sample_person(sample_version_summary):
     """Create a sample person entity for testing."""
     return Person(
         slug="harka-sampang",
-        names=[Name(kind="DEFAULT", value="Harka Sampang", lang="ne")],
-        versionSummary=sample_version_summary,
-        createdAt=datetime.now(),
+        names=[Name(kind=NameKind.PRIMARY, en=NameParts(full="Harka Sampang"))],
+        version_summary=sample_version_summary,
+        created_at=datetime.now(),
     )
 
 
@@ -58,9 +60,9 @@ def sample_organization(sample_version_summary):
     return Organization(
         slug="shram-sanskriti-party",
         type="organization",
-        names=[Name(kind="DEFAULT", value="Shram Sanskriti Party", lang="ne")],
-        versionSummary=sample_version_summary,
-        createdAt=datetime.now(),
+        names=[Name(kind=NameKind.PRIMARY, en=NameParts(full="Shram Sanskriti Party"))],
+        version_summary=sample_version_summary,
+        created_at=datetime.now(),
     )
 
 
@@ -125,18 +127,18 @@ async def test_list_entities_with_pagination(temp_db, sample_actor):
     entities = []
     for i in range(5):
         version_summary = VersionSummary(
-            entityOrRelationshipId=f"entity:person/person-{i}",
+            entity_or_relationship_id=f"entity:person/person-{i}",
             type="ENTITY",
-            versionNumber=1,
+            version_number=1,
             actor=sample_actor,
-            changeDescription=f"Person {i} creation",
-            createdAt=datetime.now(),
+            change_description=f"Person {i} creation",
+            created_at=datetime.now(),
         )
         entity = Person(
             slug=f"person-{i}",
-            names=[Name(kind="DEFAULT", value=f"Person {i}", lang="ne")],
-            versionSummary=version_summary,
-            createdAt=datetime.now(),
+            names=[Name(kind=NameKind.PRIMARY, en=NameParts(full=f"Person {i}"))],
+            version_summary=version_summary,
+            created_at=datetime.now(),
         )
         entities.append(entity)
         await temp_db.put_entity(entity)
@@ -149,27 +151,27 @@ async def test_list_entities_with_pagination(temp_db, sample_actor):
 async def test_person_with_education_persistence(temp_db, sample_actor):
     """Test that person education info persists after save and retrieval."""
     education = Education(
-        institution="Tribhuvan University",
-        degree="Bachelor of Arts",
-        field="Political Science",
-        startYear=2015,
-        endYear=2019,
+        institution=LangText(en=LangTextValue(value="Tribhuvan University")),
+        degree=LangText(en=LangTextValue(value="Bachelor of Arts")),
+        field=LangText(en=LangTextValue(value="Political Science")),
+        start_year=2015,
+        end_year=2019,
     )
 
     version_summary = VersionSummary(
-        entityOrRelationshipId="entity:person/miraj-dhungana",
-        type="ENTITY",
-        versionNumber=1,
+        entity_or_relationship_id="entity:person/miraj-dhungana",
+        type=VersionType.ENTITY,
+        version_number=1,
         actor=sample_actor,
-        changeDescription="Initial creation",
-        createdAt=datetime.now(),
+        change_description="Initial creation",
+        created_at=datetime.now(),
     )
 
     person = Person(
         slug="miraj-dhungana",
-        names=[Name(kind="DEFAULT", value="Miraj Dhungana", lang="en")],
-        versionSummary=version_summary,
-        createdAt=datetime.now(),
+        names=[Name(kind=NameKind.PRIMARY, en=NameParts(full="Miraj Dhungana"))],
+        version_summary=version_summary,
+        created_at=datetime.now(),
     )
     person.education = [education]
 
@@ -178,13 +180,8 @@ async def test_person_with_education_persistence(temp_db, sample_actor):
 
     assert retrieved_person.education is not None
     assert len(retrieved_person.education) == 1
-    assert retrieved_person.education[0].institution == "Tribhuvan University"
-    assert retrieved_person.education[0].degree == "Bachelor of Arts"
-    assert retrieved_person.education[0].field == "Political Science"
-    assert retrieved_person.education[0].startYear == 2015
-    assert retrieved_person.education[0].endYear == 2019
-    assert "sys:education" in retrieved_person.attributes
-    assert (
-        retrieved_person.attributes["sys:education"][0]
-        == retrieved_person.education[0].model_dump()
-    )
+    assert retrieved_person.education[0].institution.en.value == "Tribhuvan University"
+    assert retrieved_person.education[0].degree.en.value == "Bachelor of Arts"
+    assert retrieved_person.education[0].field.en.value == "Political Science"
+    assert retrieved_person.education[0].start_year == 2015
+    assert retrieved_person.education[0].end_year == 2019

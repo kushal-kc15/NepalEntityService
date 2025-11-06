@@ -26,8 +26,8 @@ def get_entity_schema() -> dict:
     del schema["$defs"]["Version"]
     del schema["properties"]["type"]
     del schema["properties"]["subType"]
-    del schema["properties"]["versionSummary"]
-    del schema["properties"]["createdAt"]
+    del schema["properties"]["version_summary"]
+    del schema["properties"]["created_at"]
 
     return schema
 
@@ -96,19 +96,19 @@ The person bio: {content}
     )
 
     version = Version(
-        entityOrRelationshipId=entity_id,
+        entity_or_relationship_id=entity_id,
         type="ENTITY",
-        versionNumber=1,
+        version_number=1,
         actor=Actor(slug="system", name="System user"),
-        changeDescription="Initial version",
-        createdAt=created_at,
+        change_description="Initial version",
+        created_at=created_at,
         changes=result,
     )
 
-    result["versionSummary"] = version
+    result["version_summary"] = version
     result["type"] = entity_type
     result["subtype"] = entity_subtype
-    result["createdAt"] = created_at
+    result["created_at"] = created_at
 
     entity = Entity(**result)
 

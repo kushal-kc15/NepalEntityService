@@ -29,12 +29,12 @@ def sample_actor():
 def sample_version(sample_actor):
     """Create a sample version for testing."""
     return Version(
-        entityOrRelationshipId="entity:person/harka-sampang",
+        entity_or_relationship_id="entity:person/harka-sampang",
         type="ENTITY",
-        versionNumber=1,
+        version_number=1,
         actor=sample_actor,
-        changeDescription="Initial entity creation",
-        createdAt=datetime.now(),
+        change_description="Initial entity creation",
+        created_at=datetime.now(),
     )
 
 
@@ -53,9 +53,9 @@ async def test_get_version(temp_db, sample_version):
     """Test getting a version."""
     await temp_db.put_version(sample_version)
     result = await temp_db.get_version(sample_version.id)
-    assert result.createdAt == sample_version.createdAt
+    assert result.created_at == sample_version.created_at
     assert result.type == sample_version.type
-    assert result.versionNumber == sample_version.versionNumber
+    assert result.version_number == sample_version.version_number
 
 
 @pytest.mark.asyncio
@@ -88,20 +88,20 @@ async def test_list_versions(temp_db, sample_actor):
     """Test listing versions."""
     versions = [
         Version(
-            entityOrRelationshipId="entity:person/harka-sampang",
+            entity_or_relationship_id="entity:person/harka-sampang",
             type="ENTITY",
-            versionNumber=1,
+            version_number=1,
             actor=sample_actor,
-            changeDescription="Initial creation",
-            createdAt=datetime.now(),
+            change_description="Initial creation",
+            created_at=datetime.now(),
         ),
         Version(
-            entityOrRelationshipId="relationship:person/harka-sampang:organization/party:MEMBER_OF",
+            entity_or_relationship_id="relationship:person/harka-sampang:organization/party:MEMBER_OF",
             type="RELATIONSHIP",
-            versionNumber=1,
+            version_number=1,
             actor=sample_actor,
-            changeDescription="Relationship update",
-            createdAt=datetime.now(),
+            change_description="Relationship update",
+            created_at=datetime.now(),
         ),
     ]
 
@@ -119,12 +119,12 @@ async def test_list_versions_with_pagination(temp_db, sample_actor):
     versions = []
     for i in range(5):
         version = Version(
-            entityOrRelationshipId=f"entity:person/person-{i}",
+            entity_or_relationship_id=f"entity:person/person-{i}",
             type="ENTITY",
-            versionNumber=i + 1,
+            version_number=i + 1,
             actor=sample_actor,
-            changeDescription=f"Version {i + 1}",
-            createdAt=datetime.now(),
+            change_description=f"Version {i + 1}",
+            created_at=datetime.now(),
         )
         versions.append(version)
         await temp_db.put_version(version)

@@ -11,7 +11,7 @@ import re
 from datetime import datetime
 from urllib.request import urlopen
 
-from nes.core.models.base import ContactInfo, Name
+from nes.core.models.base import ContactInfo, Name, NameKind, NameParts
 from nes.core.models.entity import GovernmentBody, GovernmentType
 from nes.core.models.version import Actor, Version, VersionSummary
 from nes.database.file_database import FileDatabase
@@ -102,8 +102,8 @@ async def parse_and_create_entities():
         # Create government body entity
         entity = GovernmentBody(
             slug=slug,
-            names=[Name(kind="DEFAULT", value=name, lang="en")],
-            createdAt=now,
+            names=[Name(kind=NameKind.PRIMARY, en=NameParts(full=name))],
+            created_at=now,
             short_description=f"Government body in {district}",
             contacts=contacts if contacts else None,
             attributes={
@@ -112,13 +112,13 @@ async def parse_and_create_entities():
                 "sys:governmentType": determine_government_type(name, district),
             },
             attributions=[ATTRIBUTION],
-            versionSummary=VersionSummary(
-                entityOrRelationshipId=f"entity:organization/government-body/{slug}",
+            version_summary=VersionSummary(
+                entity_or_relationship_id=f"entity:organization/government-body/{slug}",
                 type="ENTITY",
-                versionNumber=1,
+                version_number=1,
                 actor=actor,
-                changeDescription="Initial creation from CSV data",
-                createdAt=now,
+                change_description="Initial creation from CSV data",
+                created_at=now,
             ),
         )
 
@@ -127,7 +127,7 @@ async def parse_and_create_entities():
         # Create and publish version
         version = Version.model_validate(
             dict(
-                **entity.versionSummary.model_dump(),
+                **entity.version_summary.model_dump(),
                 snapshot=entity.model_dump(),
                 changes={},
             ),

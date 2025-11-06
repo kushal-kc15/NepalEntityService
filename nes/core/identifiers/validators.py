@@ -41,6 +41,9 @@ def validate_entity_id(entity_id: str) -> str:
     Raises:
         ValueError: If the entity ID format is invalid
     """
+    from nes.core.models.entity import EntitySubType, EntityType
+    from nes.core.models.entity_type_map import ENTITY_TYPE_MAP
+
     try:
         components = break_entity_id(entity_id)
     except ValueError as e:
@@ -49,15 +52,22 @@ def validate_entity_id(entity_id: str) -> str:
     # Validate type
     if len(components.type) > MAX_TYPE_LENGTH:
         raise ValueError(f"Entity type too long: {components.type}")
-    if not re.match(ENTITY_TYPE_PATTERN, components.type):
-        raise ValueError(f"Invalid entity type format: {components.type}")
+    if components.type not in EntityType:
+        raise ValueError(f"Unsupported entity type {components.type}.")
+
+    entity_type = EntityType(components.type)
 
     # Validate subtype if present
     if components.subtype is not None:
-        if len(components.subtype) > MAX_SUBTYPE_LENGTH:
-            raise ValueError(f"Entity subtype too long: {components.subtype}")
-        if not re.match(ENTITY_SUBTYPE_PATTERN, components.subtype):
-            raise ValueError(f"Invalid entity subtype format: {components.subtype}")
+        if components.subtype not in EntitySubType:
+            raise ValueError(f"Unsupported entity sub type {components.subtype}.")
+
+        entity_subtype = EntitySubType(components.subtype)
+
+        if entity_subtype not in ENTITY_TYPE_MAP[entity_type]:
+            raise ValueError(
+                f"Entity subtype {components.subtype} not supported for entity type {entity_type}."
+            )
 
     # Validate slug
     if len(components.slug) < MIN_SLUG_LENGTH or len(components.slug) > MAX_SLUG_LENGTH:

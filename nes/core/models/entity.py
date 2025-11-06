@@ -128,7 +128,9 @@ class Entity(BaseModel):
     @computed_field
     @property
     def id(self) -> str:
-        return build_entity_id(self.type, self.sub_type, self.slug)
+        return build_entity_id(
+            self.type, self.sub_type.value if self.sub_type else None, self.slug
+        )
 
     @field_validator("names")
     @classmethod

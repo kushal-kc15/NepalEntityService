@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING, List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from nes.core.identifiers.validators import is_valid_entity_id
-
 from .base import Address, LangText
 from .entity import Entity
 
@@ -94,8 +92,11 @@ class Candidacy(BaseModel):
     @field_validator("candidate_id", "party_id")
     @classmethod
     def validate_entity_ids(cls, v: Optional[str]) -> Optional[str]:
+        from nes.core.identifiers.validators import is_valid_entity_id
+
         if v is None:
             return v
+
         if not is_valid_entity_id(v):
             raise ValueError("Must be a valid entity ID")
         return v

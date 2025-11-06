@@ -7,10 +7,11 @@ from datetime import date, datetime
 
 import pytest
 
-from nes.core.models.base import Name
-from nes.core.models.entity import Organization, Person
+from nes.core.models.base import Name, NameKind, NameParts
+from nes.core.models.organization import Organization
+from nes.core.models.person import Person
 from nes.core.models.relationship import Relationship
-from nes.core.models.version import Actor, Version, VersionSummary
+from nes.core.models.version import Actor, Version, VersionSummary, VersionType
 from nes.database import get_database
 from nes.database.entity_database import EntityDatabase
 
@@ -34,12 +35,12 @@ def sample_actor():
 def sample_version(sample_actor):
     """Create a sample version for testing."""
     return Version(
-        entityOrRelationshipId="entity:person/harka-sampang",
+        entity_or_relationship_id="entity:person/harka-sampang",
         type="ENTITY",
-        versionNumber=1,
+        version_number=1,
         actor=sample_actor,
-        changeDescription="Test version",
-        createdAt=datetime.now(),
+        change_description="Test version",
+        created_at=datetime.now(),
     )
 
 
@@ -47,12 +48,12 @@ def sample_version(sample_actor):
 def sample_version_summary(sample_actor):
     """Create a sample version summary for testing."""
     return VersionSummary(
-        entityOrRelationshipId="entity:person/harka-sampang",
-        type="ENTITY",
-        versionNumber=1,
+        entity_or_relationship_id="entity:person/harka-sampang",
+        type=VersionType.ENTITY,
+        version_number=1,
         actor=sample_actor,
-        changeDescription="Test version",
-        createdAt=datetime.now(),
+        change_description="Test version",
+        created_at=datetime.now(),
     )
 
 
@@ -61,9 +62,9 @@ def sample_person(sample_version_summary):
     """Create a sample person entity for testing."""
     return Person(
         slug="harka-sampang",
-        names=[Name(kind="DEFAULT", value="Harka Sampang", lang="ne")],
-        versionSummary=sample_version_summary,
-        createdAt=datetime.now(),
+        names=[Name(kind=NameKind.PRIMARY, en=NameParts(full="Harka Sampang"))],
+        version_summary=sample_version_summary,
+        created_at=datetime.now(),
     )
 
 
@@ -73,9 +74,9 @@ def sample_organization(sample_version_summary):
     return Organization(
         slug="nepal-communist-party",
         type="organization",
-        names=[Name(kind="DEFAULT", value="Nepal Communist Party", lang="ne")],
-        versionSummary=sample_version_summary,
-        createdAt=datetime.now(),
+        names=[Name(kind=NameKind.PRIMARY, en=NameParts(full="Nepal Communist Party"))],
+        version_summary=sample_version_summary,
+        created_at=datetime.now(),
     )
 
 
@@ -83,12 +84,12 @@ def sample_organization(sample_version_summary):
 def sample_relationship(sample_version_summary):
     """Create a sample relationship for testing."""
     return Relationship(
-        sourceEntityId="entity:person/harka-sampang",
-        targetEntityId="entity:organization/nepal-communist-party",
+        source_entity_id="entity:person/harka-sampang",
+        target_entity_id="entity:organization/nepal-communist-party",
         type="MEMBER_OF",
-        startDate=date(2020, 1, 1),
-        versionSummary=sample_version_summary,
-        createdAt=datetime.now(),
+        start_date=date(2020, 1, 1),
+        version_summary=sample_version_summary,
+        created_at=datetime.now(),
     )
 
 
@@ -123,7 +124,7 @@ async def test_complete_crud_workflow(
     assert version_result == sample_version
 
     retrieved_version = await temp_db.get_version(sample_version.id)
-    assert retrieved_version.versionNumber == sample_version.versionNumber
+    assert retrieved_version.version_number == sample_version.version_number
 
     # Test Entity CRUD
     person_result = await temp_db.put_entity(sample_person)
@@ -182,12 +183,12 @@ async def test_pagination_consistency(temp_db, sample_version):
     versions = []
     for i in range(10):
         version = Version(
-            entityOrRelationshipId=f"entity:person/person-{i}",
+            entity_or_relationship_id=f"entity:person/person-{i}",
             type="ENTITY",
-            versionNumber=i + 1,
+            version_number=i + 1,
             actor=actors[0],
-            changeDescription=f"Version {i}",
-            createdAt=datetime.now(),
+            change_description=f"Version {i}",
+            created_at=datetime.now(),
         )
         versions.append(version)
         await temp_db.put_version(version)
@@ -195,18 +196,18 @@ async def test_pagination_consistency(temp_db, sample_version):
     entities = []
     for i in range(10):
         version_summary = VersionSummary(
-            entityOrRelationshipId=f"entity:person/person-{i}",
+            entity_or_relationship_id=f"entity:person/person-{i}",
             type="ENTITY",
-            versionNumber=1,
+            version_number=1,
             actor=actors[0],
-            changeDescription=f"Person {i} version",
-            createdAt=datetime.now(),
+            change_description=f"Person {i} version",
+            created_at=datetime.now(),
         )
         entity = Person(
             slug=f"person-{i}",
-            names=[Name(kind="DEFAULT", value=f"Person {i}", lang="ne")],
-            versionSummary=version_summary,
-            createdAt=datetime.now(),
+            names=[Name(kind=NameKind.PRIMARY, en=NameParts(full=f"Person {i}"))],
+            version_summary=version_summary,
+            created_at=datetime.now(),
         )
         entities.append(entity)
         await temp_db.put_entity(entity)
@@ -214,19 +215,19 @@ async def test_pagination_consistency(temp_db, sample_version):
     relationships = []
     for i in range(10):
         rel_version_summary = VersionSummary(
-            entityOrRelationshipId=f"relationship:person-{i}:org-{i}",
+            entity_or_relationship_id=f"relationship:person-{i}:org-{i}",
             type="RELATIONSHIP",
-            versionNumber=1,
+            version_number=1,
             actor=actors[0],
-            changeDescription=f"Relationship {i} version",
-            createdAt=datetime.now(),
+            change_description=f"Relationship {i} version",
+            created_at=datetime.now(),
         )
         relationship = Relationship(
-            sourceEntityId=f"entity:person/person-{i}",
-            targetEntityId=f"entity:organization/org-{i}",
+            source_entity_id=f"entity:person/person-{i}",
+            target_entity_id=f"entity:organization/org-{i}",
             type="MEMBER_OF",
-            versionSummary=rel_version_summary,
-            createdAt=datetime.now(),
+            version_summary=rel_version_summary,
+            created_at=datetime.now(),
         )
         relationships.append(relationship)
         await temp_db.put_relationship(relationship)

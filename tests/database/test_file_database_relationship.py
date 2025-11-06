@@ -30,12 +30,12 @@ def sample_actor():
 def sample_version_summary(sample_actor):
     """Create a sample version summary for testing."""
     return VersionSummary(
-        entityOrRelationshipId="relationship:person/harka-sampang:organization/shram-sanskriti-party:MEMBER_OF",
+        entity_or_relationship_id="relationship:person/harka-sampang:organization/shram-sanskriti-party:MEMBER_OF",
         type="RELATIONSHIP",
-        versionNumber=1,
+        version_number=1,
         actor=sample_actor,
-        changeDescription="Initial relationship creation",
-        createdAt=datetime.now(),
+        change_description="Initial relationship creation",
+        created_at=datetime.now(),
     )
 
 
@@ -43,12 +43,12 @@ def sample_version_summary(sample_actor):
 def sample_relationship(sample_version_summary):
     """Create a sample relationship for testing."""
     return Relationship(
-        sourceEntityId="entity:person/harka-sampang",
-        targetEntityId="entity:organization/shram-sanskriti-party",
+        source_entity_id="entity:person/harka-sampang",
+        target_entity_id="entity:organization/shram-sanskriti-party",
         type="MEMBER_OF",
-        startDate=date(2020, 1, 1),
-        versionSummary=sample_version_summary,
-        createdAt=datetime.now(),
+        start_date=date(2020, 1, 1),
+        version_summary=sample_version_summary,
+        created_at=datetime.now(),
     )
 
 
@@ -67,8 +67,8 @@ async def test_get_relationship(temp_db, sample_relationship):
     """Test getting a relationship."""
     await temp_db.put_relationship(sample_relationship)
     result = await temp_db.get_relationship(sample_relationship.id)
-    assert result.sourceEntityId == sample_relationship.sourceEntityId
-    assert result.targetEntityId == sample_relationship.targetEntityId
+    assert result.source_entity_id == sample_relationship.source_entity_id
+    assert result.target_entity_id == sample_relationship.target_entity_id
     assert result.type == sample_relationship.type
 
 
@@ -101,35 +101,35 @@ async def test_delete_nonexistent_relationship(temp_db):
 async def test_list_relationships(temp_db, sample_actor):
     """Test listing relationships."""
     version_summary1 = VersionSummary(
-        entityOrRelationshipId="relationship:person/harka-sampang:organization/shram-sanskriti-party:MEMBER_OF",
+        entity_or_relationship_id="relationship:person/harka-sampang:organization/shram-sanskriti-party:MEMBER_OF",
         type="RELATIONSHIP",
-        versionNumber=1,
+        version_number=1,
         actor=sample_actor,
-        changeDescription="Relationship 1",
-        createdAt=datetime.now(),
+        change_description="Relationship 1",
+        created_at=datetime.now(),
     )
     version_summary2 = VersionSummary(
-        entityOrRelationshipId="relationship:person/rabindra-mishra:organization/rastriya-swatantra-party:AFFILIATED_WITH",
+        entity_or_relationship_id="relationship:person/rabindra-mishra:organization/rastriya-swatantra-party:AFFILIATED_WITH",
         type="RELATIONSHIP",
-        versionNumber=1,
+        version_number=1,
         actor=sample_actor,
-        changeDescription="Relationship 2",
-        createdAt=datetime.now(),
+        change_description="Relationship 2",
+        created_at=datetime.now(),
     )
     relationships = [
         Relationship(
-            sourceEntityId="entity:person/harka-sampang",
-            targetEntityId="entity:organization/shram-sanskriti-party",
+            source_entity_id="entity:person/harka-sampang",
+            target_entity_id="entity:organization/shram-sanskriti-party",
             type="MEMBER_OF",
-            versionSummary=version_summary1,
-            createdAt=datetime.now(),
+            version_summary=version_summary1,
+            created_at=datetime.now(),
         ),
         Relationship(
-            sourceEntityId="entity:person/rabindra-mishra",
-            targetEntityId="entity:organization/rastriya-swatantra-party",
+            source_entity_id="entity:person/rabindra-mishra",
+            target_entity_id="entity:organization/rastriya-swatantra-party",
             type="AFFILIATED_WITH",
-            versionSummary=version_summary2,
-            createdAt=datetime.now(),
+            version_summary=version_summary2,
+            created_at=datetime.now(),
         ),
     ]
 
@@ -147,19 +147,19 @@ async def test_list_relationships_with_pagination(temp_db, sample_actor):
     relationships = []
     for i in range(5):
         version_summary = VersionSummary(
-            entityOrRelationshipId=f"relationship:person/person-{i}:organization/org-{i}:MEMBER_OF",
+            entity_or_relationship_id=f"relationship:person/person-{i}:organization/org-{i}:MEMBER_OF",
             type="RELATIONSHIP",
-            versionNumber=1,
+            version_number=1,
             actor=sample_actor,
-            changeDescription=f"Relationship {i}",
-            createdAt=datetime.now(),
+            change_description=f"Relationship {i}",
+            created_at=datetime.now(),
         )
         relationship = Relationship(
-            sourceEntityId=f"entity:person/person-{i}",
-            targetEntityId=f"entity:organization/org-{i}",
+            source_entity_id=f"entity:person/person-{i}",
+            target_entity_id=f"entity:organization/org-{i}",
             type="MEMBER_OF",
-            versionSummary=version_summary,
-            createdAt=datetime.now(),
+            version_summary=version_summary,
+            created_at=datetime.now(),
         )
         relationships.append(relationship)
         await temp_db.put_relationship(relationship)

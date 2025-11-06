@@ -65,7 +65,7 @@ def test_location_structure():
         assert "slug" in location
         assert "subType" in location
         assert "names" in location
-        assert "createdAt" in location
+        assert "created_at" in location
 
         # Check names structure
         for name in location["names"]:
@@ -103,7 +103,7 @@ def test_retrieve_ward_office_4_step_hierarchy():
     assert len(province_data["results"]) > 0, "No provinces found in database"
 
     province = province_data["results"][0]
-    province_id = province["versionSummary"]["entityOrRelationshipId"]
+    province_id = province["version_summary"]["entity_or_relationship_id"]
     print(f"Found province: {province['slug']} (ID: {province_id})")
 
     # Verify province structure
@@ -131,7 +131,7 @@ def test_retrieve_ward_office_4_step_hierarchy():
     assert len(district_data["results"]) > 0, "No districts found in database"
 
     district = district_data["results"][0]
-    district_id = district["versionSummary"]["entityOrRelationshipId"]
+    district_id = district["version_summary"]["entity_or_relationship_id"]
     print(f"Found district: {district['slug']} (ID: {district_id})")
 
     # Verify district structure
@@ -173,7 +173,7 @@ def test_retrieve_ward_office_4_step_hierarchy():
     assert len(municipality_data["results"]) > 0, "No municipalities found in database"
 
     municipality = municipality_data["results"][0]
-    municipality_id = municipality["versionSummary"]["entityOrRelationshipId"]
+    municipality_id = municipality["version_summary"]["entity_or_relationship_id"]
     print(f"Found municipality: {municipality['slug']} (ID: {municipality_id})")
     print(f"Municipality type: {municipality['subType']}")
 
@@ -200,7 +200,7 @@ def test_retrieve_ward_office_4_step_hierarchy():
 
     if len(ward_data["results"]) > 0:
         ward = ward_data["results"][0]
-        ward_id = ward["versionSummary"]["entityOrRelationshipId"]
+        ward_id = ward["version_summary"]["entity_or_relationship_id"]
         print(f"Found ward: {ward['slug']} (ID: {ward_id})")
 
         # Verify ward structure

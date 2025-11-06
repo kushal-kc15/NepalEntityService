@@ -13,17 +13,17 @@ from nes.core.identifiers import (ActorIdComponents, EntityIdComponents,
 
 class TestEntityId:
     def test_build_entity_id(self):
-        result = build_entity_id("person", "politician", "harka-sampang")
-        assert result == "entity:person/politician/harka-sampang"
+        result = build_entity_id("person", None, "harka-sampang")
+        assert result == "entity:person/harka-sampang"
 
     def test_build_entity_id_organization(self):
         result = build_entity_id("organization", "party", "shram-sanskriti-party")
         assert result == "entity:organization/party/shram-sanskriti-party"
 
     def test_break_entity_id(self):
-        result = break_entity_id("entity:person/politician/harka-sampang")
+        result = break_entity_id("entity:person/harka-sampang")
         assert result == EntityIdComponents(
-            type="person", subtype="politician", slug="harka-sampang"
+            type="person", subtype=None, slug="harka-sampang"
         )
 
     def test_break_entity_id_organization(self):
@@ -34,7 +34,7 @@ class TestEntityId:
 
     def test_break_entity_id_invalid_prefix(self):
         with pytest.raises(ValueError, match="Invalid entity ID format"):
-            break_entity_id("invalid:person/politician/harka-sampang")
+            break_entity_id("invalid:person/harka-sampang")
 
     def test_break_entity_id_single_part(self):
         with pytest.raises(ValueError, match="Invalid entity ID format"):
@@ -42,7 +42,7 @@ class TestEntityId:
 
     def test_break_entity_id_too_many_parts(self):
         with pytest.raises(ValueError, match="Invalid entity ID format"):
-            break_entity_id("entity:person/politician/harka/sampang")
+            break_entity_id("entity:person/harka/sampang/lampang")
 
     def test_build_entity_id_no_subtype(self):
         result = build_entity_id("person", None, "harka-sampang")
@@ -65,7 +65,7 @@ class TestEntityId:
         )
 
     def test_roundtrip_entity_id(self):
-        original = "entity:person/politician/harka-sampang"
+        original = "entity:person/harka-sampang"
         components = break_entity_id(original)
         rebuilt = build_entity_id(components.type, components.subtype, components.slug)
         assert rebuilt == original
@@ -80,32 +80,32 @@ class TestEntityId:
 class TestRelationshipId:
     def test_build_relationship_id_with_entity_prefix(self):
         result = build_relationship_id(
-            "entity:person/politician/harka-sampang",
+            "entity:person/harka-sampang",
             "entity:organization/party/shram-sanskriti-party",
             "MEMBER_OF",
         )
         assert (
             result
-            == "relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
+            == "relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
         )
 
     def test_build_relationship_id_without_entity_prefix(self):
         result = build_relationship_id(
-            "person/politician/harka-sampang",
+            "person/harka-sampang",
             "organization/party/shram-sanskriti-party",
             "MEMBER_OF",
         )
         assert (
             result
-            == "relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
+            == "relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
         )
 
     def test_break_relationship_id(self):
         result = break_relationship_id(
-            "relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
+            "relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
         )
         assert result == RelationshipIdComponents(
-            source="entity:person/politician/harka-sampang",
+            source="entity:person/harka-sampang",
             target="entity:organization/party/shram-sanskriti-party",
             type="MEMBER_OF",
         )
@@ -113,14 +113,12 @@ class TestRelationshipId:
     def test_break_relationship_id_invalid_prefix(self):
         with pytest.raises(ValueError, match="Invalid relationship ID format"):
             break_relationship_id(
-                "invalid:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
+                "invalid:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
             )
 
     def test_break_relationship_id_missing_parts(self):
         with pytest.raises(ValueError, match="Invalid relationship ID format"):
-            break_relationship_id(
-                "relationship:person/politician/harka-sampang:organization"
-            )
+            break_relationship_id("relationship:person/harka-sampang:organization")
 
     def test_break_relationship_id_too_many_parts(self):
         with pytest.raises(ValueError, match="Invalid relationship ID format"):
@@ -129,7 +127,7 @@ class TestRelationshipId:
             )
 
     def test_roundtrip_relationship_id(self):
-        source = "entity:person/politician/harka-sampang"
+        source = "entity:person/harka-sampang"
         target = "entity:organization/party/shram-sanskriti-party"
         rel_type = "MEMBER_OF"
 
@@ -171,55 +169,55 @@ class TestActorId:
 
 class TestVersionId:
     def test_build_version_id_entity(self):
-        result = build_version_id("entity:person/politician/harka-sampang", 1)
-        assert result == "version:entity:person/politician/harka-sampang:1"
+        result = build_version_id("entity:person/harka-sampang", 1)
+        assert result == "version:entity:person/harka-sampang:1"
 
     def test_build_version_id_relationship(self):
         result = build_version_id(
-            "relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF",
+            "relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF",
             2,
         )
         assert (
             result
-            == "version:relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF:2"
+            == "version:relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF:2"
         )
 
     def test_break_version_id_entity(self):
-        result = break_version_id("version:entity:person/politician/harka-sampang:1")
+        result = break_version_id("version:entity:person/harka-sampang:1")
         assert result == VersionIdComponents(
-            entity_or_relationship_id="entity:person/politician/harka-sampang",
+            entity_or_relationship_id="entity:person/harka-sampang",
             version_number=1,
         )
 
     def test_break_version_id_relationship(self):
         result = break_version_id(
-            "version:relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF:2"
+            "version:relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF:2"
         )
         assert result == VersionIdComponents(
-            entity_or_relationship_id="relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF",
+            entity_or_relationship_id="relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF",
             version_number=2,
         )
 
     def test_break_version_id_invalid_prefix(self):
         with pytest.raises(ValueError, match="Invalid version ID format"):
-            break_version_id("invalid:entity:person/politician/harka-sampang:1")
+            break_version_id("invalid:entity:person/harka-sampang:1")
 
     def test_break_version_id_invalid_entity_type(self):
         with pytest.raises(
             ValueError, match="Version ID must contain entity or relationship ID"
         ):
-            break_version_id("version:invalid:person/politician/harka-sampang:1")
+            break_version_id("version:invalid:person/harka-sampang:1")
 
     def test_break_version_id_invalid_version_number(self):
         with pytest.raises(ValueError, match="Invalid version number format"):
-            break_version_id("version:entity:person/politician/harka-sampang:invalid")
+            break_version_id("version:entity:person/harka-sampang:invalid")
 
     def test_break_version_id_missing_version_number(self):
         with pytest.raises(ValueError, match="Invalid version ID format"):
-            break_version_id("version:entity:person/politician/harka-sampang")
+            break_version_id("version:entity:person/harka-sampang")
 
     def test_roundtrip_version_id_entity(self):
-        entity_id = "entity:person/politician/harka-sampang"
+        entity_id = "entity:person/harka-sampang"
         version_num = 5
 
         built = build_version_id(entity_id, version_num)
@@ -249,7 +247,7 @@ class TestVersionId:
         assert components.version_number == version_num
 
     def test_roundtrip_version_id_relationship(self):
-        relationship_id = "relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
+        relationship_id = "relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
         version_num = 3
 
         built = build_version_id(relationship_id, version_num)

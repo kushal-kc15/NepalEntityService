@@ -36,7 +36,7 @@ def build_entity_id(type: str, subtype: str | None, slug: str) -> str:
 
     Example:
         >>> build_entity_id("person", "politician", "harka-sampang")
-        "entity:person/politician/harka-sampang"
+        "entity:person/harka-sampang"
         >>> build_entity_id("person", None, "harka-sampang")
         "entity:person/harka-sampang"
     """
@@ -47,7 +47,7 @@ def break_entity_id(entity_id: str) -> EntityIdComponents:
     """Break entity ID into components: EntityIdComponents(type, subtype, slug).
 
     Example:
-        >>> break_entity_id("entity:person/politician/harka-sampang")
+        >>> break_entity_id("entity:person/harka-sampang")
         EntityIdComponents(type='person', subtype='politician', slug='harka-sampang')
         >>> break_entity_id("entity:person/harka-sampang")
         EntityIdComponents(type='person', subtype=None, slug='harka-sampang')
@@ -68,8 +68,8 @@ def build_relationship_id(source: str, target: str, type: str) -> str:
     """Build relationship ID in format: relationship:<source>:<target>:<type>.
 
     Example:
-        >>> build_relationship_id("entity:person/politician/harka-sampang", "entity:organization/party/shram-sanskriti-party", "MEMBER_OF")
-        "relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
+        >>> build_relationship_id("entity:person/harka-sampang", "entity:organization/party/shram-sanskriti-party", "MEMBER_OF")
+        "relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF"
     """
     # Extract ID parts without "entity:" prefix
     source_part = (
@@ -85,8 +85,8 @@ def break_relationship_id(relationship_id: str) -> RelationshipIdComponents:
     """Break relationship ID into components: RelationshipIdComponents(source, target, type).
 
     Example:
-        >>> break_relationship_id("relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF")
-        RelationshipIdComponents(source='entity:person/politician/harka-sampang', target='entity:organization/party/shram-sanskriti-party', type='MEMBER_OF')
+        >>> break_relationship_id("relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF")
+        RelationshipIdComponents(source='entity:person/harka-sampang', target='entity:organization/party/shram-sanskriti-party', type='MEMBER_OF')
     """
     if not relationship_id.startswith("relationship:"):
         raise ValueError("Invalid relationship ID format")
@@ -136,10 +136,10 @@ def build_version_id(entity_or_relationship_id: str, version_number: int) -> str
     """Build version ID in format: version:<entity_or_relationship_id>:<version_number>.
 
     Example:
-        >>> build_version_id("entity:person/politician/harka-sampang", 1)
-        "version:entity:person/politician/harka-sampang:1"
-        >>> build_version_id("relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF", 2)
-        "version:relationship:person/politician/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF:2"
+        >>> build_version_id("entity:person/harka-sampang", 1)
+        "version:entity:person/harka-sampang:1"
+        >>> build_version_id("relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF", 2)
+        "version:relationship:person/harka-sampang:organization/party/shram-sanskriti-party:MEMBER_OF:2"
     """
     return f"version:{entity_or_relationship_id}:{version_number}"
 
@@ -148,8 +148,8 @@ def break_version_id(version_id: str) -> VersionIdComponents:
     """Break version ID into components: VersionIdComponents(entity_or_relationship_id, version_number).
 
     Example:
-        >>> break_version_id("version:entity:person/politician/harka-sampang:1")
-        VersionIdComponents(entity_or_relationship_id='entity:person/politician/harka-sampang', version_number=1)
+        >>> break_version_id("version:entity:person/harka-sampang:1")
+        VersionIdComponents(entity_or_relationship_id='entity:person/harka-sampang', version_number=1)
     """
     if not version_id.startswith("version:"):
         raise ValueError("Invalid version ID format")

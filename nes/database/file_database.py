@@ -4,7 +4,8 @@ import json
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-from nes.core.models.entity import ENTITY_TYPE_MAP, Entity
+from nes.core.models import ENTITY_TYPE_MAP, Entity
+from nes.core.models.entity import EntitySubType, EntityType
 from nes.core.models.relationship import Relationship
 from nes.core.models.version import Actor, Version
 
@@ -50,11 +51,7 @@ class FileDatabase(EntityDatabase):
         with open(file_path, "r") as f:
             data = json.load(f)
 
-        entity_type = data.get("type")
-        entity_subtype = data.get("subType")
-        type_map = ENTITY_TYPE_MAP.get(entity_type, {})
-        entity_class = type_map.get(entity_subtype, type_map.get(None, Entity))
-        return entity_class.model_validate(data, extra="ignore")
+        return FileDatabase._get_entity_from_dict(data)
 
     async def delete_entity(self, entity_id: str) -> bool:
         file_path = self._id_to_path(entity_id)
@@ -62,6 +59,28 @@ class FileDatabase(EntityDatabase):
             file_path.unlink()
             return True
         return False
+
+    @staticmethod
+    def _get_entity_from_dict(entity: dict) -> Entity:
+        if "type" not in entity:
+            raise ValueError("Entity must have a 'type' field")
+
+        entity_type = EntityType(entity["type"])
+        entity_subtype = (
+            EntitySubType(entity["sub_type"]) if entity.get("sub_type") else None
+        )
+
+        if entity_type not in ENTITY_TYPE_MAP:
+            raise KeyError(f"Entity type '{entity_type}' not found in ENTITY_TYPE_MAP")
+
+        type_map = ENTITY_TYPE_MAP[entity_type]
+        if entity_subtype not in type_map:
+            raise KeyError(
+                f"Entity subtype '{entity_subtype}' not found for type '{entity_type}'"
+            )
+
+        entity_class = type_map[entity_subtype]
+        return entity_class.model_validate(entity, extra="ignore")
 
     async def list_entities(
         self,
@@ -90,11 +109,8 @@ class FileDatabase(EntityDatabase):
                     if not all(attributes.get(k) == v for k, v in attr_filters.items()):
                         continue
 
-                entity_type = data.get("type")
-                entity_subtype = data.get("subType")
-                type_map = ENTITY_TYPE_MAP.get(entity_type, {})
-                entity_class = type_map.get(entity_subtype, type_map.get(None, Entity))
-                entity = entity_class.model_validate(data, extra="ignore")
+                entity = FileDatabase._get_entity_from_dict(data)
+
                 entities.append(entity)
                 if len(entities) >= limit + offset:
                     break
@@ -138,7 +154,7 @@ class FileDatabase(EntityDatabase):
                 break
             with open(file_path, "r") as f:
                 data = json.load(f)
-            if "sourceEntityId" in data:
+            if "source_entity_id" in data:
                 relationships.append(Relationship.model_validate(data, extra="ignore"))
         return relationships[offset : offset + limit]
 
@@ -178,7 +194,7 @@ class FileDatabase(EntityDatabase):
                 break
             with open(file_path, "r") as f:
                 data = json.load(f)
-            if "versionNumber" in data:
+            if "version_number" in data:
                 versions.append(Version.model_validate(data, extra="ignore"))
         return versions[offset : offset + limit]
 

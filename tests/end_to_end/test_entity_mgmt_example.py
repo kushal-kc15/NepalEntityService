@@ -6,8 +6,10 @@ from datetime import datetime
 
 import pytest
 
-from nes.core.models.base import Name
-from nes.core.models.entity import Person, PoliticalParty
+from nes.core.models.base import (LangText, LangTextValue, Name, NameKind,
+                                  NameParts)
+from nes.core.models.organization import PoliticalParty
+from nes.core.models.person import Person
 from nes.core.models.version import Actor, Version, VersionSummary
 from nes.database.file_database import FileDatabase
 
@@ -35,18 +37,23 @@ async def test_entity_lifecycle_management(temp_db):
     entity = Person(
         slug="rabindra-mishra",
         names=[
-            Name(kind="DEFAULT", value="Rabindra Mishra", lang="en"),
-            Name(kind="DEFAULT", value="रवीन्द्र मिश्र", lang="np"),
+            Name(
+                kind=NameKind.PRIMARY,
+                en=NameParts(full="Rabindra Mishra"),
+                ne=NameParts(full="रवीन्द्र मिश्र"),
+            ),
         ],
-        createdAt=now,
-        short_description="Nepali journalist and politician",
-        versionSummary=VersionSummary(
-            entityOrRelationshipId="entity:person/rabindra-mishra",
+        created_at=now,
+        short_description=LangText(
+            en=LangTextValue(value="Nepali journalist and politician")
+        ),
+        version_summary=VersionSummary(
+            entity_or_relationship_id="entity:person/rabindra-mishra",
             type="ENTITY",
-            versionNumber=1,
+            version_number=1,
             actor=actor,
-            changeDescription="Initial entity creation",
-            createdAt=now,
+            change_description="Initial entity creation",
+            created_at=now,
         ),
     )
 
@@ -57,12 +64,12 @@ async def test_entity_lifecycle_management(temp_db):
     retrieved_entity = await temp_db.get_entity(entity.id)
     assert retrieved_entity is not None
     assert retrieved_entity.slug == "rabindra-mishra"
-    assert len(retrieved_entity.names) == 2
+    assert len(retrieved_entity.names) == 1
 
     # 3. Publish the Version. This is an extension of version summary and includes snapshot and changes
     version = Version.model_validate(
         dict(
-            **entity.versionSummary.model_dump(),
+            **entity.version_summary.model_dump(),
             snapshot=entity.model_dump(),
             changes={},  # TODO: Implement the differ. In this case, this would be the entire object.
         ),
@@ -75,25 +82,27 @@ async def test_entity_lifecycle_management(temp_db):
     # Verify version exists
     retrieved_version = await temp_db.get_version(version.id)
     assert retrieved_version is not None
-    assert retrieved_version.versionNumber == 1
-    assert retrieved_version.changeDescription == "Initial entity creation"
+    assert retrieved_version.version_number == 1
+    assert retrieved_version.change_description == "Initial entity creation"
 
     # 4. Update Entity and Publish New Version
-    entity.short_description = "Nepali journalist, politician and media personality"
+    entity.short_description = LangText(
+        en=LangTextValue(value="Nepali journalist, politician and media personality")
+    )
     entity.tags = ["journalist", "politician", "media"]
 
-    version2_summary = entity.versionSummary.model_copy()
-    version2_summary.versionNumber += 1
-    version2_summary.changeDescription = "Updated description and added tags"
-    version2_summary.createdAt = now
+    version2_summary = entity.version_summary.model_copy()
+    version2_summary.version_number += 1
+    version2_summary.change_description = "Updated description and added tags"
+    version2_summary.created_at = now
     version2_summary.actor = actor
-    entity.versionSummary = version2_summary
+    entity.version_summary = version2_summary
 
     updated_entity = await temp_db.put_entity(entity)
 
     version_2 = Version.model_validate(
         dict(
-            **entity.versionSummary.model_dump(),
+            **entity.version_summary.model_dump(),
             snapshot=entity.model_dump(),
             changes={
                 "short_description": "Nepali journalist and politician",
@@ -107,7 +116,7 @@ async def test_entity_lifecycle_management(temp_db):
     # Verify both versions exist
     # TODO: list_versions() should be changed to require entity_id or relationship_id parameter
     versions = await temp_db.list_versions()
-    entity_versions = [v for v in versions if v.entityOrRelationshipId == entity.id]
+    entity_versions = [v for v in versions if v.entity_or_relationship_id == entity.id]
     assert len(entity_versions) == 2
 
     # 5. Delete Version (for development purposes only.)
@@ -130,7 +139,7 @@ async def test_entity_lifecycle_management(temp_db):
     # Verify remaining version still references deleted entity
     remaining_version = await temp_db.get_version(version_2.id)
     assert remaining_version is not None
-    assert remaining_version.entityOrRelationshipId == entity.id
+    assert remaining_version.entity_or_relationship_id == entity.id
 
 
 @pytest.mark.asyncio
@@ -147,18 +156,21 @@ async def test_organization_lifecycle(temp_db):
     entity = PoliticalParty(
         slug="rastriya-swatantra-party",
         names=[
-            Name(kind="DEFAULT", value="Rastriya Swatantra Party", lang="en"),
-            Name(kind="DEFAULT", value="राष्ट्रिय स्वतन्त्र पार्टी", lang="np"),
+            Name(
+                kind=NameKind.PRIMARY,
+                en=NameParts(full="Rastriya Swatantra Party"),
+                ne=NameParts(full="राष्ट्रिय स्वतन्त्र पार्टी"),
+            ),
         ],
-        createdAt=now,
-        short_description="Nepali political party",
-        versionSummary=VersionSummary(
-            entityOrRelationshipId="entity:organization/political_party/rastriya-swatantra-party",
+        created_at=now,
+        short_description=LangText(en=LangTextValue(value="Nepali political party")),
+        version_summary=VersionSummary(
+            entity_or_relationship_id="entity:organization/political_party/rastriya-swatantra-party",
             type="ENTITY",
-            versionNumber=1,
+            version_number=1,
             actor=actor,
-            changeDescription="Initial organization creation",
-            createdAt=now,
+            change_description="Initial organization creation",
+            created_at=now,
         ),
     )
 
@@ -173,13 +185,13 @@ async def test_organization_lifecycle(temp_db):
     assert retrieved_entity is not None
     assert retrieved_entity.slug == "rastriya-swatantra-party"
     assert retrieved_entity.type == "organization"
-    assert retrieved_entity.subType == "political_party"
-    assert len(retrieved_entity.names) == 2
+    assert retrieved_entity.sub_type == "political_party"
+    assert len(retrieved_entity.names) == 1
 
     # 3. Publish the Version
     version = Version.model_validate(
         dict(
-            **entity.versionSummary.model_dump(),
+            **entity.version_summary.model_dump(),
             snapshot=entity.model_dump(),
             changes={},
         ),
@@ -192,8 +204,8 @@ async def test_organization_lifecycle(temp_db):
     # Verify version exists
     retrieved_version = await temp_db.get_version(version.id)
     assert retrieved_version is not None
-    assert retrieved_version.versionNumber == 1
-    assert retrieved_version.changeDescription == "Initial organization creation"
+    assert retrieved_version.version_number == 1
+    assert retrieved_version.change_description == "Initial organization creation"
 
     # 4. Delete Version
     version_deleted = await temp_db.delete_version(version.id)

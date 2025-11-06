@@ -59,22 +59,22 @@ def create_location_entity(
     now = datetime.now()
 
     names = [
-        Name(value=name_en.strip(), lang="en", kind="DEFAULT"),
-        Name(value=name_ne.strip(), lang="ne", kind="DEFAULT"),
+        Name(value=name_en.strip(), lang="en", kind=NameKind.PRIMARY),
+        Name(value=name_ne.strip(), lang="ne", kind=NameKind.PRIMARY),
     ]
 
     entity = Location(
         slug=slug,
         subType=subtype,
         names=names,
-        createdAt=now,
-        versionSummary=VersionSummary(
-            entityOrRelationshipId=build_entity_id("location", subtype, slug),
+        created_at=now,
+        version_summary=VersionSummary(
+            entity_or_relationship_id=build_entity_id("location", subtype, slug),
             type="ENTITY",
-            versionNumber=1,
+            version_number=1,
             actor=actor,
-            changeDescription="Imported from Nepal administrative map data",
-            createdAt=now,
+            change_description="Imported from Nepal administrative map data",
+            created_at=now,
         ),
         attributions=["https://github.com/sagautam5/local-states-nepal"],
         **kwargs,
@@ -94,7 +94,7 @@ async def save_entity(db, entity: Location):
 
     version = Version.model_validate(
         dict(
-            **entity.versionSummary.model_dump(),
+            **entity.version_summary.model_dump(),
             snapshot=entity.model_dump(),
             changes={},
         ),

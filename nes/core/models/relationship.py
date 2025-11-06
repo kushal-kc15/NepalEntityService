@@ -3,7 +3,8 @@
 from datetime import date, datetime
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
+from pydantic import (BaseModel, ConfigDict, Field, computed_field,
+                      field_validator)
 
 from nes.core.identifiers import build_relationship_id, validate_entity_id
 

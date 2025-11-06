@@ -3,20 +3,11 @@
 from enum import Enum
 from typing import Annotated, Dict, Optional
 
-from pydantic import (
-    AnyUrl,
-    BaseModel,
-    ConfigDict,
-    EmailStr,
-    Field,
-    constr,
-    field_validator,
-    model_validator,
-)
+from pydantic import (AnyUrl, BaseModel, ConfigDict, EmailStr, Field, constr,
+                      field_validator, model_validator)
 
 from nes.core.identifiers.builders import break_entity_id
 from nes.core.identifiers.validators import is_valid_entity_id
-
 
 # E.164 phone number, e.g., "+977123456789"
 E164PhoneStr = constr(pattern=r"^\+[1-9]\d{1,14}$")

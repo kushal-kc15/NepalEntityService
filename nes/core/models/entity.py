@@ -4,23 +4,13 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from pydantic import (
-    AnyUrl,
-    BaseModel,
-    ConfigDict,
-    Field,
-    computed_field,
-    field_validator,
-)
+from pydantic import (AnyUrl, BaseModel, ConfigDict, Field, computed_field,
+                      field_validator)
 
 from nes.core.identifiers import build_entity_id
 
-from ..constraints import (
-    MAX_SLUG_LENGTH,
-    MIN_SLUG_LENGTH,
-    SLUG_PATTERN,
-)
-from .base import EntityPicture, LangText, Contact, Name, NameKind
+from ..constraints import MAX_SLUG_LENGTH, MIN_SLUG_LENGTH, SLUG_PATTERN
+from .base import Contact, EntityPicture, LangText, Name, NameKind
 from .version import VersionSummary
 
 
@@ -144,9 +134,8 @@ class Entity(BaseModel):
     @classmethod
     def validate_names(cls, v: List[Name]):
         if not any(name.kind == NameKind.PRIMARY for name in v):
-            raise ValueError(f'At least one name with kind="{NameKind.PRIMARY}" is required')
+            raise ValueError(
+                f'At least one name with kind="{NameKind.PRIMARY}" is required'
+            )
 
         return v
-
-
-

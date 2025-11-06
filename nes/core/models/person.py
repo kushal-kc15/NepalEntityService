@@ -7,13 +7,14 @@ from typing import TYPE_CHECKING, List, Literal, Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from nes.core.identifiers.validators import is_valid_entity_id
+
 from .base import Address, LangText
 from .entity import Entity
 
 
 class Gender(str, Enum):
     """Gender enumeration."""
-    
+
     MALE = "male"
     FEMALE = "female"
     OTHER = "other"
@@ -21,10 +22,12 @@ class Gender(str, Enum):
 
 class PersonDetails(BaseModel):
     """Personal details for a person."""
-    
+
     model_config = ConfigDict(extra="forbid")
-    
-    birth_date: Optional[str] = Field(None, description="Birth date (may be partial, e.g., year only)")
+
+    birth_date: Optional[str] = Field(
+        None, description="Birth date (may be partial, e.g., year only)"
+    )
     gender: Optional[Gender] = Field(None, description="Gender")
     birth_place: Optional[Address] = Field(None, description="Place of birth")
     address: Optional[Address] = Field(None, description="Current address")
@@ -38,8 +41,12 @@ class Education(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    institution: LangText = Field(..., description="Name of the educational institution")
-    degree: Optional[LangText] = Field(None, description="Degree or qualification obtained")
+    institution: LangText = Field(
+        ..., description="Name of the educational institution"
+    )
+    degree: Optional[LangText] = Field(
+        None, description="Degree or qualification obtained"
+    )
     field: Optional[LangText] = Field(None, description="Field of study")
     start_year: Optional[int] = Field(None, description="Year education started")
     end_year: Optional[int] = Field(None, description="Year education completed")
@@ -54,9 +61,7 @@ class Position(BaseModel):
     organization: Optional[LangText] = Field(
         None, description="Organization or company name"
     )
-    start_date: Optional[date] = Field(
-        None, description="Start date of the position"
-    )
+    start_date: Optional[date] = Field(None, description="Start date of the position")
     end_date: Optional[date] = Field(None, description="End date of the position")
     description: Optional[str] = Field(
         None, max_length=200, description="Description of the position"

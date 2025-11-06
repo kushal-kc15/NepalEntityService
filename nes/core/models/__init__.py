@@ -3,9 +3,9 @@
 from .base import Contact, CursorPage, Name
 from .entity import Entity, EntityType
 from .entity_type_map import ENTITY_TYPE_MAP
-from .person import Person
-from .organization import Organization
 from .location import ADMINISTRATIVE_LEVELS, Location, LocationType
+from .organization import Organization
+from .person import Person
 from .relationship import Relationship, RelationshipType
 from .version import Actor, Version, VersionType
 

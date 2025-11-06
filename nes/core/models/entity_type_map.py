@@ -1,9 +1,10 @@
 """Entity type/subtype to class mapping."""
 
-from nes.core.models.entity import EntityType, EntitySubType
-from nes.core.models.person import Person
-from nes.core.models.organization import Organization, PoliticalParty, GovernmentBody
+from nes.core.models.entity import EntitySubType, EntityType
 from nes.core.models.location import Location, LocationType
+from nes.core.models.organization import (GovernmentBody, Organization,
+                                          PoliticalParty)
+from nes.core.models.person import Person
 
 ENTITY_TYPE_MAP = {
     EntityType.PERSON: {

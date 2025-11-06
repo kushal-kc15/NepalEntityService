@@ -49,4 +49,5 @@ exclude = '''
 '''
 
 [tool.isort]
+profile = "black"
 skip = ["entity-db", "nes-db", ".venv"]

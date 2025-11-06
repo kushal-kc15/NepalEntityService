@@ -6,11 +6,10 @@ from datetime import datetime
 
 import pytest
 
-from nes.core.models.base import (LangText, LangTextValue, Name, NameKind,
-                                  NameParts)
+from nes.core.models.base import LangText, LangTextValue, Name, NameKind, NameParts
 from nes.core.models.entity import Entity
 from nes.core.models.organization import Organization
-from nes.core.models.person import Education, Person
+from nes.core.models.person import Education, Person, PersonDetails
 from nes.core.models.version import Actor, VersionSummary, VersionType
 from nes.database import get_database
 
@@ -172,16 +171,18 @@ async def test_person_with_education_persistence(temp_db, sample_actor):
         names=[Name(kind=NameKind.PRIMARY, en=NameParts(full="Miraj Dhungana"))],
         version_summary=version_summary,
         created_at=datetime.now(),
+        personal_details=PersonDetails(education=[education]),
     )
-    person.education = [education]
 
     await temp_db.put_entity(person)
     retrieved_person: Person = await temp_db.get_entity(person.id)
 
-    assert retrieved_person.education is not None
-    assert len(retrieved_person.education) == 1
-    assert retrieved_person.education[0].institution.en.value == "Tribhuvan University"
-    assert retrieved_person.education[0].degree.en.value == "Bachelor of Arts"
-    assert retrieved_person.education[0].field.en.value == "Political Science"
-    assert retrieved_person.education[0].start_year == 2015
-    assert retrieved_person.education[0].end_year == 2019
+    assert retrieved_person.personal_details.education is not None
+    assert len(retrieved_person.personal_details.education) == 1
+    education = retrieved_person.personal_details.education[0]
+
+    assert education.institution.en.value == "Tribhuvan University"
+    assert education.degree.en.value == "Bachelor of Arts"
+    assert education.field.en.value == "Political Science"
+    assert education.start_year == 2015
+    assert education.end_year == 2019

@@ -3,8 +3,16 @@
 from enum import Enum
 from typing import Annotated, Dict, Optional
 
-from pydantic import (AnyUrl, BaseModel, ConfigDict, EmailStr, Field, constr,
-                      field_validator, model_validator)
+from pydantic import (
+    AnyUrl,
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    constr,
+    field_validator,
+    model_validator,
+)
 
 from nes.core.identifiers.builders import break_entity_id
 from nes.core.identifiers.validators import is_valid_entity_id
@@ -162,7 +170,9 @@ class Address(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    location_id: Optional[str] = Field(None, description="Location identifier")
+    location_id: Optional[str] = Field(
+        None, description="Location identifier"
+    )  # eg: "entity:location/district/dang"
     description: Optional[str] = Field(None, description="Address description")
 
     @field_validator("location_id")

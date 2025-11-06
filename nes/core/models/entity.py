@@ -4,8 +4,14 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from pydantic import (AnyUrl, BaseModel, ConfigDict, Field, computed_field,
-                      field_validator)
+from pydantic import (
+    AnyUrl,
+    BaseModel,
+    ConfigDict,
+    Field,
+    computed_field,
+    field_validator,
+)
 
 from nes.core.identifiers import build_entity_id
 
@@ -61,6 +67,7 @@ class EntitySubType(str, Enum):
     RURAL_MUNICIPALITY = "rural_municipality"
     WARD = "ward"
     CONSTITUENCY = "constituency"
+
 
 Attributes = Dict[str, Any]
 

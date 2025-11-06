@@ -21,7 +21,7 @@ class FileDatabase(EntityDatabase):
 
     def __init__(self, root_path: str):
         self.root_path = Path(root_path)
-        self.root_path.mkdir(exist_ok=True)
+        self.root_path.mkdir(exist_ok=True, parents=True)
 
     def _id_to_path(self, obj_id: str) -> Path:
         file_path = obj_id.replace(":", "/") + ".json"

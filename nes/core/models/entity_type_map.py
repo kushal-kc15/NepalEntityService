@@ -2,8 +2,7 @@
 
 from nes.core.models.entity import EntitySubType, EntityType
 from nes.core.models.location import Location, LocationType
-from nes.core.models.organization import (GovernmentBody, Organization,
-                                          PoliticalParty)
+from nes.core.models.organization import GovernmentBody, Organization, PoliticalParty
 from nes.core.models.person import Person
 
 ENTITY_TYPE_MAP = {

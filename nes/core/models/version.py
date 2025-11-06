@@ -4,8 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, Optional
 
-from pydantic import (BaseModel, ConfigDict, Field, computed_field,
-                      field_validator)
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 
 from nes.core.identifiers import build_version_id
 
@@ -52,5 +51,4 @@ class VersionSummary(BaseModel):
 
 
 class Version(VersionSummary):
-    changes: Optional[Dict[str, Any]] = None
     snapshot: Optional[Dict[str, Any]] = None

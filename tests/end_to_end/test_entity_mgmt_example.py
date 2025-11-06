@@ -6,8 +6,7 @@ from datetime import datetime
 
 import pytest
 
-from nes.core.models.base import (LangText, LangTextValue, Name, NameKind,
-                                  NameParts)
+from nes.core.models.base import LangText, LangTextValue, Name, NameKind, NameParts
 from nes.core.models.organization import PoliticalParty
 from nes.core.models.person import Person
 from nes.core.models.version import Actor, Version, VersionSummary

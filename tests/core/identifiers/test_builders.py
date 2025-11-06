@@ -2,13 +2,20 @@
 
 import pytest
 
-from nes.core.identifiers import (ActorIdComponents, EntityIdComponents,
-                                  RelationshipIdComponents,
-                                  VersionIdComponents, break_actor_id,
-                                  break_entity_id, break_relationship_id,
-                                  break_version_id, build_actor_id,
-                                  build_entity_id, build_relationship_id,
-                                  build_version_id)
+from nes.core.identifiers import (
+    ActorIdComponents,
+    EntityIdComponents,
+    RelationshipIdComponents,
+    VersionIdComponents,
+    break_actor_id,
+    break_entity_id,
+    break_relationship_id,
+    break_version_id,
+    build_actor_id,
+    build_entity_id,
+    build_relationship_id,
+    build_version_id,
+)
 
 
 class TestEntityId:

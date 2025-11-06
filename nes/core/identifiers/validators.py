@@ -2,10 +2,19 @@
 
 import re
 
-from ..constraints import (MAX_SLUG_LENGTH, MAX_SUBTYPE_LENGTH,
-                           MAX_TYPE_LENGTH, MIN_SLUG_LENGTH, SLUG_PATTERN)
-from .builders import (break_actor_id, break_entity_id, break_relationship_id,
-                       break_version_id)
+from ..constraints import (
+    MAX_SLUG_LENGTH,
+    MAX_SUBTYPE_LENGTH,
+    MAX_TYPE_LENGTH,
+    MIN_SLUG_LENGTH,
+    SLUG_PATTERN,
+)
+from .builders import (
+    break_actor_id,
+    break_entity_id,
+    break_relationship_id,
+    break_version_id,
+)
 
 
 def is_valid_entity_id(entity_id: str) -> bool:

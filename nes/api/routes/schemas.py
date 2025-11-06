@@ -5,8 +5,7 @@ from typing import Any, Dict
 from fastapi import APIRouter, HTTPException, Path
 
 from nes.api.responses import SchemaListResponse
-from nes.core.models import (ENTITY_TYPE_MAP, Entity, EntityType, Location,
-                             Person)
+from nes.core.models import ENTITY_TYPE_MAP, Entity, EntityType, Location, Person
 
 router = APIRouter(tags=["Schemas"])
 

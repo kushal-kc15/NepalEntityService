@@ -18,22 +18,6 @@ class Gender(str, Enum):
     OTHER = "other"
 
 
-class PersonDetails(BaseModel):
-    """Personal details for a person."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    birth_date: Optional[str] = Field(
-        None, description="Birth date (may be partial, e.g., year only)"
-    )
-    gender: Optional[Gender] = Field(None, description="Gender")
-    birth_place: Optional[Address] = Field(None, description="Place of birth")
-    address: Optional[Address] = Field(None, description="Current address")
-    father_name: Optional[LangText] = Field(None, description="Father's name")
-    mother_name: Optional[LangText] = Field(None, description="Mother's name")
-    spouse_name: Optional[LangText] = Field(None, description="Spouse's name")
-
-
 class Education(BaseModel):
     """Education record for a person."""
 
@@ -63,6 +47,29 @@ class Position(BaseModel):
     end_date: Optional[date] = Field(None, description="End date of the position")
     description: Optional[str] = Field(
         None, max_length=200, description="Description of the position"
+    )
+
+
+class PersonDetails(BaseModel):
+    """Personal details for a person."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    birth_date: Optional[str] = Field(  # "2012", "2012-01", "2012-01-01"
+        None, description="Birth date (may be partial, e.g., year only)"
+    )
+    gender: Optional[Gender] = Field(None, description="Gender")
+    birth_place: Optional[Address] = Field(None, description="Place of birth")
+    address: Optional[Address] = Field(None, description="Current address")
+    father_name: Optional[LangText] = Field(None, description="Father's name")
+    mother_name: Optional[LangText] = Field(None, description="Mother's name")
+    spouse_name: Optional[LangText] = Field(None, description="Spouse's name")
+
+    education: Optional[List[Education]] = Field(
+        None, description="Educational background"
+    )
+    positions: Optional[List[Position]] = Field(
+        None, description="Professional positions held"
     )
 
 
@@ -120,12 +127,6 @@ class Person(Entity):
     )
     personal_details: Optional[PersonDetails] = Field(
         None, description="Personal details"
-    )
-    education: Optional[List[Education]] = Field(
-        None, description="Educational background"
-    )
-    positions: Optional[List[Position]] = Field(
-        None, description="Professional positions held"
     )
     electoral_details: Optional[ElectoralDetails] = Field(
         None, description="Electoral details"

@@ -47,6 +47,10 @@ class Location(Entity):
     )
     parent: Optional[str] = Field(None, description="Entity ID of parent location")
 
+    area: Optional[float] = Field(None, description="Area in square kilometers")
+    lat: Optional[float] = Field(None, description="Latitude")
+    lng: Optional[float] = Field(None, description="Longitude")
+
     @computed_field
     @property
     def location_type(self) -> LocationType:

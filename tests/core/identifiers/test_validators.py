@@ -2,11 +2,16 @@
 
 import pytest
 
-from nes.core.identifiers import (is_valid_actor_id, is_valid_entity_id,
-                                  is_valid_relationship_id,
-                                  is_valid_version_id, validate_actor_id,
-                                  validate_entity_id, validate_relationship_id,
-                                  validate_version_id)
+from nes.core.identifiers import (
+    is_valid_actor_id,
+    is_valid_entity_id,
+    is_valid_relationship_id,
+    is_valid_version_id,
+    validate_actor_id,
+    validate_entity_id,
+    validate_relationship_id,
+    validate_version_id,
+)
 
 
 class TestEntityIdValidators:

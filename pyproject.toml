@@ -1,10 +1,13 @@
 [tool.poetry]
 name = "nepal-entity-service"
-version = "0.1.0"
+version = "2.0.0"
 description = "A comprehensive service for managing Nepali public entities"
 authors = ["Damodar Dahal <damo94761@gmail.com>"]
 readme = "README.md"
-packages = [{include = "nes"}]
+packages = [
+    {include = "nes"},
+    {include = "nes2"}
+]
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -27,6 +30,7 @@ all = ["fastapi", "uvicorn", "wikipedia", "google-cloud-aiplatform", "google-aut
 [tool.poetry.scripts]
 nes-api = "nes.cli:main"
 nes-dev = "nes.cli:dev"
+nes2 = "nes2.cli:main"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
@@ -51,3 +55,13 @@ exclude = '''
 [tool.isort]
 profile = "black"
 skip = ["entity-db", "nes-db", ".venv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "tests2"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore::DeprecationWarning:pytest_asyncio.*",
+]

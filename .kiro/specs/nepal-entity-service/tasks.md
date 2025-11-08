@@ -6,22 +6,22 @@
 
 ## Phase 0: Project Setup
 
-- [ ] 0. Initialize nes2 package structure
-  - [ ] 0.1 Create nes2 package foundation
+- [x] 0. Initialize nes2 package structure
+  - [x] 0.1 Create nes2 package foundation
     - Create `nes2/` directory with `__init__.py`
     - Create subdirectories: `core/`, `database/`, `services/`, `api/`, `cli/`, `scraping/`
     - Set up `pyproject.toml` for nes2 package (separate from nes v1)
     - Configure package metadata, dependencies, and entry points
     - _Requirements: Package structure_
 
-  - [ ] 0.2 Set up testing infrastructure
+  - [x] 0.2 Set up testing infrastructure
     - Create `tests2/` directory for nes2 tests
     - Set up pytest configuration for nes2
     - Create test fixtures with authentic Nepali data
     - Set up test utilities and helpers
     - _Requirements: Testing infrastructure, TDD foundation_
 
-  - [ ] 0.3 Set up core models package
+  - [x] 0.3 Set up core models package
     - Write tests for Entity, Relationship, Version, and base models FIRST
     - Create `nes2/core/models/` with `__init__.py`
     - Create model files: `entity.py`, `relationship.py`, `version.py`, `base.py`
@@ -30,7 +30,7 @@
     - Ensure all model tests pass
     - _Requirements: 1.1, 1.4, 7.1, 7.2, 8.1, 8.3_
 
-  - [ ] 0.4 Set up core utilities
+  - [x] 0.4 Set up core utilities
     - Write tests for ID generation and validation FIRST
     - Create `nes2/core/identifiers/` for ID generation and validation
     - Create `nes2/core/constraints.py` for validation rules
@@ -39,7 +39,7 @@
     - Ensure all utility tests pass
     - _Requirements: Core infrastructure_
 
-  - [ ] 0.5 Configure database path
+  - [x] 0.5 Configure database path
     - Update all database initialization to use `nes-db/v2` path
     - Ensure complete separation from v1's `entity-db`
     - Add configuration for database path override

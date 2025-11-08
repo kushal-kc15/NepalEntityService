@@ -1,1 +1,1 @@
-"""Service layer for Nepal Entity Service v2."""
+"""Services layer for nes2."""

@@ -191,12 +191,12 @@
 
 ## Phase 3: Service Layer Architecture (TDD)
 
-- [ ] 3. Implement Publication Service
-  - [ ] 3.1 Write Publication Service tests FIRST
+- [x] 3. Implement Publication Service
+  - [x] 3.1 Write Publication Service tests FIRST
     - Write tests for entity creation with automatic versioning
     - Write tests for entity updates with version creation
     - Write tests for entity retrieval
-    - Write tests for entity deletion (soft delete)
+    - Write tests for entity deletion (hard delete)
     - Write tests for relationship creation with versioning
     - Write tests for relationship updates
     - Write tests for relationship deletion
@@ -206,7 +206,7 @@
     - Write tests for business rule enforcement
     - _Requirements: 9.1, 9.2, 2.4, TDD_
 
-  - [ ] 3.2 Implement Publication Service foundation (Green)
+  - [x] 3.2 Implement Publication Service foundation (Green)
     - Create `nes2/services/publication/` directory with `__init__.py`
     - Create `nes2/services/publication/service.py` with PublicationService class
     - Initialize with database instance
@@ -214,7 +214,7 @@
     - Ensure foundation tests pass
     - _Requirements: 9.1, 9.2, 2.4_
 
-  - [ ] 3.3 Implement entity business logic (Green)
+  - [x] 3.3 Implement entity business logic (Green)
     - Add entity validation and constraint enforcement
     - Implement name and identifier management logic
     - Add entity-specific business rules
@@ -222,7 +222,7 @@
     - Ensure all entity tests pass
     - _Requirements: 9.1, 9.2, 8.1, 2.1_
 
-  - [ ] 3.4 Implement relationship business logic (Green)
+  - [x] 3.4 Implement relationship business logic (Green)
     - Add relationship validation and constraint enforcement
     - Implement relationship type validation
     - Add temporal relationship handling (start/end dates)
@@ -231,7 +231,7 @@
     - Ensure all relationship tests pass
     - _Requirements: 9.2, 4.1, 4.2, 4.5_
 
-  - [ ] 3.5 Implement version and author management (Green)
+  - [x] 3.5 Implement version and author management (Green)
     - Add snapshot creation and storage logic
     - Implement change description management
     - Add attribution tracking
@@ -240,7 +240,7 @@
     - Ensure all version/author tests pass
     - _Requirements: 2.1, 2.2, 2.3, 9.1_
 
-  - [ ] 3.6 Implement coordinated operations (Green)
+  - [x] 3.6 Implement coordinated operations (Green)
     - Implement `update_entity_with_relationships()` for atomic updates
     - Add batch operation support for multiple entities
     - Implement rollback mechanisms for failed operations
@@ -248,7 +248,7 @@
     - Ensure all coordinated operation tests pass
     - _Requirements: 2.4, 4.5, 9.1, 9.2_
 
-  - [ ] 3.7 Refactor Publication Service
+  - [x] 3.7 Refactor Publication Service
     - Refactor for code quality and maintainability
     - Extract common patterns into helper methods
     - Improve error handling and logging
@@ -256,7 +256,7 @@
     - Ensure all tests still pass after refactoring
     - _Requirements: Code quality_
 
-- [ ] 4. Implement Search Service
+- [-] 4. Implement Search Service
   - [ ] 4.1 Write Search Service tests FIRST
     - Write tests for entity text search
     - Write tests for multilingual search (Nepali and English)

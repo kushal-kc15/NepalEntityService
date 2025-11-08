@@ -36,7 +36,7 @@ class TestEntityExistenceValidation:
             "sub_type": "political_party",
             "names": [{"kind": "PRIMARY", "en": {"full": "Target Org"}}]
         }
-        target = await service.create_entity(target_data, "actor:test", "Test")
+        target = await service.create_entity(target_data, "author:test", "Test")
         
         # Try to create relationship with nonexistent source
         with pytest.raises(ValueError, match="Source entity .* does not exist"):
@@ -44,7 +44,7 @@ class TestEntityExistenceValidation:
                 source_entity_id="entity:person/nonexistent",
                 target_entity_id=target.id,
                 relationship_type="MEMBER_OF",
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="Test"
             )
 
@@ -62,7 +62,7 @@ class TestEntityExistenceValidation:
             "type": "person",
             "names": [{"kind": "PRIMARY", "en": {"full": "Source Person"}}]
         }
-        source = await service.create_entity(source_data, "actor:test", "Test")
+        source = await service.create_entity(source_data, "author:test", "Test")
         
         # Try to create relationship with nonexistent target
         with pytest.raises(ValueError, match="Target entity .* does not exist"):
@@ -70,7 +70,7 @@ class TestEntityExistenceValidation:
                 source_entity_id=source.id,
                 target_entity_id="entity:organization/political_party/nonexistent",
                 relationship_type="MEMBER_OF",
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="Test"
             )
 
@@ -88,7 +88,7 @@ class TestEntityExistenceValidation:
                 source_entity_id="entity:person/nonexistent-source",
                 target_entity_id="entity:organization/political_party/nonexistent-target",
                 relationship_type="MEMBER_OF",
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="Test"
             )
 
@@ -113,15 +113,15 @@ class TestEntityExistenceValidation:
             "names": [{"kind": "PRIMARY", "en": {"full": "Valid Org"}}]
         }
         
-        source = await service.create_entity(source_data, "actor:test", "Test")
-        target = await service.create_entity(target_data, "actor:test", "Test")
+        source = await service.create_entity(source_data, "author:test", "Test")
+        target = await service.create_entity(target_data, "author:test", "Test")
         
         # Create relationship should succeed
         relationship = await service.create_relationship(
             source_entity_id=source.id,
             target_entity_id=target.id,
             relationship_type="MEMBER_OF",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Test"
         )
         
@@ -148,7 +148,7 @@ class TestCircularRelationshipDetection:
             "type": "person",
             "names": [{"kind": "PRIMARY", "en": {"full": "Self Ref"}}]
         }
-        entity = await service.create_entity(entity_data, "actor:test", "Test")
+        entity = await service.create_entity(entity_data, "author:test", "Test")
         
         # Check for circular relationship (entity to itself)
         is_circular = await check_circular_relationship(
@@ -181,15 +181,15 @@ class TestCircularRelationshipDetection:
             "names": [{"kind": "PRIMARY", "en": {"full": "Person B"}}]
         }
         
-        person_a = await service.create_entity(person_a_data, "actor:test", "Test")
-        person_b = await service.create_entity(person_b_data, "actor:test", "Test")
+        person_a = await service.create_entity(person_a_data, "author:test", "Test")
+        person_b = await service.create_entity(person_b_data, "author:test", "Test")
         
         # Create relationship A -> B
         await service.create_relationship(
             source_entity_id=person_a.id,
             target_entity_id=person_b.id,
             relationship_type="SUPERVISES",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="A supervises B"
         )
         
@@ -220,7 +220,7 @@ class TestCircularRelationshipDetection:
                 "type": "person",
                 "names": [{"kind": "PRIMARY", "en": {"full": slug.replace("-", " ").title()}}]
             }
-            entity = await service.create_entity(entity_data, "actor:test", "Test")
+            entity = await service.create_entity(entity_data, "author:test", "Test")
             entities.append(entity)
         
         # Create relationships X -> Y -> Z
@@ -228,7 +228,7 @@ class TestCircularRelationshipDetection:
             source_entity_id=entities[0].id,
             target_entity_id=entities[1].id,
             relationship_type="SUPERVISES",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="X supervises Y"
         )
         
@@ -236,7 +236,7 @@ class TestCircularRelationshipDetection:
             source_entity_id=entities[1].id,
             target_entity_id=entities[2].id,
             relationship_type="SUPERVISES",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Y supervises Z"
         )
         
@@ -267,7 +267,7 @@ class TestCircularRelationshipDetection:
                 "type": "person",
                 "names": [{"kind": "PRIMARY", "en": {"full": slug.replace("-", " ").title()}}]
             }
-            entity = await service.create_entity(entity_data, "actor:test", "Test")
+            entity = await service.create_entity(entity_data, "author:test", "Test")
             entities.append(entity)
         
         # Create relationships A -> B, B -> C (no circle)
@@ -275,7 +275,7 @@ class TestCircularRelationshipDetection:
             source_entity_id=entities[0].id,
             target_entity_id=entities[1].id,
             relationship_type="SUPERVISES",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="1 supervises 2"
         )
         
@@ -283,7 +283,7 @@ class TestCircularRelationshipDetection:
             source_entity_id=entities[1].id,
             target_entity_id=entities[2].id,
             relationship_type="SUPERVISES",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="2 supervises 3"
         )
         
@@ -319,15 +319,15 @@ class TestCircularRelationshipDetection:
             "names": [{"kind": "PRIMARY", "en": {"full": "Member Org"}}]
         }
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         # Create relationship person -> org (MEMBER_OF)
         await service.create_relationship(
             source_entity_id=person.id,
             target_entity_id=org.id,
             relationship_type="MEMBER_OF",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Person member of org"
         )
         
@@ -368,8 +368,8 @@ class TestConstraintValidation:
             "names": [{"kind": "PRIMARY", "en": {"full": "Temporal Org"}}]
         }
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         # Try to create relationship with end_date before start_date
         with pytest.raises(ValueError, match="end_date cannot be before start_date"):
@@ -377,7 +377,7 @@ class TestConstraintValidation:
                 source_entity_id=person.id,
                 target_entity_id=org.id,
                 relationship_type="MEMBER_OF",
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="Test",
                 start_date=date(2024, 1, 1),
                 end_date=date(2023, 1, 1)
@@ -404,8 +404,8 @@ class TestConstraintValidation:
             "names": [{"kind": "PRIMARY", "en": {"full": "Type Org"}}]
         }
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         # Try to create relationship with invalid type
         with pytest.raises(ValueError, match="Invalid relationship type"):
@@ -413,7 +413,7 @@ class TestConstraintValidation:
                 source_entity_id=person.id,
                 target_entity_id=org.id,
                 relationship_type="INVALID_TYPE",
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="Test"
             )
 
@@ -439,15 +439,15 @@ class TestConstraintValidation:
             "names": [{"kind": "PRIMARY", "en": {"full": "Dup Org"}}]
         }
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         # Create first relationship
         await service.create_relationship(
             source_entity_id=person.id,
             target_entity_id=org.id,
             relationship_type="MEMBER_OF",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="First"
         )
         
@@ -483,15 +483,15 @@ class TestConstraintValidation:
             "names": [{"kind": "PRIMARY", "en": {"full": "Multi Rel Org"}}]
         }
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         # Create first relationship
         await service.create_relationship(
             source_entity_id=person.id,
             target_entity_id=org.id,
             relationship_type="MEMBER_OF",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Member"
         )
         
@@ -562,15 +562,15 @@ class TestIntegrityCheckCLI:
                 "names": [{"kind": "PRIMARY", "en": {"full": "Circular B"}}]
             }
             
-            person_a = await service.create_entity(person_a_data, "actor:test", "Test")
-            person_b = await service.create_entity(person_b_data, "actor:test", "Test")
+            person_a = await service.create_entity(person_a_data, "author:test", "Test")
+            person_b = await service.create_entity(person_b_data, "author:test", "Test")
             
             # Create circular relationships (A supervises B, B supervises A)
             await service.create_relationship(
                 source_entity_id=person_a.id,
                 target_entity_id=person_b.id,
                 relationship_type="SUPERVISES",
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="A supervises B"
             )
             
@@ -578,7 +578,7 @@ class TestIntegrityCheckCLI:
                 source_entity_id=person_b.id,
                 target_entity_id=person_a.id,
                 relationship_type="SUPERVISES",
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="B supervises A"
             )
         

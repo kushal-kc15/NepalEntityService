@@ -269,7 +269,7 @@ def show(entity_id, output_json):
         
         click.echo(f"\nVersion: {entity.version_summary.version_number}")
         click.echo(f"Created: {entity.version_summary.created_at}")
-        click.echo(f"Actor: {entity.version_summary.actor.slug}")
+        click.echo(f"Author: {entity.version_summary.author.slug}")
         click.echo()
 
 
@@ -310,7 +310,7 @@ def versions(entity_id, limit):
     for version in versions_list:
         click.echo(f"  Version {version.version_number}")
         click.echo(f"    Created: {version.created_at}")
-        click.echo(f"    Actor: {version.actor.slug}")
+        click.echo(f"    Author: {version.author.slug}")
         if version.change_description:
             click.echo(f"    Description: {version.change_description}")
         click.echo()

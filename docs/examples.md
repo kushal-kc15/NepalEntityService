@@ -171,12 +171,12 @@ print(f"Entity has {len(versions)} versions\n")
 
 for version in versions:
     created_at = datetime.fromisoformat(version['created_at'].replace('Z', '+00:00'))
-    actor = version['actor']
+    author = version['author']
     description = version.get('change_description', 'No description')
     
     print(f"Version {version['version_number']}:")
     print(f"  Date: {created_at.strftime('%Y-%m-%d %H:%M')}")
-    print(f"  By: {actor}")
+    print(f"  By: {author}")
     print(f"  Change: {description}")
     
     # Show what changed

@@ -219,7 +219,7 @@ entity = await pub_service.create_entity(
         "type": "person",
         "names": [{"kind": "PRIMARY", "en": {"full": "Name"}, "ne": {"full": "नाम"}}]
     },
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Description of change"
 )
 ```
@@ -231,7 +231,7 @@ entity = await pub_service.get_entity(entity_id)
 entity.attributes["key"] = "value"
 updated = await pub_service.update_entity(
     entity=entity,
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Updated attribute"
 )
 ```
@@ -243,7 +243,7 @@ relationship = await pub_service.create_relationship(
     source_entity_id="entity:person/politician-slug",
     target_entity_id="entity:organization/political_party/party-slug",
     relationship_type="MEMBER_OF",
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Added membership"
 )
 ```

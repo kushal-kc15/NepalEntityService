@@ -52,17 +52,17 @@ def test_name_parts_structure():
     # Minimal name with just full
     name_parts = NameParts(full="Ram Chandra Poudel")
     assert name_parts.full == "Ram Chandra Poudel"
-    assert name_parts.first is None
+    assert name_parts.given is None
     
     # Complete name with all parts
     name_parts = NameParts(
         full="Ram Chandra Poudel",
-        first="Ram Chandra",
-        last="Poudel"
+        given="Ram Chandra",
+        family="Poudel"
     )
     assert name_parts.full == "Ram Chandra Poudel"
-    assert name_parts.first == "Ram Chandra"
-    assert name_parts.last == "Poudel"
+    assert name_parts.given == "Ram Chandra"
+    assert name_parts.family == "Poudel"
 
 
 def test_contact_validation():

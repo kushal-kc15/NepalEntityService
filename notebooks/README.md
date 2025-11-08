@@ -177,7 +177,7 @@ entity_data = {
 
 entity = await pub_service.create_entity(
     entity_data=entity_data,
-    actor_id="actor:human:notebook-user",
+    author_id="author:human:notebook-user",
     change_description="Created via notebook"
 )
 ```

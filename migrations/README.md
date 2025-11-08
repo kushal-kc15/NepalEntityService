@@ -54,7 +54,7 @@ async def migrate(context):
     # Example: Create entities
     # for row in data:
     #     entity = Entity(...)
-    #     await context.publication.create_entity(entity, actor_id, description)
+    #     await context.publication.create_entity(entity, author_id, description)
     
     context.log("Migration completed")
 ```

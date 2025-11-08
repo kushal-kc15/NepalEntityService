@@ -26,32 +26,32 @@ def temp_db():
 
 
 @pytest.fixture
-def sample_actor():
-    """Create a sample actor for testing."""
+def sample_author():
+    """Create a sample author for testing."""
     return Actor(slug="miraj-dhungana", name="Miraj Dhungana")
 
 
 @pytest.fixture
-def sample_version(sample_actor):
+def sample_version(sample_author):
     """Create a sample version for testing."""
     return Version(
         entity_or_relationship_id="entity:person/harka-sampang",
         type="ENTITY",
         version_number=1,
-        actor=sample_actor,
+        author=sample_author,
         change_description="Test version",
         created_at=datetime.now(),
     )
 
 
 @pytest.fixture
-def sample_version_summary(sample_actor):
+def sample_version_summary(sample_author):
     """Create a sample version summary for testing."""
     return VersionSummary(
         entity_or_relationship_id="entity:person/harka-sampang",
         type=VersionType.ENTITY,
         version_number=1,
-        actor=sample_actor,
+        author=sample_author,
         change_description="Test version",
         created_at=datetime.now(),
     )
@@ -108,16 +108,16 @@ async def test_complete_crud_workflow(
     sample_organization,
     sample_relationship,
     sample_version,
-    sample_actor,
+    sample_author,
 ):
     """Test complete CRUD workflow for all entity types."""
 
     # Test Actor CRUD
-    actor_result = await temp_db.put_actor(sample_actor)
-    assert actor_result == sample_actor
+    actor_result = await temp_db.put_author(sample_author)
+    assert actor_result == sample_author
 
-    retrieved_actor = await temp_db.get_actor(sample_actor.id)
-    assert retrieved_actor.slug == sample_actor.slug
+    retrieved_actor = await temp_db.get_author(sample_author.id)
+    assert retrieved_actor.slug == sample_author.slug
 
     # Test Version CRUD
     version_result = await temp_db.put_version(sample_version)
@@ -153,7 +153,7 @@ async def test_complete_crud_workflow(
     versions = await temp_db.list_versions()
     assert len(versions) == 1
 
-    actors = await temp_db.list_actors()
+    authors = await temp_db.list_actors()
     assert len(actors) == 1
 
     # Test Delete operations
@@ -161,14 +161,14 @@ async def test_complete_crud_workflow(
     assert await temp_db.delete_entity(sample_person.id) is True
     assert await temp_db.delete_entity(sample_organization.id) is True
     assert await temp_db.delete_version(sample_version.id) is True
-    assert await temp_db.delete_actor(sample_actor.id) is True
+    assert await temp_db.delete_author(sample_author.id) is True
 
     # Verify deletions
     assert await temp_db.get_relationship(sample_relationship.id) is None
     assert await temp_db.get_entity(sample_person.id) is None
     assert await temp_db.get_entity(sample_organization.id) is None
     assert await temp_db.get_version(sample_version.id) is None
-    assert await temp_db.get_actor(sample_actor.id) is None
+    assert await temp_db.get_author(sample_author.id) is None
 
 
 @pytest.mark.asyncio
@@ -176,9 +176,9 @@ async def test_pagination_consistency(temp_db, sample_version):
     """Test that pagination works consistently across all list operations."""
 
     # Create test data
-    actors = [Actor(slug=f"actor-{i}", name=f"Actor {i}") for i in range(10)]
-    for actor in actors:
-        await temp_db.put_actor(actor)
+    authors = [Actor(slug=f"actor-{i}", name=f"Author {i}") for i in range(10)]
+    for author in authors:
+        await temp_db.put_author(actor)
 
     versions = []
     for i in range(10):
@@ -186,7 +186,7 @@ async def test_pagination_consistency(temp_db, sample_version):
             entity_or_relationship_id=f"entity:person/person-{i}",
             type="ENTITY",
             version_number=i + 1,
-            actor=actors[0],
+            author=actors[0],
             change_description=f"Version {i}",
             created_at=datetime.now(),
         )
@@ -199,7 +199,7 @@ async def test_pagination_consistency(temp_db, sample_version):
             entity_or_relationship_id=f"entity:person/person-{i}",
             type="ENTITY",
             version_number=1,
-            actor=actors[0],
+            author=actors[0],
             change_description=f"Person {i} version",
             created_at=datetime.now(),
         )
@@ -218,7 +218,7 @@ async def test_pagination_consistency(temp_db, sample_version):
             entity_or_relationship_id=f"relationship:person-{i}:org-{i}",
             type="RELATIONSHIP",
             version_number=1,
-            actor=actors[0],
+            author=actors[0],
             change_description=f"Relationship {i} version",
             created_at=datetime.now(),
         )
@@ -236,8 +236,8 @@ async def test_pagination_consistency(temp_db, sample_version):
     page_size = 3
 
     # Test actors pagination
-    page1_actors = await temp_db.list_actors(limit=page_size, offset=0)
-    page2_actors = await temp_db.list_actors(limit=page_size, offset=page_size)
+    page1_authors = await temp_db.list_actors(limit=page_size, offset=0)
+    page2_authors = await temp_db.list_actors(limit=page_size, offset=page_size)
     assert len(page1_actors) == page_size
     assert len(page2_actors) == page_size
 

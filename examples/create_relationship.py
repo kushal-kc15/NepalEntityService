@@ -106,7 +106,7 @@ async def main():
                 start_date=rel_data.get("start_date"),
                 end_date=rel_data.get("end_date"),
                 attributes=rel_data.get("attributes"),
-                actor_id="actor:human:data-maintainer",
+                author_id="author:human:data-maintainer",
                 change_description=rel_data["description"]
             )
             
@@ -172,7 +172,7 @@ async def main():
         for version in versions:
             print(f"\n   Version {version.version_number}:")
             print(f"   - Created: {version.created_at}")
-            print(f"   - Actor: {version.actor.slug}")
+            print(f"   - Author: {version.author.slug}")
             print(f"   - Description: {version.change_description or '(no description)'}")
     
     print("\n" + "=" * 70)

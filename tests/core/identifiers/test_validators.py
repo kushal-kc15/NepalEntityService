@@ -3,7 +3,7 @@
 import pytest
 
 from nes.core.identifiers import (
-    is_valid_actor_id,
+    is_valid_author_id,
     is_valid_entity_id,
     is_valid_relationship_id,
     is_valid_version_id,
@@ -235,77 +235,77 @@ class TestVersionIdValidators:
 
 class TestActorIdValidators:
     def test_valid_actor_id(self):
-        actor_id = "actor:system-admin"
-        assert is_valid_actor_id(actor_id) is True
+        author_id = "author:system-admin"
+        assert is_valid_author_id(actor_id) is True
         assert validate_actor_id(actor_id) == actor_id
 
     def test_valid_actor_id_with_numbers(self):
-        actor_id = "actor:user-123"
-        assert is_valid_actor_id(actor_id) is True
+        author_id = "author:user-123"
+        assert is_valid_author_id(actor_id) is True
         assert validate_actor_id(actor_id) == actor_id
 
     def test_valid_actor_id_min_length(self):
-        actor_id = "actor:abc"
-        assert is_valid_actor_id(actor_id) is True
+        author_id = "author:abc"
+        assert is_valid_author_id(actor_id) is True
         assert validate_actor_id(actor_id) == actor_id
 
     def test_valid_actor_id_max_length(self):
         long_slug = "a" * 64
         actor_id = f"actor:{long_slug}"
-        assert is_valid_actor_id(actor_id) is True
+        assert is_valid_author_id(actor_id) is True
         assert validate_actor_id(actor_id) == actor_id
 
     def test_invalid_actor_id_wrong_prefix(self):
         actor_id = "invalid:system-admin"
-        assert is_valid_actor_id(actor_id) is False
-        with pytest.raises(ValueError, match="Invalid actor ID format"):
+        assert is_valid_author_id(actor_id) is False
+        with pytest.raises(ValueError, match="Invalid author ID format"):
             validate_actor_id(actor_id)
 
     def test_invalid_actor_id_no_prefix(self):
         actor_id = "system-admin"
-        assert is_valid_actor_id(actor_id) is False
-        with pytest.raises(ValueError, match="Invalid actor ID format"):
+        assert is_valid_author_id(actor_id) is False
+        with pytest.raises(ValueError, match="Invalid author ID format"):
             validate_actor_id(actor_id)
 
     def test_invalid_actor_id_slug_too_short(self):
-        actor_id = "actor:ab"
-        assert is_valid_actor_id(actor_id) is False
+        author_id = "author:ab"
+        assert is_valid_author_id(actor_id) is False
         with pytest.raises(ValueError, match="Actor slug length invalid"):
             validate_actor_id(actor_id)
 
     def test_invalid_actor_id_slug_too_long(self):
         long_slug = "a" * 101
         actor_id = f"actor:{long_slug}"
-        assert is_valid_actor_id(actor_id) is False
+        assert is_valid_author_id(actor_id) is False
         with pytest.raises(ValueError, match="Actor slug length invalid"):
             validate_actor_id(actor_id)
 
     def test_invalid_actor_id_uppercase(self):
-        actor_id = "actor:System-Admin"
-        assert is_valid_actor_id(actor_id) is False
-        with pytest.raises(ValueError, match="Invalid actor slug format"):
+        author_id = "author:System-Admin"
+        assert is_valid_author_id(actor_id) is False
+        with pytest.raises(ValueError, match="Invalid author slug format"):
             validate_actor_id(actor_id)
 
     def test_invalid_actor_id_special_chars(self):
-        actor_id = "actor:system_admin"
-        assert is_valid_actor_id(actor_id) is False
-        with pytest.raises(ValueError, match="Invalid actor slug format"):
+        author_id = "author:system_admin"
+        assert is_valid_author_id(actor_id) is False
+        with pytest.raises(ValueError, match="Invalid author slug format"):
             validate_actor_id(actor_id)
 
     def test_invalid_actor_id_spaces(self):
-        actor_id = "actor:system admin"
-        assert is_valid_actor_id(actor_id) is False
-        with pytest.raises(ValueError, match="Invalid actor slug format"):
+        author_id = "author:system admin"
+        assert is_valid_author_id(actor_id) is False
+        with pytest.raises(ValueError, match="Invalid author slug format"):
             validate_actor_id(actor_id)
 
     def test_empty_actor_id(self):
-        assert is_valid_actor_id("") is False
-        with pytest.raises(ValueError, match="Invalid actor ID format"):
+        assert is_valid_author_id("") is False
+        with pytest.raises(ValueError, match="Invalid author ID format"):
             validate_actor_id("")
 
     def test_actor_id_empty_slug(self):
-        actor_id = "actor:"
-        assert is_valid_actor_id(actor_id) is False
+        author_id = "author:"
+        assert is_valid_author_id(actor_id) is False
         with pytest.raises(ValueError, match="Actor slug length invalid"):
             validate_actor_id(actor_id)
 
@@ -321,12 +321,12 @@ class TestEdgeCases:
             is False
         )
         assert is_valid_version_id(" version:entity:person/harka:1 ") is False
-        assert is_valid_actor_id(" actor:admin ") is False
+        assert is_valid_author_id(" actor:admin ") is False
 
     def test_unicode_characters(self):
         # Unicode characters should fail validation
         assert is_valid_entity_id("entity:person/हर्क-साम्पाङ") is False
-        assert is_valid_actor_id("actor:प्रशासक") is False
+        assert is_valid_author_id("actor:प्रशासक") is False
 
     def test_boundary_values(self):
         # Test exact boundary values
@@ -335,7 +335,7 @@ class TestEdgeCases:
         max_type = "a" * 16
 
         assert is_valid_entity_id(f"entity:person/{max_slug}") is True
-        assert is_valid_actor_id(f"actor:{max_slug}") is True
+        assert is_valid_author_id(f"actor:{max_slug}") is True
 
     def test_case_sensitivity(self):
         # All validators should be case-sensitive
@@ -347,7 +347,7 @@ class TestEdgeCases:
             is False
         )
         assert is_valid_version_id("VERSION:entity:person/harka:1") is False
-        assert is_valid_actor_id("ACTOR:admin") is False
+        assert is_valid_author_id("ACTOR:admin") is False
 
     def test_malformed_colons_and_slashes(self):
         # Test various malformed separators

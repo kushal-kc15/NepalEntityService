@@ -11,20 +11,20 @@ from nes2.core.identifiers import build_version_id
 from ..constraints import MAX_SLUG_LENGTH, MIN_SLUG_LENGTH, SLUG_PATTERN
 
 
-class Actor(BaseModel):
+class Author(BaseModel):
     slug: str = Field(
         ...,
         min_length=MIN_SLUG_LENGTH,
         max_length=MAX_SLUG_LENGTH,
         pattern=SLUG_PATTERN,
-        description="URL-friendly identifier for the actor",
+        description="URL-friendly identifier for the author",
     )
     name: Optional[str] = None
 
     @computed_field
     @property
     def id(self) -> str:
-        return f"actor:{self.slug}"
+        return f"author:{self.slug}"
 
 
 class VersionType(str, Enum):
@@ -40,7 +40,7 @@ class VersionSummary(BaseModel):
     )
     type: VersionType
     version_number: int
-    actor: Actor
+    author: Author
     change_description: str
     created_at: datetime
 

@@ -21,7 +21,7 @@ from nes2.core.models.person import Person
 from nes2.core.models.organization import PoliticalParty
 from nes2.core.models.entity import EntityType, EntitySubType
 from nes2.core.models.relationship import Relationship
-from nes2.core.models.version import Actor, Version, VersionSummary, VersionType
+from nes2.core.models.version import Author, Version, VersionSummary, VersionType
 from nes2.database.file_database import FileDatabase
 
 
@@ -65,11 +65,11 @@ class TestSearchServiceEntityTextSearch:
         # Create test entities
         await pub_service.create_entity(
             {"slug": "ram-poudel", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Ram Chandra Poudel"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         await pub_service.create_entity(
             {"slug": "sher-deuba", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Sher Bahadur Deuba"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Search for "ram"
@@ -91,7 +91,7 @@ class TestSearchServiceEntityTextSearch:
         # Create entity
         await pub_service.create_entity(
             {"slug": "test-person", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Ram Chandra Poudel"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Search with different cases
@@ -116,7 +116,7 @@ class TestSearchServiceEntityTextSearch:
         # Create entity
         await pub_service.create_entity(
             {"slug": "test-person", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Ram Chandra Poudel"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Search with substring
@@ -150,7 +150,7 @@ class TestSearchServiceMultilingualSearch:
                     "ne": {"full": "राम चन्द्र पौडेल"}
                 }]
             },
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Search with Nepali text
@@ -180,7 +180,7 @@ class TestSearchServiceMultilingualSearch:
                     "ne": {"full": "राम चन्द्र पौडेल"}
                 }]
             },
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Search with English
@@ -208,11 +208,11 @@ class TestSearchServiceTypeFiltering:
         # Create entities of different types
         await pub_service.create_entity(
             {"slug": "person-1", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Test Person"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         await pub_service.create_entity(
             {"slug": "org-1", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Test Party"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Search with type filter
@@ -234,11 +234,11 @@ class TestSearchServiceTypeFiltering:
         # Create organizations with different subtypes
         await pub_service.create_entity(
             {"slug": "party-1", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Party 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         await pub_service.create_entity(
             {"slug": "gov-1", "type": "organization", "sub_type": "government_body", "names": [{"kind": "PRIMARY", "en": {"full": "Gov Body 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Search with subtype filter
@@ -263,11 +263,11 @@ class TestSearchServiceTypeFiltering:
         # Create entities
         await pub_service.create_entity(
             {"slug": "ram-person", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Ram Poudel"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         await pub_service.create_entity(
             {"slug": "ram-org", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Ram Party"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Search with type filter and query
@@ -296,11 +296,11 @@ class TestSearchServiceAttributeFiltering:
         # Create entities with different attributes
         await pub_service.create_entity(
             {"slug": "person-1", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Person 1"}}], "attributes": {"party": "nepali-congress"}},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         await pub_service.create_entity(
             {"slug": "person-2", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Person 2"}}], "attributes": {"party": "cpn-uml"}},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Search with attribute filter
@@ -325,12 +325,12 @@ class TestSearchServiceAttributeFiltering:
         await pub_service.create_entity(
             {"slug": "person-1", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Person 1"}}], 
              "attributes": {"party": "nepali-congress", "position": "minister"}},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         await pub_service.create_entity(
             {"slug": "person-2", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Person 2"}}], 
              "attributes": {"party": "nepali-congress", "position": "member"}},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Search with multiple attribute filters (AND logic)
@@ -359,7 +359,7 @@ class TestSearchServicePagination:
         for i in range(5):
             await pub_service.create_entity(
                 {"slug": f"person-{i}", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": f"Person {i}"}}]},
-                "actor:test", "Test"
+                "author:test", "Test"
             )
         
         # Search with limit
@@ -381,7 +381,7 @@ class TestSearchServicePagination:
         for i in range(5):
             await pub_service.create_entity(
                 {"slug": f"person-{i}", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": f"Person {i}"}}]},
-                "actor:test", "Test"
+                "author:test", "Test"
             )
         
         # Get first page
@@ -408,7 +408,7 @@ class TestSearchServicePagination:
         for i in range(5):
             await pub_service.create_entity(
                 {"slug": f"test-{i}", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": f"Test Person {i}"}}]},
-                "actor:test", "Test"
+                "author:test", "Test"
             )
         
         # Search with query and pagination
@@ -433,19 +433,19 @@ class TestSearchServiceRelationshipSearch:
         # Create entities
         person = await pub_service.create_entity(
             {"slug": "person-1", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Person 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         org = await pub_service.create_entity(
             {"slug": "org-1", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Org 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Create relationships of different types
         await pub_service.create_relationship(
-            person.id, org.id, "MEMBER_OF", "actor:test", "Test"
+            person.id, org.id, "MEMBER_OF", "author:test", "Test"
         )
         await pub_service.create_relationship(
-            person.id, org.id, "AFFILIATED_WITH", "actor:test", "Test"
+            person.id, org.id, "AFFILIATED_WITH", "author:test", "Test"
         )
         
         # Search by relationship type
@@ -467,20 +467,20 @@ class TestSearchServiceRelationshipSearch:
         # Create entities
         person1 = await pub_service.create_entity(
             {"slug": "person-1", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Person 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         person2 = await pub_service.create_entity(
             {"slug": "person-2", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Person 2"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         org = await pub_service.create_entity(
             {"slug": "org-1", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Org 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Create relationships
-        await pub_service.create_relationship(person1.id, org.id, "MEMBER_OF", "actor:test", "Test")
-        await pub_service.create_relationship(person2.id, org.id, "MEMBER_OF", "actor:test", "Test")
+        await pub_service.create_relationship(person1.id, org.id, "MEMBER_OF", "author:test", "Test")
+        await pub_service.create_relationship(person2.id, org.id, "MEMBER_OF", "author:test", "Test")
         
         # Search by source entity
         results = await search_service.search_relationships(source_entity_id=person1.id)
@@ -501,20 +501,20 @@ class TestSearchServiceRelationshipSearch:
         # Create entities
         person = await pub_service.create_entity(
             {"slug": "person-1", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Person 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         org1 = await pub_service.create_entity(
             {"slug": "org-1", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Org 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         org2 = await pub_service.create_entity(
             {"slug": "org-2", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Org 2"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Create relationships
-        await pub_service.create_relationship(person.id, org1.id, "MEMBER_OF", "actor:test", "Test")
-        await pub_service.create_relationship(person.id, org2.id, "AFFILIATED_WITH", "actor:test", "Test")
+        await pub_service.create_relationship(person.id, org1.id, "MEMBER_OF", "author:test", "Test")
+        await pub_service.create_relationship(person.id, org2.id, "AFFILIATED_WITH", "author:test", "Test")
         
         # Search by target entity
         results = await search_service.search_relationships(target_entity_id=org1.id)
@@ -539,20 +539,20 @@ class TestSearchServiceTemporalFiltering:
         # Create entities
         person = await pub_service.create_entity(
             {"slug": "person-1", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Person 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         org = await pub_service.create_entity(
             {"slug": "org-1", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Org 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Create relationships with different date ranges
         await pub_service.create_relationship(
-            person.id, org.id, "MEMBER_OF", "actor:test", "Test",
+            person.id, org.id, "MEMBER_OF", "author:test", "Test",
             start_date=date(2020, 1, 1), end_date=date(2022, 12, 31)
         )
         await pub_service.create_relationship(
-            person.id, org.id, "AFFILIATED_WITH", "actor:test", "Test",
+            person.id, org.id, "AFFILIATED_WITH", "author:test", "Test",
             start_date=date(2023, 1, 1)
         )
         
@@ -578,20 +578,20 @@ class TestSearchServiceTemporalFiltering:
         # Create entities
         person = await pub_service.create_entity(
             {"slug": "person-1", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Person 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         org = await pub_service.create_entity(
             {"slug": "org-1", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Org 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         # Create relationships - one ended, one active
         await pub_service.create_relationship(
-            person.id, org.id, "MEMBER_OF", "actor:test", "Test",
+            person.id, org.id, "MEMBER_OF", "author:test", "Test",
             start_date=date(2020, 1, 1), end_date=date(2022, 12, 31)
         )
         await pub_service.create_relationship(
-            person.id, org.id, "AFFILIATED_WITH", "actor:test", "Test",
+            person.id, org.id, "AFFILIATED_WITH", "author:test", "Test",
             start_date=date(2023, 1, 1)
         )
         
@@ -622,14 +622,14 @@ class TestSearchServiceVersionRetrieval:
         # Create and update entity
         entity = await pub_service.create_entity(
             {"slug": "test-person", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Test Person"}}]},
-            "actor:test", "Initial"
+            "author:test", "Initial"
         )
         
         entity.attributes = {"update": "1"}
-        await pub_service.update_entity(entity, "actor:test", "Update 1")
+        await pub_service.update_entity(entity, "author:test", "Update 1")
         
         entity.attributes = {"update": "2"}
-        await pub_service.update_entity(entity, "actor:test", "Update 2")
+        await pub_service.update_entity(entity, "author:test", "Update 2")
         
         # Get versions
         versions = await search_service.get_entity_versions(entity_id=entity.id)
@@ -652,20 +652,20 @@ class TestSearchServiceVersionRetrieval:
         # Create entities and relationship
         person = await pub_service.create_entity(
             {"slug": "person-1", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Person 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         org = await pub_service.create_entity(
             {"slug": "org-1", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Org 1"}}]},
-            "actor:test", "Test"
+            "author:test", "Test"
         )
         
         relationship = await pub_service.create_relationship(
-            person.id, org.id, "MEMBER_OF", "actor:test", "Initial"
+            person.id, org.id, "MEMBER_OF", "author:test", "Initial"
         )
         
         # Update relationship
         relationship.attributes = {"role": "member"}
-        await pub_service.update_relationship(relationship, "actor:test", "Update 1")
+        await pub_service.update_relationship(relationship, "author:test", "Update 1")
         
         # Get versions
         versions = await search_service.get_relationship_versions(relationship_id=relationship.id)

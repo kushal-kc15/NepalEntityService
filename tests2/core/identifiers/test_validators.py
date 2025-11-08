@@ -50,13 +50,13 @@ def test_validate_version_id_valid():
     assert validate_version_id(version_id) == version_id
 
 
-def test_validate_actor_id_valid():
-    """Test validating valid actor IDs."""
-    from nes2.core.identifiers.validators import validate_actor_id, is_valid_actor_id
+def test_validate_author_id_valid():
+    """Test validating valid author IDs."""
+    from nes2.core.identifiers.validators import validate_author_id, is_valid_author_id
     
-    actor_id = "actor:csv-importer"
-    assert is_valid_actor_id(actor_id)
-    assert validate_actor_id(actor_id) == actor_id
+    author_id = "author:csv-importer"
+    assert is_valid_author_id(author_id)
+    assert validate_author_id(author_id) == author_id
     
     # Invalid slug (too short)
-    assert not is_valid_actor_id("actor:ab")
+    assert not is_valid_author_id("author:ab")

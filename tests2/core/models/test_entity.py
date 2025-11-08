@@ -8,7 +8,7 @@ from nes2.core.models.base import Name, NameKind
 from nes2.core.models.entity import Entity, ExternalIdentifier, IdentifierScheme
 from nes2.core.models.organization import PoliticalParty
 from nes2.core.models.person import Person
-from nes2.core.models.version import Actor, VersionSummary, VersionType
+from nes2.core.models.version import Author, VersionSummary, VersionType
 
 
 def test_entity_requires_primary_name():
@@ -24,7 +24,7 @@ def test_entity_requires_primary_name():
                 entity_or_relationship_id="entity:person/test-entity",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -39,7 +39,7 @@ def test_entity_with_multilingual_names():
         names=[
             Name(
                 kind=NameKind.PRIMARY,
-                en={"full": "Test Person", "first": "Test", "last": "Person"},
+                en={"full": "Test Person", "given": "Test", "family": "Person"},
                 ne={"full": "परीक्षण व्यक्ति"}
             )
         ],
@@ -47,7 +47,7 @@ def test_entity_with_multilingual_names():
             entity_or_relationship_id="entity:person/test-entity",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -71,7 +71,7 @@ def test_entity_computed_id():
             entity_or_relationship_id="entity:organization/political_party/nepali-congress",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -92,7 +92,7 @@ def test_entity_slug_validation():
                 entity_or_relationship_id="entity:person/ab",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -108,7 +108,7 @@ def test_entity_slug_validation():
                 entity_or_relationship_id="entity:person/Test-Entity",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -129,7 +129,7 @@ def test_entity_with_multiple_names():
             entity_or_relationship_id="entity:person/test-entity",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -162,7 +162,7 @@ def test_entity_with_external_identifiers():
             entity_or_relationship_id="entity:person/test-entity",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -190,7 +190,7 @@ def test_entity_with_tags_and_attributes():
             entity_or_relationship_id="entity:person/test-entity",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -215,7 +215,7 @@ def test_entity_cannot_be_instantiated_directly():
                 entity_or_relationship_id="entity:person/test-person",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),

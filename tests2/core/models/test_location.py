@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from nes2.core.models.base import Name, NameKind
 from nes2.core.models.entity import EntitySubType
 from nes2.core.models.location import Location, LocationType
-from nes2.core.models.version import Actor, VersionSummary, VersionType
+from nes2.core.models.version import Author, VersionSummary, VersionType
 
 
 def test_location_basic_creation():
@@ -20,7 +20,7 @@ def test_location_basic_creation():
             entity_or_relationship_id="entity:location/test-location",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -49,7 +49,7 @@ def test_location_province():
             entity_or_relationship_id="entity:location/province/bagmati-province",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -80,7 +80,7 @@ def test_location_district():
             entity_or_relationship_id="entity:location/district/kathmandu-district",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -114,7 +114,7 @@ def test_location_metropolitan_city():
             entity_or_relationship_id="entity:location/metropolitan_city/kathmandu-metropolitan-city",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -146,7 +146,7 @@ def test_location_municipality():
             entity_or_relationship_id="entity:location/metropolitan_city/pokhara-metropolitan-city",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -169,7 +169,7 @@ def test_location_ward():
             entity_or_relationship_id="entity:location/ward/kathmandu-ward-1",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -192,7 +192,7 @@ def test_location_constituency():
             entity_or_relationship_id="entity:location/constituency/kathmandu-1",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -218,7 +218,7 @@ def test_location_with_coordinates():
             entity_or_relationship_id="entity:location/municipality/test-location",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -242,7 +242,7 @@ def test_location_hierarchy():
             entity_or_relationship_id="entity:location/province/bagmati-province",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -259,7 +259,7 @@ def test_location_hierarchy():
             entity_or_relationship_id="entity:location/district/kathmandu-district",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -276,7 +276,7 @@ def test_location_hierarchy():
             entity_or_relationship_id="entity:location/metropolitan_city/kathmandu-metro",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),

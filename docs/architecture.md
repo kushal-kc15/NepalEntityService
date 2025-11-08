@@ -135,8 +135,8 @@ nes-db/v2/
 │           └── ram-chandra-poudel/
 │               ├── v1.json
 │               └── v2.json
-└── actor/
-    └── {actor-id}.json
+└── author/
+    └── {author-id}.json
 ```
 
 ## Data Flow

@@ -141,14 +141,14 @@ POLITICAL_PARTIES = [
 async def batch_import_entities(
     pub_service: PublicationService,
     entities_data: List[Dict[str, Any]],
-    actor_id: str
+    author_id: str
 ) -> Dict[str, Any]:
     """Import multiple entities in a batch operation.
     
     Args:
         pub_service: Publication service instance
         entities_data: List of entity data dictionaries
-        actor_id: Actor performing the import
+        author_id: Author performing the import
         
     Returns:
         Dictionary with import statistics
@@ -183,7 +183,7 @@ async def batch_import_entities(
                 
                 await pub_service.update_entity(
                     entity=existing,
-                    actor_id=actor_id,
+                    author_id=author_id,
                     change_description=f"Batch import update: {entity_data['slug']}"
                 )
                 stats["updated"] += 1
@@ -192,7 +192,7 @@ async def batch_import_entities(
                 # Create new entity
                 await pub_service.create_entity(
                     entity_data=entity_data,
-                    actor_id=actor_id,
+                    author_id=author_id,
                     change_description=f"Batch import: {entity_data['slug']}"
                 )
                 stats["created"] += 1
@@ -225,7 +225,7 @@ async def main():
     print(f"\n1. Import plan:")
     print(f"   Total entities to import: {len(POLITICAL_PARTIES)}")
     print(f"   Entity type: Political Parties")
-    print(f"   Actor: actor:system:batch-importer")
+    print(f"   Author: author:system:batch-importer")
     
     print("\n   Entities to import:")
     for party in POLITICAL_PARTIES:
@@ -237,7 +237,7 @@ async def main():
     stats = await batch_import_entities(
         pub_service=pub_service,
         entities_data=POLITICAL_PARTIES,
-        actor_id="actor:system:batch-importer"
+        author_id="author:system:batch-importer"
     )
     
     # Step 3: Display import statistics
@@ -292,7 +292,7 @@ async def main():
         print(f"\n   Version Info:")
         print(f"   - Version: {nc_entity.version_summary.version_number}")
         print(f"   - Created: {nc_entity.version_summary.created_at}")
-        print(f"   - Actor: {nc_entity.version_summary.actor.slug}")
+        print(f"   - Author: {nc_entity.version_summary.author.slug}")
     
     print("\n" + "=" * 70)
     print("✓ Batch import completed successfully!")

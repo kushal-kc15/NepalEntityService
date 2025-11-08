@@ -198,9 +198,9 @@ The `context` object provides access to services and utilities:
 
 ```python
 # Publication Service - create/update entities and relationships
-await context.publication.create_entity(entity, actor_id, change_description)
-await context.publication.update_entity(entity, actor_id, change_description)
-await context.publication.create_relationship(source_id, target_id, type, actor_id, change_description)
+await context.publication.create_entity(entity, author_id, change_description)
+await context.publication.update_entity(entity, author_id, change_description)
+await context.publication.create_relationship(source_id, target_id, type, author_id, change_description)
 
 # Search Service - query existing entities
 entity = await context.search.find_entity_by_name("Ram Sharma", "person")
@@ -255,8 +255,8 @@ context.log(f"Created {count} entities")
 from nes2.core.models.entity import Entity, EntityType
 from nes2.core.models.name import Name, NameKind, NameParts
 
-# Create actor ID for this migration
-actor_id = "actor:migration:005-add-new-ministers"
+# Create author ID for this migration
+author_id = "author:migration:005-add-new-ministers"
 
 # Build entity
 entity_data = {
@@ -278,7 +278,7 @@ entity_data = {
 # Create entity
 await context.publication.create_entity(
     entity_data=entity_data,
-    actor_id=actor_id,
+    author_id=author_id,
     change_description="Import minister from official records"
 )
 ```
@@ -299,7 +299,7 @@ if entity:
     # Save update
     await context.publication.update_entity(
         entity=entity,
-        actor_id=actor_id,
+        author_id=author_id,
         change_description="Updated ministerial position"
     )
 ```
@@ -317,7 +317,7 @@ await context.publication.create_relationship(
         "position": "Minister",
         "appointment_type": "Cabinet"
     },
-    actor_id=actor_id,
+    author_id=author_id,
     change_description="Added ministerial appointment"
 )
 ```
@@ -334,7 +334,7 @@ async def migrate(context):
     # Read CSV
     rows = context.read_csv("data.csv")
     
-    actor_id = "actor:migration:005-import-data"
+    author_id = "author:migration:005-import-data"
     
     for row in rows:
         entity_data = {
@@ -354,7 +354,7 @@ async def migrate(context):
         
         await context.publication.create_entity(
             entity_data=entity_data,
-            actor_id=actor_id,
+            author_id=author_id,
             change_description=f"Import {row['name_en']}"
         )
     
@@ -369,7 +369,7 @@ async def migrate(context):
     # Read update data
     updates = context.read_json("updates.json")
     
-    actor_id = "actor:migration:006-update-attributes"
+    author_id = "author:migration:006-update-attributes"
     
     for update in updates:
         # Find entity
@@ -387,7 +387,7 @@ async def migrate(context):
         # Save
         await context.publication.update_entity(
             entity=entity,
-            actor_id=actor_id,
+            author_id=author_id,
             change_description=update["description"]
         )
     
@@ -401,7 +401,7 @@ async def migrate(context):
     """Create entities and their relationships."""
     data = context.read_csv("politicians.csv")
     
-    actor_id = "actor:migration:007-politicians-with-parties"
+    author_id = "author:migration:007-politicians-with-parties"
     
     for row in data:
         # Create person entity
@@ -420,7 +420,7 @@ async def migrate(context):
         
         person = await context.publication.create_entity(
             entity_data=person_data,
-            actor_id=actor_id,
+            author_id=author_id,
             change_description=f"Import politician {row['name_en']}"
         )
         
@@ -430,7 +430,7 @@ async def migrate(context):
                 source_entity_id=person.id,
                 target_entity_id=row["party_id"],
                 relationship_type="MEMBER_OF",
-                actor_id=actor_id,
+                author_id=author_id,
                 change_description="Add party membership"
             )
     
@@ -444,7 +444,7 @@ async def migrate(context):
     """Create new entities or update existing ones."""
     data = context.read_csv("entities.csv")
     
-    actor_id = "actor:migration:008-upsert-entities"
+    author_id = "author:migration:008-upsert-entities"
     created = 0
     updated = 0
     
@@ -462,7 +462,7 @@ async def migrate(context):
             
             await context.publication.update_entity(
                 entity=entity,
-                actor_id=actor_id,
+                author_id=author_id,
                 change_description="Update from new data source"
             )
             updated += 1
@@ -483,7 +483,7 @@ async def migrate(context):
             
             await context.publication.create_entity(
                 entity_data=entity_data,
-                actor_id=actor_id,
+                author_id=author_id,
                 change_description="Create from new data source"
             )
             created += 1
@@ -498,7 +498,7 @@ async def migrate(context):
     """Import with error handling and reporting."""
     data = context.read_csv("data.csv")
     
-    actor_id = "actor:migration:009-safe-import"
+    author_id = "author:migration:009-safe-import"
     stats = {"success": 0, "failed": 0, "errors": []}
     
     for row in data:
@@ -517,7 +517,7 @@ async def migrate(context):
             
             await context.publication.create_entity(
                 entity_data=entity_data,
-                actor_id=actor_id,
+                author_id=author_id,
                 change_description="Import entity"
             )
             stats["success"] += 1
@@ -764,15 +764,15 @@ Each migration should have a single, clear purpose:
 - ✓ Update party leadership
 - ✗ Import ministers, update parties, fix typos, add relationships (too much)
 
-### 8. Use Meaningful Actor IDs
+### 8. Use Meaningful Author IDs
 
 ```python
 # Good
-actor_id = "actor:migration:005-add-cabinet-ministers"
+author_id = "author:migration:005-add-cabinet-ministers"
 
 # Bad
-actor_id = "actor:migration"
-actor_id = "actor:user"
+author_id = "author:migration"
+author_id = "author:user"
 ```
 
 ---
@@ -805,7 +805,7 @@ async def migrate(context):
     """Import districts from CSV."""
     districts = context.read_csv("districts.csv")
     
-    actor_id = "actor:migration:010-import-districts"
+    author_id = "author:migration:010-import-districts"
     
     for district in districts:
         entity_data = {
@@ -827,7 +827,7 @@ async def migrate(context):
         
         await context.publication.create_entity(
             entity_data=entity_data,
-            actor_id=actor_id,
+            author_id=author_id,
             change_description=f"Import district {district['name_en']}"
         )
     
@@ -855,7 +855,7 @@ async def migrate(context):
     """Add party memberships."""
     memberships = context.read_csv("memberships.csv")
     
-    actor_id = "actor:migration:011-add-party-memberships"
+    author_id = "author:migration:011-add-party-memberships"
     created = 0
     
     for row in memberships:
@@ -868,7 +868,7 @@ async def migrate(context):
                 attributes={
                     "role": row.get("role", "Member")
                 },
-                actor_id=actor_id,
+                author_id=author_id,
                 change_description=f"Add party membership"
             )
             created += 1

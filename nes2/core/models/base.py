@@ -45,9 +45,9 @@ class NamePart(str, Enum):
     """Parts of a name."""
 
     FULL = "full"
-    FIRST = "first"
+    GIVEN = "given"
     MIDDLE = "middle"
-    LAST = "last"
+    FAMILY = "family"
     PREFIX = "prefix"
     SUFFIX = "suffix"
 
@@ -98,9 +98,9 @@ class NameParts(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     full: str
-    first: Optional[str] = None
+    given: Optional[str] = None
     middle: Optional[str] = None
-    last: Optional[str] = None
+    family: Optional[str] = None
     prefix: Optional[str] = None
     suffix: Optional[str] = None
 

@@ -702,9 +702,9 @@ print(f"Imported: {politician.id}")
       "kind": "PRIMARY|ALIAS|ALTERNATE|BIRTH|OFFICIAL",
       "en": {
         "full": "string",
-        "first": "string?",
+        "given": "string?",
         "middle": "string?",
-        "last": "string?",
+        "family": "string?",
         "prefix": "string?",
         "suffix": "string?"
       },

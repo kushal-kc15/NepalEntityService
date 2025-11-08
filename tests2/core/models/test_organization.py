@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from nes2.core.models.base import Name, NameKind
 from nes2.core.models.entity import EntitySubType
 from nes2.core.models.organization import GovernmentBody, GovernmentType, Organization, PoliticalParty
-from nes2.core.models.version import Actor, VersionSummary, VersionType
+from nes2.core.models.version import Author, VersionSummary, VersionType
 
 
 def test_organization_basic_creation():
@@ -20,7 +20,7 @@ def test_organization_basic_creation():
             entity_or_relationship_id="entity:organization/test-organization",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -48,7 +48,7 @@ def test_political_party_creation():
             entity_or_relationship_id="entity:organization/political_party/shram-sanskriti-party",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -82,7 +82,7 @@ def test_political_party_with_attributes():
             entity_or_relationship_id="entity:organization/political_party/rastriya-swatantra-party",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -111,7 +111,7 @@ def test_government_body_creation():
             entity_or_relationship_id="entity:organization/government_body/election-commission",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -136,7 +136,7 @@ def test_government_body_types():
             entity_or_relationship_id="entity:organization/government_body/supreme-court",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -154,7 +154,7 @@ def test_government_body_types():
             entity_or_relationship_id="entity:organization/government_body/bagmati-assembly",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -172,7 +172,7 @@ def test_government_body_types():
             entity_or_relationship_id="entity:organization/government_body/kathmandu-municipality",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -193,7 +193,7 @@ def test_organization_subtype_enforcement():
             entity_or_relationship_id="entity:organization/political_party/test-party",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -210,7 +210,7 @@ def test_organization_subtype_enforcement():
             entity_or_relationship_id="entity:organization/government_body/test-gov",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),

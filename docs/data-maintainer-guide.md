@@ -95,7 +95,7 @@ nes-db/v2/
 │   └── relationship/
 │       └── {relationship-id}/
 │           └── {version-number}.json
-└── actor/
+└── author/
     └── {slug}.json
 ```
 
@@ -127,14 +127,14 @@ entity = await pub_service.create_entity(
             "position": "President"
         }
     },
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Initial import from official records"
 )
 ```
 
 **Parameters:**
 - `entity_data` (dict): Entity data following the entity schema
-- `actor_id` (str): ID of the actor creating the entity
+- `author_id` (str): ID of the author creating the entity
 - `change_description` (str): Description of this change
 
 **Returns:** Created entity with version 1
@@ -166,14 +166,14 @@ entity.attributes["term_start"] = "2023-03-13"
 # Update with automatic versioning
 updated_entity = await pub_service.update_entity(
     entity=entity,
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Updated position to President"
 )
 ```
 
 **Parameters:**
 - `entity` (Entity): Entity to update (with modifications)
-- `actor_id` (str): ID of the actor updating the entity
+- `author_id` (str): ID of the author updating the entity
 - `change_description` (str): Description of this change
 
 **Returns:** Updated entity with incremented version number
@@ -202,7 +202,7 @@ versions = await pub_service.get_entity_versions("entity:person/ram-chandra-poud
 for version in versions:
     print(f"Version {version.version_number}")
     print(f"  Created: {version.created_at}")
-    print(f"  Actor: {version.actor.slug}")
+    print(f"  Author: {version.author.slug}")
     print(f"  Description: {version.change_description}")
 ```
 
@@ -225,7 +225,7 @@ relationship = await pub_service.create_relationship(
         "role": "Senior Leader",
         "positions": ["Acting President", "General Secretary"]
     },
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Added party membership"
 )
 ```
@@ -237,7 +237,7 @@ relationship = await pub_service.create_relationship(
 - `start_date` (date, optional): When the relationship started
 - `end_date` (date, optional): When the relationship ended
 - `attributes` (dict, optional): Additional relationship metadata
-- `actor_id` (str): ID of the actor creating the relationship
+- `author_id` (str): ID of the author creating the relationship
 - `change_description` (str): Description of this change
 
 **Returns:** Created relationship with version 1
@@ -258,14 +258,14 @@ relationship.attributes["end_reason"] = "Term completed"
 # Update with versioning
 updated_rel = await pub_service.update_relationship(
     relationship=relationship,
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Added end date"
 )
 ```
 
 **Parameters:**
 - `relationship` (Relationship): Relationship to update (with modifications)
-- `actor_id` (str): ID of the actor updating the relationship
+- `author_id` (str): ID of the author updating the relationship
 - `change_description` (str): Description of this change
 
 **Returns:** Updated relationship with incremented version number
@@ -297,13 +297,13 @@ politician_data = {
             "kind": "PRIMARY",
             "en": {
                 "full": "Pushpa Kamal Dahal",
-                "first": "Pushpa Kamal",
-                "last": "Dahal"
+                "given": "Pushpa Kamal",
+                "family": "Dahal"
             },
             "ne": {
                 "full": "पुष्पकमल दाहाल",
-                "first": "पुष्पकमल",
-                "last": "दाहाल"
+                "given": "पुष्पकमल",
+                "family": "दाहाल"
             }
         },
         {
@@ -321,7 +321,7 @@ politician_data = {
 
 entity = await pub_service.create_entity(
     entity_data=politician_data,
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Initial import"
 )
 ```
@@ -355,7 +355,7 @@ party_data = {
 
 entity = await pub_service.create_entity(
     entity_data=party_data,
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Initial import"
 )
 ```
@@ -384,7 +384,7 @@ province_data = {
 
 entity = await pub_service.create_entity(
     entity_data=province_data,
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Initial import"
 )
 ```
@@ -392,7 +392,7 @@ entity = await pub_service.create_entity(
 ### Batch Import
 
 ```python
-async def batch_import_entities(entities_data, actor_id):
+async def batch_import_entities(entities_data, author_id):
     """Import multiple entities with error handling."""
     stats = {"created": 0, "updated": 0, "failed": 0, "errors": []}
     
@@ -415,7 +415,7 @@ async def batch_import_entities(entities_data, actor_id):
                 
                 await pub_service.update_entity(
                     entity=existing,
-                    actor_id=actor_id,
+                    author_id=author_id,
                     change_description="Batch update"
                 )
                 stats["updated"] += 1
@@ -423,7 +423,7 @@ async def batch_import_entities(entities_data, actor_id):
                 # Create new
                 await pub_service.create_entity(
                     entity_data=entity_data,
-                    actor_id=actor_id,
+                    author_id=author_id,
                     change_description="Batch import"
                 )
                 stats["created"] += 1
@@ -452,13 +452,13 @@ Always provide both English and Nepali names:
         "kind": "PRIMARY",
         "en": {
             "full": "Sher Bahadur Deuba",
-            "first": "Sher Bahadur",
-            "last": "Deuba"
+            "given": "Sher Bahadur",
+            "family": "Deuba"
         },
         "ne": {
             "full": "शेरबहादुर देउवा",
-            "first": "शेरबहादुर",
-            "last": "देउवा"
+            "given": "शेरबहादुर",
+            "family": "देउवा"
         }
     }
 ]
@@ -536,29 +536,29 @@ Include authentic party information:
 # Good
 await pub_service.update_entity(
     entity=entity,
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Updated position after 2023 election results"
 )
 
 # Bad
 await pub_service.update_entity(
     entity=entity,
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Update"  # Too vague
 )
 ```
 
-### 2. Use Meaningful Actor IDs
+### 2. Use Meaningful Author IDs
 
 ```python
-# Good actor IDs
-"actor:human:john-doe"
-"actor:system:wikipedia-importer"
-"actor:system:election-commission-sync"
+# Good author IDs
+"author:human:john-doe"
+"author:system:wikipedia-importer"
+"author:system:election-commission-sync"
 
-# Bad actor IDs
-"actor:user"
-"actor:admin"
+# Bad author IDs
+"author:user"
+"author:admin"
 ```
 
 ### 3. Validate Before Creating
@@ -599,7 +599,7 @@ else:
 try:
     entity = await pub_service.create_entity(
         entity_data=entity_data,
-        actor_id="actor:human:data-maintainer",
+        author_id="author:human:data-maintainer",
         change_description="Import"
     )
 except ValueError as e:
@@ -615,13 +615,13 @@ except Exception as e:
 When creating entities and relationships together, handle failures:
 
 ```python
-async def create_politician_with_party(politician_data, party_id, actor_id):
+async def create_politician_with_party(politician_data, party_id, author_id):
     """Create politician and party membership atomically."""
     try:
         # Create politician
         politician = await pub_service.create_entity(
             entity_data=politician_data,
-            actor_id=actor_id,
+            author_id=author_id,
             change_description="Import politician"
         )
         
@@ -630,7 +630,7 @@ async def create_politician_with_party(politician_data, party_id, actor_id):
             source_entity_id=politician.id,
             target_entity_id=party_id,
             relationship_type="MEMBER_OF",
-            actor_id=actor_id,
+            author_id=author_id,
             change_description="Add party membership"
         )
         
@@ -677,7 +677,7 @@ async def audit_recent_changes(days=7):
         if recent:
             print(f"{entity.names[0].en.full}: {len(recent)} changes")
             for v in recent:
-                print(f"  - {v.actor.slug}: {v.change_description}")
+                print(f"  - {v.author.slug}: {v.change_description}")
 ```
 
 ---
@@ -755,7 +755,7 @@ entity.attributes["position"] = "New Position"
 # Update
 updated = await pub_service.update_entity(
     entity=entity,
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Update position"
 )
 ```
@@ -832,7 +832,7 @@ async def import_politician_complete():
     try:
         entity = await pub_service.create_entity(
             entity_data=politician_data,
-            actor_id="actor:human:data-maintainer",
+            author_id="author:human:data-maintainer",
             change_description="Initial import from official records"
         )
         print(f"✓ Created: {entity.id}")
@@ -842,7 +842,7 @@ async def import_politician_complete():
             source_entity_id=entity.id,
             target_entity_id="entity:organization/political_party/nepali-congress",
             relationship_type="MEMBER_OF",
-            actor_id="actor:human:data-maintainer",
+            author_id="author:human:data-maintainer",
             change_description="Add party membership"
         )
         print(f"✓ Created relationship: {relationship.id}")
@@ -879,7 +879,7 @@ async def update_politicians_by_party(party_slug, new_attribute):
             
             await pub_service.update_entity(
                 entity=entity,
-                actor_id="actor:system:batch-updater",
+                author_id="author:system:batch-updater",
                 change_description=f"Batch update: {list(new_attribute.keys())}"
             )
             updated_count += 1

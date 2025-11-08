@@ -269,12 +269,17 @@ def run(
         publication_service = Config.get_publication_service()
         search_service = Config.get_search_service()
         
-        # Initialize scraping service (may not be configured, that's ok)
+        # Initialize scraping service (optional - may not be configured)
         try:
             from nes2.services.scraping.service import ScrapingService
-            scraping_service = ScrapingService()
+            from nes2.services.scraping.providers import MockLLMProvider
+            
+            # Use mock provider for migrations (scraping is optional)
+            mock_provider = MockLLMProvider()
+            scraping_service = ScrapingService(llm_provider=mock_provider)
         except Exception as e:
             logger.warning(f"Scraping service not available: {e}")
+            click.echo(f"Scraping service not available: {e}")
             scraping_service = None
         
         # Initialize migration manager and runner
@@ -533,15 +538,15 @@ async def migrate(context):
         # Read data from CSV
         data = context.read_csv("data.csv")
         
-        # Create actor for this migration
-        actor_id = "actor:migration:{migration_name}"
+        # Create author for this migration
+        author_id = "migration-{migration_name}"
         
         # Process each row
         for row in data:
-            entity = Entity(...)
+            entity_data = {{...}}
             await context.publication.create_entity(
-                entity=entity,
-                actor_id=actor_id,
+                entity_data=entity_data,
+                author_id=author_id,
                 change_description="Description of change"
             )
         
@@ -554,13 +559,13 @@ async def migrate(context):
     # Example: Read data from CSV
     # data = context.read_csv("data.csv")
     
-    # Example: Create actor for this migration
-    # actor_id = "actor:migration:{migration_name}"
+    # Example: Create author for this migration
+    # author_id = "migration-{migration_name}"
     
     # Example: Process each row
     # for row in data:
-    #     entity = Entity(...)
-    #     await context.publication.create_entity(entity, actor_id, "Description")
+    #     entity_data = {{...}}
+    #     await context.publication.create_entity(entity_data, author_id, "Description")
     
     context.log("Migration completed")
 '''

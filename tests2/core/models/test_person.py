@@ -15,7 +15,7 @@ from nes2.core.models.person import (
     Position,
     Symbol,
 )
-from nes2.core.models.version import Actor, VersionSummary, VersionType
+from nes2.core.models.version import Author, VersionSummary, VersionType
 
 
 def test_person_basic_creation():
@@ -28,7 +28,7 @@ def test_person_basic_creation():
             entity_or_relationship_id="entity:person/harka-sampang",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -67,7 +67,7 @@ def test_person_with_personal_details():
             entity_or_relationship_id="entity:person/harka-sampang",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -104,7 +104,7 @@ def test_person_with_education():
             entity_or_relationship_id="entity:person/harka-sampang",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -141,7 +141,7 @@ def test_person_with_positions():
             entity_or_relationship_id="entity:person/harka-sampang",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -182,7 +182,7 @@ def test_person_with_electoral_details():
             entity_or_relationship_id="entity:person/harka-sampang",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -210,7 +210,7 @@ def test_person_cannot_have_subtype():
             entity_or_relationship_id="entity:person/harka-sampang",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),

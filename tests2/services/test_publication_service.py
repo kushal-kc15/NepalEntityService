@@ -20,7 +20,7 @@ from nes2.core.models.person import Person
 from nes2.core.models.organization import PoliticalParty
 from nes2.core.models.entity import EntityType, EntitySubType
 from nes2.core.models.relationship import Relationship
-from nes2.core.models.version import Actor, Version, VersionSummary, VersionType
+from nes2.core.models.version import Author, Version, VersionSummary, VersionType
 from nes2.database.file_database import FileDatabase
 
 
@@ -65,8 +65,8 @@ class TestPublicationServiceEntityCreation:
             "names": [
                 {
                     "kind": "PRIMARY",
-                    "en": {"full": "Ram Chandra Poudel", "first": "Ram Chandra", "last": "Poudel"},
-                    "ne": {"full": "राम चन्द्र पौडेल", "first": "राम चन्द्र", "last": "पौडेल"}
+                    "en": {"full": "Ram Chandra Poudel", "given": "Ram Chandra", "family": "Poudel"},
+                    "ne": {"full": "राम चन्द्र पौडेल", "given": "राम चन्द्र", "family": "पौडेल"}
                 }
             ],
             "attributes": {"party": "nepali-congress"}
@@ -75,7 +75,7 @@ class TestPublicationServiceEntityCreation:
         # Create entity
         entity = await service.create_entity(
             entity_data=entity_data,
-            actor_id="actor:system-importer",
+            author_id="author:system-importer",
             change_description="Initial import"
         )
         
@@ -87,7 +87,7 @@ class TestPublicationServiceEntityCreation:
         # Verify version was created automatically
         assert entity.version_summary is not None
         assert entity.version_summary.version_number == 1
-        assert entity.version_summary.actor.id == "actor:system-importer"
+        assert entity.version_summary.author.id == "author:system-importer"
         assert entity.version_summary.change_description == "Initial import"
 
     @pytest.mark.asyncio
@@ -112,7 +112,7 @@ class TestPublicationServiceEntityCreation:
         
         entity = await service.create_entity(
             entity_data=entity_data,
-            actor_id="actor:system-importer",
+            author_id="author:system-importer",
             change_description="Initial import"
         )
         
@@ -138,7 +138,7 @@ class TestPublicationServiceEntityCreation:
         with pytest.raises(ValueError):
             await service.create_entity(
                 entity_data=invalid_data,
-                actor_id="actor:system-importer",
+                author_id="author:system-importer",
                 change_description="Test"
             )
 
@@ -165,7 +165,7 @@ class TestPublicationServiceEntityCreation:
         with pytest.raises(ValueError):
             await service.create_entity(
                 entity_data=invalid_data,
-                actor_id="actor:system-importer",
+                author_id="author:system-importer",
                 change_description="Test"
             )
 
@@ -196,7 +196,7 @@ class TestPublicationServiceEntityUpdates:
         
         entity = await service.create_entity(
             entity_data=entity_data,
-            actor_id="actor:system-importer",
+            author_id="author:system-importer",
             change_description="Initial import"
         )
         
@@ -207,7 +207,7 @@ class TestPublicationServiceEntityUpdates:
         
         updated_entity = await service.update_entity(
             entity=entity,
-            actor_id="actor:data-maintainer",
+            author_id="author:data-maintainer",
             change_description="Added party affiliation"
         )
         
@@ -233,14 +233,14 @@ class TestPublicationServiceEntityUpdates:
         
         entity = await service.create_entity(
             entity_data=entity_data,
-            actor_id="actor:system-importer",
+            author_id="author:system-importer",
             change_description="Initial"
         )
         
         entity.attributes = {"position": "Prime Minister"}
         await service.update_entity(
             entity=entity,
-            actor_id="actor:maintainer",
+            author_id="author:maintainer",
             change_description="Update 1"
         )
         
@@ -272,7 +272,7 @@ class TestPublicationServiceEntityRetrieval:
         
         created = await service.create_entity(
             entity_data=entity_data,
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Test"
         )
         
@@ -316,14 +316,14 @@ class TestPublicationServiceEntityDeletion:
         
         entity = await service.create_entity(
             entity_data=entity_data,
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Test"
         )
         
         # Delete entity
         result = await service.delete_entity(
             entity_id=entity.id,
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Deletion test"
         )
         
@@ -358,15 +358,15 @@ class TestPublicationServiceRelationshipCreation:
             "names": [{"kind": "PRIMARY", "en": {"full": "Party A"}}]
         }
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         # Create relationship
         relationship = await service.create_relationship(
             source_entity_id=person.id,
             target_entity_id=org.id,
             relationship_type="MEMBER_OF",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Initial relationship",
             start_date=date(2020, 1, 1)
         )
@@ -391,7 +391,7 @@ class TestPublicationServiceRelationshipCreation:
                 source_entity_id="entity:person/nonexistent",
                 target_entity_id="entity:organization/political_party/nonexistent",
                 relationship_type="MEMBER_OF",
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="Test"
             )
 
@@ -411,14 +411,14 @@ class TestPublicationServiceRelationshipUpdates:
         person_data = {"slug": "pol-b", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Pol B"}}]}
         org_data = {"slug": "party-b", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Party B"}}]}
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         relationship = await service.create_relationship(
             source_entity_id=person.id,
             target_entity_id=org.id,
             relationship_type="MEMBER_OF",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Initial"
         )
         
@@ -427,7 +427,7 @@ class TestPublicationServiceRelationshipUpdates:
         
         updated = await service.update_relationship(
             relationship=relationship,
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Added end date"
         )
         
@@ -450,21 +450,21 @@ class TestPublicationServiceRelationshipDeletion:
         person_data = {"slug": "pol-c", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Pol C"}}]}
         org_data = {"slug": "party-c", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Party C"}}]}
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         relationship = await service.create_relationship(
             source_entity_id=person.id,
             target_entity_id=org.id,
             relationship_type="MEMBER_OF",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Test"
         )
         
         # Delete relationship
         result = await service.delete_relationship(
             relationship_id=relationship.id,
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Deletion"
         )
         
@@ -486,15 +486,15 @@ class TestPublicationServiceBidirectionalConsistency:
         person_data = {"slug": "pol-d", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Pol D"}}]}
         org_data = {"slug": "party-d", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Party D"}}]}
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         # Create relationship
         relationship = await service.create_relationship(
             source_entity_id=person.id,
             target_entity_id=org.id,
             relationship_type="MEMBER_OF",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Test"
         )
         
@@ -532,16 +532,16 @@ class TestPublicationServiceCoordinatedOperations:
         org1_data = {"slug": "party-e1", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Party E1"}}]}
         org2_data = {"slug": "party-e2", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Party E2"}}]}
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org1 = await service.create_entity(org1_data, "actor:test", "Test")
-        org2 = await service.create_entity(org2_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org1 = await service.create_entity(org1_data, "author:test", "Test")
+        org2 = await service.create_entity(org2_data, "author:test", "Test")
         
         # Create initial relationship
         rel1 = await service.create_relationship(
             source_entity_id=person.id,
             target_entity_id=org1.id,
             relationship_type="MEMBER_OF",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Initial"
         )
         
@@ -560,7 +560,7 @@ class TestPublicationServiceCoordinatedOperations:
         result = await service.update_entity_with_relationships(
             entity=person,
             new_relationships=new_relationships,
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Updated with new affiliation"
         )
         
@@ -583,7 +583,7 @@ class TestPublicationServiceCoordinatedOperations:
         
         results = await service.batch_create_entities(
             entities_data=entities_data,
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Batch import"
         )
         
@@ -612,7 +612,7 @@ class TestPublicationServiceRollback:
         with pytest.raises(ValueError):
             await service.create_entity(
                 entity_data=invalid_data,
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="Test"
             )
         
@@ -630,7 +630,7 @@ class TestPublicationServiceRollback:
         
         # Create entity
         person_data = {"slug": "rollback-test", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Rollback Test"}}]}
-        person = await service.create_entity(person_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
         
         # Try coordinated update with invalid relationship
         person.attributes = {"updated": "yes"}
@@ -647,7 +647,7 @@ class TestPublicationServiceRollback:
             await service.update_entity_with_relationships(
                 entity=person,
                 new_relationships=invalid_relationships,
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="Should fail"
             )
         
@@ -669,13 +669,13 @@ class TestPublicationServiceBusinessRules:
         
         # Create first entity
         entity_data = {"slug": "duplicate-slug", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "First"}}]}
-        await service.create_entity(entity_data, "actor:test", "Test")
+        await service.create_entity(entity_data, "author:test", "Test")
         
         # Try to create second entity with same slug and type
         duplicate_data = {"slug": "duplicate-slug", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Second"}}]}
         
         with pytest.raises(ValueError):
-            await service.create_entity(duplicate_data, "actor:test", "Test")
+            await service.create_entity(duplicate_data, "author:test", "Test")
 
     @pytest.mark.asyncio
     async def test_enforce_relationship_temporal_consistency(self, temp_db_path):
@@ -689,8 +689,8 @@ class TestPublicationServiceBusinessRules:
         person_data = {"slug": "temporal-test", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Temporal"}}]}
         org_data = {"slug": "org-temporal", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Org"}}]}
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         # Try to create relationship with end_date before start_date
         with pytest.raises(ValueError):
@@ -698,7 +698,7 @@ class TestPublicationServiceBusinessRules:
                 source_entity_id=person.id,
                 target_entity_id=org.id,
                 relationship_type="MEMBER_OF",
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="Test",
                 start_date=date(2024, 1, 1),
                 end_date=date(2023, 1, 1)  # Before start date
@@ -716,8 +716,8 @@ class TestPublicationServiceBusinessRules:
         person_data = {"slug": "rel-type-test", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Test"}}]}
         org_data = {"slug": "org-rel-type", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Org"}}]}
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         # Try to create relationship with invalid type
         with pytest.raises(ValueError):
@@ -725,7 +725,7 @@ class TestPublicationServiceBusinessRules:
                 source_entity_id=person.id,
                 target_entity_id=org.id,
                 relationship_type="INVALID_TYPE",
-                actor_id="actor:test",
+                author_id="author:test",
                 change_description="Test"
             )
 
@@ -743,13 +743,13 @@ class TestPublicationServiceVersionManagement:
         
         # Create and update entity multiple times
         entity_data = {"slug": "version-test", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Version Test"}}]}
-        entity = await service.create_entity(entity_data, "actor:test", "Initial")
+        entity = await service.create_entity(entity_data, "author:test", "Initial")
         
         entity.attributes = {"update": "1"}
-        await service.update_entity(entity, "actor:test", "Update 1")
+        await service.update_entity(entity, "author:test", "Update 1")
         
         entity.attributes = {"update": "2"}
-        await service.update_entity(entity, "actor:test", "Update 2")
+        await service.update_entity(entity, "author:test", "Update 2")
         
         # Get versions
         versions = await service.get_entity_versions(entity_id=entity.id)
@@ -771,20 +771,20 @@ class TestPublicationServiceVersionManagement:
         person_data = {"slug": "rel-version", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Rel Version"}}]}
         org_data = {"slug": "org-version", "type": "organization", "sub_type": "political_party", "names": [{"kind": "PRIMARY", "en": {"full": "Org"}}]}
         
-        person = await service.create_entity(person_data, "actor:test", "Test")
-        org = await service.create_entity(org_data, "actor:test", "Test")
+        person = await service.create_entity(person_data, "author:test", "Test")
+        org = await service.create_entity(org_data, "author:test", "Test")
         
         relationship = await service.create_relationship(
             source_entity_id=person.id,
             target_entity_id=org.id,
             relationship_type="MEMBER_OF",
-            actor_id="actor:test",
+            author_id="author:test",
             change_description="Initial"
         )
         
         # Update relationship
         relationship.attributes = {"role": "member"}
-        await service.update_relationship(relationship, "actor:test", "Added role")
+        await service.update_relationship(relationship, "author:test", "Added role")
         
         # Get versions
         versions = await service.get_relationship_versions(relationship_id=relationship.id)
@@ -805,18 +805,18 @@ class TestPublicationServiceVersionManagement:
         entity_data = {"slug": "author-test", "type": "person", "names": [{"kind": "PRIMARY", "en": {"full": "Author Test"}}]}
         entity = await service.create_entity(
             entity_data=entity_data,
-            actor_id="actor:specific-maintainer",
+            author_id="author:specific-maintainer",
             change_description="Created by specific maintainer"
         )
         
-        assert entity.version_summary.actor.id == "actor:specific-maintainer"
+        assert entity.version_summary.author.id == "author:specific-maintainer"
         
         # Update with different author
         entity.attributes = {"updated": "yes"}
         updated = await service.update_entity(
             entity=entity,
-            actor_id="actor:different-maintainer",
+            author_id="author:different-maintainer",
             change_description="Updated by different maintainer"
         )
         
-        assert updated.version_summary.actor.id == "actor:different-maintainer"
+        assert updated.version_summary.author.id == "author:different-maintainer"

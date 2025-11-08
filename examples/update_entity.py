@@ -68,13 +68,13 @@ async def main():
     # Update the entity with automatic versioning
     updated_entity = await pub_service.update_entity(
         entity=entity,
-        actor_id="actor:human:data-maintainer",
+        author_id="author:human:data-maintainer",
         change_description="Updated position to President of Nepal and added term details"
     )
     
     print(f"   ✓ Entity updated successfully")
     print(f"   New version: {updated_entity.version_summary.version_number}")
-    print(f"   Updated by: {updated_entity.version_summary.actor.slug}")
+    print(f"   Updated by: {updated_entity.version_summary.author.slug}")
     
     # Step 4: Display updated attributes
     print(f"\n4. Updated attributes:")
@@ -88,7 +88,7 @@ async def main():
     for version in versions:
         print(f"\n   Version {version.version_number}:")
         print(f"   - Created: {version.created_at}")
-        print(f"   - Actor: {version.actor.slug}")
+        print(f"   - Author: {version.author.slug}")
         print(f"   - Description: {version.change_description or '(no description)'}")
         
         # Show what changed in this version

@@ -111,9 +111,9 @@ Migration history is tracked through Git commits in the Database Repository rath
 
 #### Acceptance Criteria
 
-1. WHEN a migration creates or updates an entity, THE Publication_Service SHALL record the migration script name as the actor
+1. WHEN a migration creates or updates an entity, THE Publication_Service SHALL record the migration script name as the author
 2. THE Migration_System SHALL preserve contributor attribution from the migration script metadata in Git commits
-3. THE Migration_System SHALL link version records to the specific migration that created them through actor attribution
+3. THE Migration_System SHALL link version records to the specific migration that created them through author attribution
 4. THE Migration_System SHALL maintain a complete audit trail through Git history in the Database_Repository
 5. THE Migration_System SHALL format Git commit messages with migration metadata including author, date, and statistics
 

@@ -4,7 +4,7 @@ import pytest
 from datetime import datetime, UTC
 from pydantic import ValidationError
 
-from nes2.core.models.version import Actor, Version, VersionSummary, VersionType
+from nes2.core.models.version import Author, Version, VersionSummary, VersionType
 
 
 def test_version_summary_structure():
@@ -14,7 +14,7 @@ def test_version_summary_structure():
         entity_or_relationship_id="entity:person/ram-chandra-poudel",
         type=VersionType.ENTITY,
         version_number=1,
-        actor=Actor(slug="system"),
+        author=Author(slug="system"),
         change_description="Initial import",
         created_at=datetime.now(UTC)
     )
@@ -32,7 +32,7 @@ def test_version_computed_id():
         entity_or_relationship_id="entity:person/ram-chandra-poudel",
         type=VersionType.ENTITY,
         version_number=2,
-        actor=Actor(slug="system"),
+        author=Author(slug="system"),
         change_description="Update",
         created_at=datetime.now(UTC)
     )
@@ -54,7 +54,7 @@ def test_version_with_snapshot():
         entity_or_relationship_id="entity:person/ram-chandra-poudel",
         type=VersionType.ENTITY,
         version_number=1,
-        actor=Actor(slug="system", name="System Importer"),
+        author=Author(slug="system", name="System Importer"),
         change_description="Initial import",
         created_at=datetime.now(UTC),
         snapshot=snapshot_data
@@ -62,14 +62,14 @@ def test_version_with_snapshot():
     
     assert version.snapshot is not None
     assert version.snapshot["slug"] == "ram-chandra-poudel"
-    assert version.actor.name == "System Importer"
+    assert version.author.name == "System Importer"
 
 
-def test_actor_model():
-    """Test Actor model structure."""
+def test_author_model():
+    """Test Author model structure."""
     
-    actor = Actor(slug="csv-importer", name="CSV Import System")
+    author = Author(slug="csv-importer", name="CSV Import System")
     
-    assert actor.slug == "csv-importer"
-    assert actor.name == "CSV Import System"
-    assert actor.id == "actor:csv-importer"
+    assert author.slug == "csv-importer"
+    assert author.name == "CSV Import System"
+    assert author.id == "author:csv-importer"

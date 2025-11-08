@@ -65,10 +65,10 @@ async def display_version_details(version, version_number: int):
     print(f"{'─' * 70}")
     
     print(f"Created: {format_datetime(version.created_at)}")
-    print(f"Actor: {version.actor.slug}")
+    print(f"Author: {version.author.slug}")
     
-    if version.actor.names:
-        print(f"Actor Name: {version.actor.names[0].en.full}")
+    if version.author.names:
+        print(f"Author Name: {version.author.names[0].en.full}")
     
     print(f"Description: {version.change_description or '(no description)'}")
     
@@ -123,7 +123,7 @@ async def main():
     print(f"   Name: {entity.names[0].en.full} / {entity.names[0].ne.full}")
     print(f"   Current Version: {entity.version_summary.version_number}")
     print(f"   Last Updated: {format_datetime(entity.version_summary.created_at)}")
-    print(f"   Last Updated By: {entity.version_summary.actor.slug}")
+    print(f"   Last Updated By: {entity.version_summary.author.slug}")
     
     # Step 2: Retrieve complete version history
     print(f"\n2. Retrieving version history...")
@@ -137,15 +137,15 @@ async def main():
     
     # Step 3: Display version timeline
     print(f"\n3. Version timeline:")
-    print(f"\n   {'Ver':<5} {'Date':<20} {'Actor':<30} {'Description':<30}")
+    print(f"\n   {'Ver':<5} {'Date':<20} {'Author':<30} {'Description':<30}")
     print(f"   {'-' * 85}")
     
     for version in versions:
         date_str = format_datetime(version.created_at)[:19]
-        actor_str = version.actor.slug[:28]
+        author_str = version.author.slug[:28]
         desc_str = (version.change_description or "")[:28]
         
-        print(f"   {version.version_number:<5} {date_str:<20} {actor_str:<30} {desc_str:<30}")
+        print(f"   {version.version_number:<5} {date_str:<20} {author_str:<30} {desc_str:<30}")
     
     # Step 4: Display detailed information for each version
     print(f"\n4. Detailed version information:")
@@ -199,7 +199,7 @@ async def main():
         
         print(f"\n   Version 1 (Original):")
         print(f"   Created: {format_datetime(version_1.created_at)}")
-        print(f"   Actor: {version_1.actor.slug}")
+        print(f"   Author: {version_1.author.slug}")
         
         if version_1.snapshot:
             snapshot = version_1.snapshot
@@ -218,15 +218,15 @@ async def main():
     # Step 7: Analyze change patterns
     print(f"\n7. Change pattern analysis:")
     
-    # Count changes by actor
-    actor_changes = {}
+    # Count changes by author
+    author_changes = {}
     for version in versions:
-        actor_slug = version.actor.slug
-        actor_changes[actor_slug] = actor_changes.get(actor_slug, 0) + 1
+        author_slug = version.author.slug
+        author_changes[author_slug] = author_changes.get(author_slug, 0) + 1
     
-    print(f"\n   Changes by actor:")
-    for actor, count in sorted(actor_changes.items(), key=lambda x: x[1], reverse=True):
-        print(f"   - {actor}: {count} change(s)")
+    print(f"\n   Changes by author:")
+    for author, count in sorted(author_changes.items(), key=lambda x: x[1], reverse=True):
+        print(f"   - {author}: {count} change(s)")
     
     # Time between changes
     if len(versions) >= 2:

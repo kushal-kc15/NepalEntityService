@@ -20,7 +20,7 @@ from nes2.core.models.person import Person
 from nes2.core.models.organization import PoliticalParty
 from nes2.core.models.location import Location
 from nes2.core.models.entity import EntitySubType
-from nes2.core.models.version import Actor, VersionSummary, VersionType
+from nes2.core.models.version import Author, VersionSummary, VersionType
 
 
 class TestTextBasedEntitySearch:
@@ -41,15 +41,15 @@ class TestTextBasedEntitySearch:
                 names=[
                     Name(
                         kind=NameKind.PRIMARY,
-                        en={"full": "Ram Chandra Poudel", "first": "Ram Chandra", "last": "Poudel"},
-                        ne={"full": "राम चन्द्र पौडेल", "first": "राम चन्द्र", "last": "पौडेल"}
+                        en={"full": "Ram Chandra Poudel", "given": "Ram Chandra", "family": "Poudel"},
+                        ne={"full": "राम चन्द्र पौडेल", "given": "राम चन्द्र", "family": "पौडेल"}
                     )
                 ],
                 version_summary=VersionSummary(
                     entity_or_relationship_id="entity:person/ram-chandra-poudel",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -61,15 +61,15 @@ class TestTextBasedEntitySearch:
                 names=[
                     Name(
                         kind=NameKind.PRIMARY,
-                        en={"full": "Sher Bahadur Deuba", "first": "Sher Bahadur", "last": "Deuba"},
-                        ne={"full": "शेरबहादुर देउवा", "first": "शेरबहादुर", "last": "देउवा"}
+                        en={"full": "Sher Bahadur Deuba", "given": "Sher Bahadur", "family": "Deuba"},
+                        ne={"full": "शेरबहादुर देउवा", "given": "शेरबहादुर", "family": "देउवा"}
                     )
                 ],
                 version_summary=VersionSummary(
                     entity_or_relationship_id="entity:person/sher-bahadur-deuba",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -81,8 +81,8 @@ class TestTextBasedEntitySearch:
                 names=[
                     Name(
                         kind=NameKind.PRIMARY,
-                        en={"full": "Pushpa Kamal Dahal", "first": "Pushpa Kamal", "last": "Dahal"},
-                        ne={"full": "पुष्पकमल दाहाल", "first": "पुष्पकमल", "last": "दाहाल"}
+                        en={"full": "Pushpa Kamal Dahal", "given": "Pushpa Kamal", "family": "Dahal"},
+                        ne={"full": "पुष्पकमल दाहाल", "given": "पुष्पकमल", "family": "दाहाल"}
                     ),
                     Name(
                         kind=NameKind.ALIAS,
@@ -94,7 +94,7 @@ class TestTextBasedEntitySearch:
                     entity_or_relationship_id="entity:person/pushpa-kamal-dahal",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -114,7 +114,7 @@ class TestTextBasedEntitySearch:
                     entity_or_relationship_id="entity:organization/political_party/nepali-congress",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -135,7 +135,7 @@ class TestTextBasedEntitySearch:
                     entity_or_relationship_id="entity:location/metropolitan_city/kathmandu-metropolitan-city",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -213,7 +213,7 @@ class TestCaseInsensitiveSearch:
                 entity_or_relationship_id="entity:person/ram-chandra-poudel",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -276,7 +276,7 @@ class TestMultilingualSearch:
                     entity_or_relationship_id="entity:person/ram-chandra-poudel",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -295,7 +295,7 @@ class TestMultilingualSearch:
                     entity_or_relationship_id="entity:organization/political_party/nepali-congress",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -371,7 +371,7 @@ class TestTypeAndSubtypeFiltering:
                     entity_or_relationship_id="entity:person/ram-chandra-poudel",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -384,7 +384,7 @@ class TestTypeAndSubtypeFiltering:
                     entity_or_relationship_id="entity:organization/political_party/nepali-congress",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -398,7 +398,7 @@ class TestTypeAndSubtypeFiltering:
                     entity_or_relationship_id="entity:location/metropolitan_city/kathmandu-metropolitan-city",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -503,7 +503,7 @@ class TestAttributeBasedFiltering:
                     entity_or_relationship_id="entity:person/ram-chandra-poudel",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -517,7 +517,7 @@ class TestAttributeBasedFiltering:
                     entity_or_relationship_id="entity:person/sher-bahadur-deuba",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -531,7 +531,7 @@ class TestAttributeBasedFiltering:
                     entity_or_relationship_id="entity:person/pushpa-kamal-dahal",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -545,7 +545,7 @@ class TestAttributeBasedFiltering:
                     entity_or_relationship_id="entity:organization/political_party/nepali-congress",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -638,14 +638,14 @@ class TestSearchResultRanking:
                 names=[
                     Name(
                         kind=NameKind.PRIMARY,
-                        en={"full": "Ram Chandra Poudel", "first": "Ram Chandra", "last": "Poudel"}
+                        en={"full": "Ram Chandra Poudel", "given": "Ram Chandra", "family": "Poudel"}
                     )
                 ],
                 version_summary=VersionSummary(
                     entity_or_relationship_id="entity:person/ram-chandra-poudel",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -656,14 +656,14 @@ class TestSearchResultRanking:
                 names=[
                     Name(
                         kind=NameKind.PRIMARY,
-                        en={"full": "Ram Prasad Sharma", "first": "Ram Prasad", "last": "Sharma"}
+                        en={"full": "Ram Prasad Sharma", "given": "Ram Prasad", "family": "Sharma"}
                     )
                 ],
                 version_summary=VersionSummary(
                     entity_or_relationship_id="entity:person/ram-prasad-sharma",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -674,14 +674,14 @@ class TestSearchResultRanking:
                 names=[
                     Name(
                         kind=NameKind.PRIMARY,
-                        en={"full": "Ramesh Lekhak", "first": "Ramesh", "last": "Lekhak"}
+                        en={"full": "Ramesh Lekhak", "given": "Ramesh", "family": "Lekhak"}
                     )
                 ],
                 version_summary=VersionSummary(
                     entity_or_relationship_id="entity:person/ramesh-lekhak",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -729,7 +729,7 @@ class TestSearchResultRanking:
                 entity_or_relationship_id="entity:person/pushpa-kamal-dahal",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -781,7 +781,7 @@ class TestSearchPagination:
                         entity_or_relationship_id=f"entity:person/ram-person-{i}",
                         type=VersionType.ENTITY,
                         version_number=1,
-                        actor=Actor(slug="system"),
+                        author=Author(slug="system"),
                         change_description="Initial",
                         created_at=datetime.now(UTC)
                     ),

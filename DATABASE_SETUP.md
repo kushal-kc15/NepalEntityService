@@ -117,7 +117,7 @@ NepalEntityService/
 │       ├── entities/          # Entity JSON files
 │       ├── relationships/     # Relationship JSON files
 │       ├── versions/          # Version history
-│       └── actors/            # Actor records
+│       └── authors/           # Author records
 ├── nes2/                      # Application code
 │   └── config.py              # Configuration with DATABASE_URL support
 └── .env                       # Local environment configuration

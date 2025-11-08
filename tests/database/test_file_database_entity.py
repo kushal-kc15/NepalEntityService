@@ -24,19 +24,19 @@ def temp_db():
 
 
 @pytest.fixture
-def sample_actor():
-    """Create a sample actor for testing."""
+def sample_author():
+    """Create a sample author for testing."""
     return Actor(slug="harka-sampang", name="Harka Sampang")
 
 
 @pytest.fixture
-def sample_version_summary(sample_actor):
+def sample_version_summary(sample_author):
     """Create a sample version summary for testing."""
     return VersionSummary(
         entity_or_relationship_id="entity:person/harka-sampang",
         type=VersionType.ENTITY,
         version_number=1,
-        actor=sample_actor,
+        author=sample_author,
         change_description="Initial creation",
         created_at=datetime.now(),
     )
@@ -121,7 +121,7 @@ async def test_list_entities(temp_db, sample_person, sample_organization):
 
 
 @pytest.mark.asyncio
-async def test_list_entities_with_pagination(temp_db, sample_actor):
+async def test_list_entities_with_pagination(temp_db, sample_author):
     """Test listing entities with pagination."""
     entities = []
     for i in range(5):
@@ -129,7 +129,7 @@ async def test_list_entities_with_pagination(temp_db, sample_actor):
             entity_or_relationship_id=f"entity:person/person-{i}",
             type="ENTITY",
             version_number=1,
-            actor=sample_actor,
+            author=sample_author,
             change_description=f"Person {i} creation",
             created_at=datetime.now(),
         )
@@ -147,7 +147,7 @@ async def test_list_entities_with_pagination(temp_db, sample_actor):
 
 
 @pytest.mark.asyncio
-async def test_person_with_education_persistence(temp_db, sample_actor):
+async def test_person_with_education_persistence(temp_db, sample_author):
     """Test that person education info persists after save and retrieval."""
     education = Education(
         institution=LangText(en=LangTextValue(value="Tribhuvan University")),
@@ -161,7 +161,7 @@ async def test_person_with_education_persistence(temp_db, sample_actor):
         entity_or_relationship_id="entity:person/miraj-dhungana",
         type=VersionType.ENTITY,
         version_number=1,
-        actor=sample_actor,
+        author=sample_author,
         change_description="Initial creation",
         created_at=datetime.now(),
     )

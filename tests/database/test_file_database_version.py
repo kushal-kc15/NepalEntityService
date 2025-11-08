@@ -20,19 +20,19 @@ def temp_db():
 
 
 @pytest.fixture
-def sample_actor():
-    """Create a sample actor for testing."""
+def sample_author():
+    """Create a sample author for testing."""
     return Actor(slug="rabindra-mishra", name="Rabindra Mishra")
 
 
 @pytest.fixture
-def sample_version(sample_actor):
+def sample_version(sample_author):
     """Create a sample version for testing."""
     return Version(
         entity_or_relationship_id="entity:person/harka-sampang",
         type="ENTITY",
         version_number=1,
-        actor=sample_actor,
+        author=sample_author,
         change_description="Initial entity creation",
         created_at=datetime.now(),
     )
@@ -84,14 +84,14 @@ async def test_delete_nonexistent_version(temp_db):
 
 
 @pytest.mark.asyncio
-async def test_list_versions(temp_db, sample_actor):
+async def test_list_versions(temp_db, sample_author):
     """Test listing versions."""
     versions = [
         Version(
             entity_or_relationship_id="entity:person/harka-sampang",
             type="ENTITY",
             version_number=1,
-            actor=sample_actor,
+            author=sample_author,
             change_description="Initial creation",
             created_at=datetime.now(),
         ),
@@ -99,7 +99,7 @@ async def test_list_versions(temp_db, sample_actor):
             entity_or_relationship_id="relationship:person/harka-sampang:organization/party:MEMBER_OF",
             type="RELATIONSHIP",
             version_number=1,
-            actor=sample_actor,
+            author=sample_author,
             change_description="Relationship update",
             created_at=datetime.now(),
         ),
@@ -114,7 +114,7 @@ async def test_list_versions(temp_db, sample_actor):
 
 
 @pytest.mark.asyncio
-async def test_list_versions_with_pagination(temp_db, sample_actor):
+async def test_list_versions_with_pagination(temp_db, sample_author):
     """Test listing versions with pagination."""
     versions = []
     for i in range(5):
@@ -122,7 +122,7 @@ async def test_list_versions_with_pagination(temp_db, sample_actor):
             entity_or_relationship_id=f"entity:person/person-{i}",
             type="ENTITY",
             version_number=i + 1,
-            actor=sample_actor,
+            author=sample_author,
             change_description=f"Version {i + 1}",
             created_at=datetime.now(),
         )

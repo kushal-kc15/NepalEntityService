@@ -41,8 +41,8 @@ class MigrationContext:
         ...     for row in data:
         ...         entity = Entity(...)
         ...         await context.publication.create_entity(
-        ...             entity=entity,
-        ...             actor_id="actor:migration:001-test",
+        ...             entity_data=entity_data,
+        ...             author_id="migration-001-test",
         ...             change_description="Import entity"
         ...         )
         ...     

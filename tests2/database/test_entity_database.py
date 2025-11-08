@@ -14,7 +14,7 @@ from nes2.core.models.organization import PoliticalParty
 from nes2.core.models.location import Location
 from nes2.core.models.entity import EntitySubType
 from nes2.core.models.relationship import Relationship
-from nes2.core.models.version import Actor, Version, VersionSummary, VersionType
+from nes2.core.models.version import Author, Version, VersionSummary, VersionType
 
 
 class TestEntityDatabaseInterface:
@@ -46,10 +46,10 @@ class TestEntityDatabaseInterface:
             'get_version',
             'delete_version',
             'list_versions',
-            'put_actor',
-            'get_actor',
-            'delete_actor',
-            'list_actors',
+            'put_author',
+            'get_author',
+            'delete_author',
+            'list_authors',
         ]
         
         for method_name in required_methods:
@@ -70,15 +70,15 @@ class TestEntityDatabaseEntityOperations:
             names=[
                 Name(
                     kind=NameKind.PRIMARY,
-                    en={"full": "Ram Chandra Poudel", "first": "Ram Chandra", "last": "Poudel"},
-                    ne={"full": "राम चन्द्र पौडेल", "first": "राम चन्द्र", "last": "पौडेल"}
+                    en={"full": "Ram Chandra Poudel", "given": "Ram Chandra", "family": "Poudel"},
+                    ne={"full": "राम चन्द्र पौडेल", "given": "राम चन्द्र", "family": "पौडेल"}
                 )
             ],
             version_summary=VersionSummary(
                 entity_or_relationship_id="entity:person/ram-chandra-poudel",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system-importer", name="System Importer"),
+                author=Author(slug="system-importer", name="System Importer"),
                 change_description="Initial import",
                 created_at=datetime.now(UTC)
             ),
@@ -102,7 +102,7 @@ class TestEntityDatabaseEntityOperations:
                 entity_or_relationship_id="entity:organization/political_party/nepali-congress",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system-importer", name="System Importer"),
+                author=Author(slug="system-importer", name="System Importer"),
                 change_description="Initial import",
                 created_at=datetime.now(UTC)
             ),
@@ -127,7 +127,7 @@ class TestEntityDatabaseEntityOperations:
                 entity_or_relationship_id="entity:location/metropolitan_city/kathmandu-metropolitan-city",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system-importer", name="System Importer"),
+                author=Author(slug="system-importer", name="System Importer"),
                 change_description="Initial import",
                 created_at=datetime.now(UTC)
             ),
@@ -297,7 +297,7 @@ class TestEntityDatabaseEntityOperations:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -334,7 +334,7 @@ class TestEntityDatabaseRelationshipOperations:
                 entity_or_relationship_id="relationship:entity:person/ram-chandra-poudel:entity:organization/political_party/nepali-congress:MEMBER_OF",
                 type=VersionType.RELATIONSHIP,
                 version_number=1,
-                actor=Actor(slug="system-importer", name="System Importer"),
+                author=Author(slug="system-importer", name="System Importer"),
                 change_description="Initial import",
                 created_at=datetime.now(UTC)
             ),
@@ -428,7 +428,7 @@ class TestEntityDatabaseRelationshipOperations:
                     entity_or_relationship_id=f"relationship:entity:person/person-{i}:entity:organization/political_party/nepali-congress:MEMBER_OF",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -453,7 +453,7 @@ class TestEntityDatabaseVersionOperations:
             entity_or_relationship_id="entity:person/ram-chandra-poudel",
             type=VersionType.ENTITY,
             version_number=1,
-            actor=Actor(slug="system-importer", name="System Importer"),
+            author=Author(slug="system-importer", name="System Importer"),
             change_description="Initial import",
             created_at=datetime.now(UTC),
             snapshot={
@@ -510,7 +510,7 @@ class TestEntityDatabaseVersionOperations:
                 entity_or_relationship_id="entity:person/ram-chandra-poudel",
                 type=VersionType.ENTITY,
                 version_number=i + 1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description=f"Update {i + 1}",
                 created_at=datetime.now(UTC),
                 snapshot={"version": i + 1}
@@ -524,65 +524,65 @@ class TestEntityDatabaseVersionOperations:
         assert len(versions) == 3
 
 
-class TestEntityDatabaseActorOperations:
-    """Test actor CRUD operations through EntityDatabase interface."""
+class TestEntityDatabaseAuthorOperations:
+    """Test author CRUD operations through EntityDatabase interface."""
 
     @pytest.fixture
-    def sample_actor(self):
-        """Create a sample actor for testing."""
-        return Actor(
+    def sample_author(self):
+        """Create a sample author for testing."""
+        return Author(
             slug="system-importer",
             name="System Importer"
         )
 
     @pytest.mark.asyncio
-    async def test_put_actor_stores_actor(self, temp_db_path, sample_actor):
-        """Test that put_actor stores an actor and returns it."""
+    async def test_put_author_stores_author(self, temp_db_path, sample_author):
+        """Test that put_author stores an author and returns it."""
         from nes2.database.file_database import FileDatabase
         
         db = FileDatabase(base_path=str(temp_db_path))
         
-        # Store actor
-        result = await db.put_actor(sample_actor)
+        # Store author
+        result = await db.put_author(sample_author)
         
-        # Should return the same actor
-        assert result.id == sample_actor.id
-        assert result.slug == sample_actor.slug
+        # Should return the same author
+        assert result.id == sample_author.id
+        assert result.slug == sample_author.slug
         assert result.name == "System Importer"
 
     @pytest.mark.asyncio
-    async def test_get_actor_retrieves_stored_actor(self, temp_db_path, sample_actor):
-        """Test that get_actor retrieves a previously stored actor."""
+    async def test_get_author_retrieves_stored_author(self, temp_db_path, sample_author):
+        """Test that get_author retrieves a previously stored author."""
         from nes2.database.file_database import FileDatabase
         
         db = FileDatabase(base_path=str(temp_db_path))
         
-        # Store actor
-        await db.put_actor(sample_actor)
+        # Store author
+        await db.put_author(sample_author)
         
-        # Retrieve actor
-        retrieved = await db.get_actor(sample_actor.id)
+        # Retrieve author
+        retrieved = await db.get_author(sample_author.id)
         
-        # Should retrieve the same actor
+        # Should retrieve the same author
         assert retrieved is not None
-        assert retrieved.id == sample_actor.id
-        assert retrieved.slug == sample_actor.slug
+        assert retrieved.id == sample_author.id
+        assert retrieved.slug == sample_author.slug
         assert retrieved.name == "System Importer"
 
     @pytest.mark.asyncio
-    async def test_list_actors_returns_all_actors(self, temp_db_path):
-        """Test that list_actors returns all stored actors."""
+    async def test_list_authors_returns_all_authors(self, temp_db_path):
+        """Test that list_authors returns all stored authors."""
         from nes2.database.file_database import FileDatabase
         
         db = FileDatabase(base_path=str(temp_db_path))
         
-        # Store multiple actors
+        # Store multiple authors
         for i in range(3):
-            actor = Actor(slug=f"actor-{i}", name=f"Actor {i}")
-            await db.put_actor(actor)
+            author = Author(slug=f"author-{i}", name=f"Author {i}")
+            await db.put_author(author)
         
-        # List all actors
-        actors = await db.list_actors(limit=100)
+        # List all authors
+        authors = await db.list_authors(limit=100)
         
-        # Should return all 3 actors
-        assert len(actors) == 3
+        # Should return all 3 authors
+        assert len(authors) == 3

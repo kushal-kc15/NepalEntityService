@@ -10,7 +10,7 @@ from ..constraints import (
     SLUG_PATTERN,
 )
 from .builders import (
-    break_actor_id,
+    break_author_id,
     break_entity_id,
     break_relationship_id,
     break_version_id,
@@ -136,26 +136,26 @@ def validate_version_id(version_id: str) -> str:
     return version_id
 
 
-def is_valid_actor_id(actor_id: str) -> bool:
-    """Validate if a string is a valid actor ID format."""
+def is_valid_author_id(author_id: str) -> bool:
+    """Validate if a string is a valid author ID format."""
     try:
-        validate_actor_id(actor_id)
+        validate_author_id(author_id)
         return True
     except ValueError:
         return False
 
 
-def validate_actor_id(actor_id: str) -> str:
-    """Validate actor ID and return it if valid, raise ValueError if not."""
+def validate_author_id(author_id: str) -> str:
+    """Validate author ID and return it if valid, raise ValueError if not."""
     try:
-        components = break_actor_id(actor_id)
+        components = break_author_id(author_id)
     except ValueError as e:
-        raise ValueError(f"Invalid actor ID format: {actor_id}") from e
+        raise ValueError(f"Invalid author ID format: {author_id}") from e
 
     # Validate slug follows same pattern as entity slugs
     if len(components.slug) < MIN_SLUG_LENGTH or len(components.slug) > MAX_SLUG_LENGTH:
-        raise ValueError(f"Actor slug length invalid: {components.slug}")
+        raise ValueError(f"Author slug length invalid: {components.slug}")
     if not re.match(SLUG_PATTERN, components.slug):
-        raise ValueError(f"Invalid actor slug format: {components.slug}")
+        raise ValueError(f"Invalid author slug format: {components.slug}")
 
-    return actor_id
+    return author_id

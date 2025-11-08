@@ -85,8 +85,8 @@ curl "http://localhost:8000/api/entities?query=poudel&entity_type=person&limit=5
           "kind": "PRIMARY",
           "en": {
             "full": "Ram Chandra Poudel",
-            "first": "Ram Chandra",
-            "last": "Poudel"
+            "given": "Ram Chandra",
+            "family": "Poudel"
           },
           "ne": {
             "full": "राम चन्द्र पौडेल"
@@ -96,7 +96,7 @@ curl "http://localhost:8000/api/entities?query=poudel&entity_type=person&limit=5
       "version_summary": {
         "version": 1,
         "created_at": "2024-01-15T10:30:00Z",
-        "created_by": "actor:system:importer"
+        "created_by": "author:system:importer"
       },
       "attributes": {
         "party": "nepali-congress",
@@ -196,7 +196,7 @@ curl "http://localhost:8000/api/entities/entity:person/ram-chandra-poudel/versio
     {
       "entity_or_relationship_id": "entity:person/ram-chandra-poudel",
       "version_number": 2,
-      "actor": "actor:human:data-maintainer",
+      "author": "author:human:data-maintainer",
       "created_at": "2024-01-20T14:30:00Z",
       "change_description": "Updated party affiliation",
       "snapshot": {
@@ -208,7 +208,7 @@ curl "http://localhost:8000/api/entities/entity:person/ram-chandra-poudel/versio
     {
       "entity_or_relationship_id": "entity:person/ram-chandra-poudel",
       "version_number": 1,
-      "actor": "actor:system:importer",
+      "author": "author:system:importer",
       "created_at": "2024-01-15T10:30:00Z",
       "change_description": "Initial import",
       "snapshot": {...}
@@ -269,7 +269,7 @@ curl "http://localhost:8000/api/entities/entity:person/ram-chandra-poudel/relati
       "version_summary": {
         "version": 1,
         "created_at": "2024-01-15T10:30:00Z",
-        "created_by": "actor:system:importer"
+        "created_by": "author:system:importer"
       }
     }
   ],

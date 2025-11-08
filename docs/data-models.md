@@ -19,17 +19,17 @@ Entities represent persons, organizations, and locations in Nepal's political an
       "kind": "PRIMARY | ALIAS | ALTERNATE | BIRTH | OFFICIAL",
       "en": {
         "full": "string",
-        "first": "string (optional)",
+        "given": "string (optional)",
         "middle": "string (optional)",
-        "last": "string (optional)",
+        "family": "string (optional)",
         "prefix": "string (optional)",
         "suffix": "string (optional)"
       },
       "ne": {
         "full": "string",
-        "first": "string (optional)",
+        "given": "string (optional)",
         "middle": "string (optional)",
-        "last": "string (optional)",
+        "family": "string (optional)",
         "prefix": "string (optional)",
         "suffix": "string (optional)"
       }
@@ -98,8 +98,8 @@ Represents individual persons (politicians, public officials, etc.).
       "kind": "PRIMARY",
       "en": {
         "full": "Ram Chandra Poudel",
-        "first": "Ram Chandra",
-        "last": "Poudel"
+        "given": "Ram Chandra",
+        "family": "Poudel"
       },
       "ne": {
         "full": "राम चन्द्र पौडेल"
@@ -349,7 +349,7 @@ Versions provide complete audit trails for entities and relationships.
 {
   "entity_or_relationship_id": "string (required)",
   "version_number": "integer (required)",
-  "actor": "string (required)",
+  "author": "string (required)",
   "created_at": "datetime (required)",
   "change_description": "string (optional)",
   "snapshot": {
@@ -374,25 +374,25 @@ Every change creates a new version:
 
 **Version Metadata**:
 - `version_number`: Sequential version number
-- `actor`: Who made the change (actor ID)
+- `author`: Who made the change (author ID)
 - `created_at`: When the change was made
 - `change_description`: Why the change was made
 - `snapshot`: Complete state at that version
 
-### Actor Model
+### Author Model
 
-Actors represent who made changes:
+Authors represent who made changes:
 
-**Actor Types**:
-- `actor:system:*`: System-generated changes (importers, scrapers)
-- `actor:human:*`: Human data maintainers
-- `actor:api:*`: API-initiated changes (future)
+**Author Types**:
+- `author:system:*`: System-generated changes (importers, scrapers)
+- `author:human:*`: Human data maintainers
+- `author:api:*`: API-initiated changes (future)
 
-**Example Actors**:
-- `actor:system:csv-importer`: CSV import script
-- `actor:system:wikipedia-scraper`: Wikipedia scraper
-- `actor:human:data-maintainer`: Human data maintainer
-- `actor:human:researcher`: Research team member
+**Example Authors**:
+- `author:system:csv-importer`: CSV import script
+- `author:system:wikipedia-scraper`: Wikipedia scraper
+- `author:human:data-maintainer`: Human data maintainer
+- `author:human:researcher`: Research team member
 
 ## Validation Rules
 
@@ -451,8 +451,8 @@ All changes should include descriptions:
       "kind": "PRIMARY",
       "en": {
         "full": "Sher Bahadur Deuba",
-        "first": "Sher Bahadur",
-        "last": "Deuba"
+        "given": "Sher Bahadur",
+        "family": "Deuba"
       },
       "ne": {
         "full": "शेर बहादुर देउबा"
@@ -462,7 +462,7 @@ All changes should include descriptions:
   "version_summary": {
     "version": 3,
     "created_at": "2024-01-20T10:30:00Z",
-    "created_by": "actor:human:data-maintainer"
+    "created_by": "author:human:data-maintainer"
   },
   "identifiers": [
     {
@@ -513,7 +513,7 @@ All changes should include descriptions:
   "version_summary": {
     "version": 2,
     "created_at": "2024-01-20T10:30:00Z",
-    "created_by": "actor:human:data-maintainer"
+    "created_by": "author:human:data-maintainer"
   },
   "attributions": [
     "https://nepalikhabar.com/article/...",

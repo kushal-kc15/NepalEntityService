@@ -131,7 +131,7 @@ entity_data = {
 
 entity = await pub_service.create_entity(
     entity_data=entity_data,
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Initial import"
 )
 ```
@@ -148,7 +148,7 @@ entity.attributes["position"] = "President of Nepal"
 # Update with versioning
 updated = await pub_service.update_entity(
     entity=entity,
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Updated position"
 )
 ```
@@ -162,7 +162,7 @@ relationship = await pub_service.create_relationship(
     relationship_type="MEMBER_OF",
     start_date=date(1970, 1, 1),
     attributes={"role": "Senior Leader"},
-    actor_id="actor:human:data-maintainer",
+    author_id="author:human:data-maintainer",
     change_description="Added party membership"
 )
 ```
@@ -198,7 +198,7 @@ versions = await pub_service.get_entity_versions(
 for version in versions:
     print(f"Version {version.version_number}")
     print(f"  Created: {version.created_at}")
-    print(f"  Actor: {version.actor.slug}")
+    print(f"  Author: {version.author.slug}")
     print(f"  Description: {version.change_description}")
 ```
 
@@ -221,7 +221,7 @@ All examples include proper error handling:
 try:
     entity = await pub_service.create_entity(
         entity_data=entity_data,
-        actor_id="actor:human:data-maintainer",
+        author_id="author:human:data-maintainer",
         change_description="Import"
     )
 except ValueError as e:

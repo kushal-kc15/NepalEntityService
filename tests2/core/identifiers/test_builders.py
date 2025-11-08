@@ -80,17 +80,17 @@ def test_break_version_id():
     assert components.version_number == 2
 
 
-def test_build_actor_id():
-    """Test building actor ID."""
-    from nes2.core.identifiers.builders import build_actor_id
+def test_build_author_id():
+    """Test building author ID."""
+    from nes2.core.identifiers.builders import build_author_id
     
-    actor_id = build_actor_id("csv-importer")
-    assert actor_id == "actor:csv-importer"
+    author_id = build_author_id("csv-importer")
+    assert author_id == "author:csv-importer"
 
 
-def test_break_actor_id():
-    """Test breaking actor ID."""
-    from nes2.core.identifiers.builders import break_actor_id
+def test_break_author_id():
+    """Test breaking author ID."""
+    from nes2.core.identifiers.builders import break_author_id
     
-    components = break_actor_id("actor:csv-importer")
+    components = break_author_id("author:csv-importer")
     assert components.slug == "csv-importer"

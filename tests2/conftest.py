@@ -26,13 +26,13 @@ def sample_nepali_person():
                 "kind": "PRIMARY",
                 "en": {
                     "full": "Ram Chandra Poudel",
-                    "first": "Ram Chandra",
-                    "last": "Poudel"
+                    "given": "Ram Chandra",
+                    "family": "Poudel"
                 },
                 "ne": {
                     "full": "राम चन्द्र पौडेल",
-                    "first": "राम चन्द्र",
-                    "last": "पौडेल"
+                    "given": "राम चन्द्र",
+                    "family": "पौडेल"
                 }
             }
         ],

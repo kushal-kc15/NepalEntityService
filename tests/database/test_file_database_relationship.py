@@ -21,19 +21,19 @@ def temp_db():
 
 
 @pytest.fixture
-def sample_actor():
-    """Create a sample actor for testing."""
+def sample_author():
+    """Create a sample author for testing."""
     return Actor(slug="miraj-dhungana", name="Miraj Dhungana")
 
 
 @pytest.fixture
-def sample_version_summary(sample_actor):
+def sample_version_summary(sample_author):
     """Create a sample version summary for testing."""
     return VersionSummary(
         entity_or_relationship_id="relationship:person/harka-sampang:organization/shram-sanskriti-party:MEMBER_OF",
         type="RELATIONSHIP",
         version_number=1,
-        actor=sample_actor,
+        author=sample_author,
         change_description="Initial relationship creation",
         created_at=datetime.now(),
     )
@@ -98,13 +98,13 @@ async def test_delete_nonexistent_relationship(temp_db):
 
 
 @pytest.mark.asyncio
-async def test_list_relationships(temp_db, sample_actor):
+async def test_list_relationships(temp_db, sample_author):
     """Test listing relationships."""
     version_summary1 = VersionSummary(
         entity_or_relationship_id="relationship:person/harka-sampang:organization/shram-sanskriti-party:MEMBER_OF",
         type="RELATIONSHIP",
         version_number=1,
-        actor=sample_actor,
+        author=sample_author,
         change_description="Relationship 1",
         created_at=datetime.now(),
     )
@@ -112,7 +112,7 @@ async def test_list_relationships(temp_db, sample_actor):
         entity_or_relationship_id="relationship:person/rabindra-mishra:organization/rastriya-swatantra-party:AFFILIATED_WITH",
         type="RELATIONSHIP",
         version_number=1,
-        actor=sample_actor,
+        author=sample_author,
         change_description="Relationship 2",
         created_at=datetime.now(),
     )
@@ -142,7 +142,7 @@ async def test_list_relationships(temp_db, sample_actor):
 
 
 @pytest.mark.asyncio
-async def test_list_relationships_with_pagination(temp_db, sample_actor):
+async def test_list_relationships_with_pagination(temp_db, sample_author):
     """Test listing relationships with pagination."""
     relationships = []
     for i in range(5):
@@ -150,7 +150,7 @@ async def test_list_relationships_with_pagination(temp_db, sample_actor):
             entity_or_relationship_id=f"relationship:person/person-{i}:organization/org-{i}:MEMBER_OF",
             type="RELATIONSHIP",
             version_number=1,
-            actor=sample_actor,
+            author=sample_author,
             change_description=f"Relationship {i}",
             created_at=datetime.now(),
         )

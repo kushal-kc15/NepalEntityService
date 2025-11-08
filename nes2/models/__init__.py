@@ -1,6 +1,17 @@
-"""Core models for Nepal Entity Service v2."""
+"""
+Convenience module for accessing nes2 models.
 
-from .base import (
+This module re-exports all models from nes2.core.models for easier imports.
+Instead of:
+    from nes2.core.models.entity import Entity, EntityType
+    from nes2.core.models.base import Name, NameKind, NameParts
+
+You can use:
+    from nes2.models import Entity, EntityType, Name, NameKind, NameParts
+"""
+
+from nes2.core.models import (
+    # Base models
     Address,
     Attribution,
     Contact,
@@ -13,22 +24,39 @@ from .base import (
     NameKind,
     NameParts,
     ProvenanceMethod,
-)
-from .entity import Entity, EntitySubType, EntityType, ExternalIdentifier, IdentifierScheme
-from .location import ADMINISTRATIVE_LEVELS, Location, LocationType
-from .organization import GovernmentBody, GovernmentType, Organization, PoliticalParty
-from .person import (
-    Candidacy,
-    Education,
-    ElectoralDetails,
-    Gender,
+    # Entity models
+    Entity,
+    EntitySubType,
+    EntityType,
+    ExternalIdentifier,
+    IdentifierScheme,
+    # Person models
     Person,
     PersonDetails,
+    Gender,
+    Education,
     Position,
+    ElectoralDetails,
+    Candidacy,
     Symbol,
+    # Organization models
+    Organization,
+    PoliticalParty,
+    GovernmentBody,
+    GovernmentType,
+    # Location models
+    Location,
+    LocationType,
+    ADMINISTRATIVE_LEVELS,
+    # Relationship models
+    Relationship,
+    RelationshipType,
+    # Version models
+    Author,
+    Version,
+    VersionSummary,
+    VersionType,
 )
-from .relationship import Relationship, RelationshipType
-from .version import Author, Version, VersionSummary, VersionType
 
 __all__ = [
     # Base models

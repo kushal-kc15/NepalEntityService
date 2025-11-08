@@ -93,7 +93,7 @@ NepalEntityService/
 - Entity JSON files (100k-1M files)
 - Relationship JSON files
 - Version history files
-- Actor files
+- Author files
 
 **Characteristics**:
 - Large (~1GB+)
@@ -124,7 +124,7 @@ nes-db/
 │   │           └── ram-chandra-poudel/
 │   │               ├── v1.json
 │   │               └── v2.json
-│   └── actor/
+│   └── author/
 │       └── ... (1k+ files)
 └── README.md
 ```

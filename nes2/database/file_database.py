@@ -31,7 +31,7 @@ from nes2.core.models.person import Person
 from nes2.core.models.organization import Organization, PoliticalParty, GovernmentBody
 from nes2.core.models.location import Location
 from nes2.core.models.relationship import Relationship
-from nes2.core.models.version import Actor, Version
+from nes2.core.models.version import Author, Version
 
 from .entity_database import EntityDatabase
 
@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 class FileDatabase(EntityDatabase):
     """File-based implementation of EntityDatabase.
     
-    Stores entities, relationships, versions, and actors as JSON files
+    Stores entities, relationships, versions, and authors as JSON files
     in a directory structure organized by type and subtype.
     
     Default database path: nes-db/v2
@@ -71,7 +71,7 @@ class FileDatabase(EntityDatabase):
                 relationship/
                     {relationship-id}/
                         {version-number}.json
-            actor/
+            author/
                 {slug}.json
     """
 
@@ -1060,16 +1060,16 @@ class FileDatabase(EntityDatabase):
                         score += 50 + name_kind_bonus
                 
                 # Check first name
-                if name.en.first:
-                    first_name_lower = name.en.first.lower()
+                if name.en.given:
+                    first_name_lower = name.en.given.lower()
                     if first_name_lower == normalized_query:
                         score += 75 + name_kind_bonus
                     elif normalized_query in first_name_lower:
                         score += 25 + name_kind_bonus
                 
                 # Check last name
-                if name.en.last:
-                    last_name_lower = name.en.last.lower()
+                if name.en.family:
+                    last_name_lower = name.en.family.lower()
                     if last_name_lower == normalized_query:
                         score += 75 + name_kind_bonus
                     elif normalized_query in last_name_lower:
@@ -1094,16 +1094,16 @@ class FileDatabase(EntityDatabase):
                         score += 50 + name_kind_bonus
                 
                 # Check first name
-                if name.ne.first:
-                    first_name_lower = name.ne.first.lower()
+                if name.ne.given:
+                    first_name_lower = name.ne.given.lower()
                     if first_name_lower == normalized_query:
                         score += 75 + name_kind_bonus
                     elif normalized_query in first_name_lower:
                         score += 25 + name_kind_bonus
                 
                 # Check last name
-                if name.ne.last:
-                    last_name_lower = name.ne.last.lower()
+                if name.ne.family:
+                    last_name_lower = name.ne.family.lower()
                     if last_name_lower == normalized_query:
                         score += 75 + name_kind_bonus
                     elif normalized_query in last_name_lower:
@@ -1592,7 +1592,7 @@ class FileDatabase(EntityDatabase):
         entity_or_relationship_id: str,
         limit: int = 100,
         offset: int = 0,
-        actor_slug: Optional[str] = None,
+        author_slug: Optional[str] = None,
         created_after: Optional["datetime"] = None,
         created_before: Optional["datetime"] = None,
         min_version: Optional[int] = None,
@@ -1605,7 +1605,7 @@ class FileDatabase(EntityDatabase):
             entity_or_relationship_id: The entity or relationship ID to filter by
             limit: Maximum number of versions to return
             offset: Number of versions to skip
-            actor_slug: Optional filter by actor slug
+            author_slug: Optional filter by author slug
             created_after: Optional filter for versions created after this datetime
             created_before: Optional filter for versions created before this datetime
             min_version: Optional filter for minimum version number (inclusive)
@@ -1647,8 +1647,8 @@ class FileDatabase(EntityDatabase):
                 # Parse version
                 version = Version.model_validate(data)
                 
-                # Apply actor filter
-                if actor_slug and version.actor.slug != actor_slug:
+                # Apply author filter
+                if author_slug and version.author.slug != author_slug:
                     continue
                 
                 # Apply date range filters
@@ -1678,13 +1678,13 @@ class FileDatabase(EntityDatabase):
         # Apply pagination
         return versions[offset : offset + limit]
 
-    async def put_actor(self, actor: Actor) -> Actor:
-        """Store an actor in the database."""
-        file_path = self._id_to_path(actor.id)
+    async def put_author(self, author: Author) -> Author:
+        """Store an author in the database."""
+        file_path = self._id_to_path(author.id)
         self._ensure_dir(file_path)
         
-        # Serialize actor and remove computed fields
-        data = actor.model_dump(mode="json")
+        # Serialize author and remove computed fields
+        data = author.model_dump(mode="json")
         data.pop("id", None)
         
         with open(file_path, "w") as f:
@@ -1697,11 +1697,11 @@ class FileDatabase(EntityDatabase):
                 indent=2,
             )
         
-        return actor
+        return author
 
-    async def get_actor(self, actor_id: str) -> Optional[Actor]:
-        """Retrieve an actor by its ID."""
-        file_path = self._id_to_path(actor_id)
+    async def get_author(self, author_id: str) -> Optional[Author]:
+        """Retrieve an author by its ID."""
+        file_path = self._id_to_path(author_id)
         
         if not file_path.exists():
             return None
@@ -1709,11 +1709,11 @@ class FileDatabase(EntityDatabase):
         with open(file_path, "r") as f:
             data = json.load(f)
         
-        return Actor.model_validate(data)
+        return Author.model_validate(data)
 
-    async def delete_actor(self, actor_id: str) -> bool:
-        """Delete an actor from the database."""
-        file_path = self._id_to_path(actor_id)
+    async def delete_author(self, author_id: str) -> bool:
+        """Delete an author from the database."""
+        file_path = self._id_to_path(author_id)
         
         if file_path.exists():
             file_path.unlink()
@@ -1721,38 +1721,38 @@ class FileDatabase(EntityDatabase):
         
         return False
 
-    async def list_actors(
+    async def list_authors(
         self,
         limit: int = 100,
         offset: int = 0,
-    ) -> List[Actor]:
-        """List actors with pagination."""
-        search_path = self.base_path / "actor"
+    ) -> List[Author]:
+        """List authors with pagination."""
+        search_path = self.base_path / "author"
         
         if not search_path.exists():
             return []
         
-        actors = []
+        authors = []
         
         # Recursively find all JSON files
         for file_path in search_path.rglob("*.json"):
-            if len(actors) >= limit + offset:
+            if len(authors) >= limit + offset:
                 break
             
             try:
                 with open(file_path, "r") as f:
                     data = json.load(f)
                 
-                # Check if this is an actor (has slug)
+                # Check if this is an author (has slug)
                 if "slug" not in data:
                     continue
                 
-                actor = Actor.model_validate(data)
-                actors.append(actor)
+                author = Author.model_validate(data)
+                authors.append(author)
                 
             except (json.JSONDecodeError, ValueError, KeyError):
                 # Skip invalid files
                 continue
         
         # Apply pagination
-        return actors[offset : offset + limit]
+        return authors[offset : offset + limit]

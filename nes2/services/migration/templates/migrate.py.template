@@ -29,9 +29,9 @@ async def migrate(context):
         Create and update entities and relationships with full versioning.
         
         Methods:
-            await context.publication.create_entity(entity, actor_id, change_description)
-            await context.publication.update_entity(entity_id, updates, actor_id, change_description)
-            await context.publication.create_relationship(relationship, actor_id, change_description)
+            await context.publication.create_entity(entity, author_id, change_description)
+            await context.publication.update_entity(entity_id, updates, author_id, change_description)
+            await context.publication.create_relationship(relationship, author_id, change_description)
     
     context.search - SearchService
         Search and query existing entities.
@@ -110,7 +110,7 @@ async def migrate(context):
     1. Import entities from CSV:
     
         data = context.read_csv("entities.csv")
-        actor_id = "actor:migration:{prefix}-{name}"
+        author_id = "author:migration:{prefix}-{name}"
         
         for row in data:
             entity = Entity(
@@ -125,7 +125,7 @@ async def migrate(context):
             
             await context.publication.create_entity(
                 entity=entity,
-                actor_id=actor_id,
+                author_id=author_id,
                 change_description=f"Import {{row['name_en']}}"
             )
         
@@ -134,7 +134,7 @@ async def migrate(context):
     2. Update existing entities:
     
         entities = context.db.list_entities(entity_type=EntityType.PERSON)
-        actor_id = "actor:migration:{prefix}-{name}"
+        author_id = "author:migration:{prefix}-{name}"
         
         for entity in entities:
             updates = {{
@@ -146,7 +146,7 @@ async def migrate(context):
             await context.publication.update_entity(
                 entity_id=entity.id,
                 updates=updates,
-                actor_id=actor_id,
+                author_id=author_id,
                 change_description="Mark as verified"
             )
         
@@ -155,7 +155,7 @@ async def migrate(context):
     3. Create relationships:
     
         data = context.read_csv("relationships.csv")
-        actor_id = "actor:migration:{prefix}-{name}"
+        author_id = "author:migration:{prefix}-{name}"
         
         for row in data:
             relationship = Relationship(
@@ -167,7 +167,7 @@ async def migrate(context):
             
             await context.publication.create_relationship(
                 relationship=relationship,
-                actor_id=actor_id,
+                author_id=author_id,
                 change_description=f"Link {{row['from_id']}} to {{row['to_id']}}"
             )
         
@@ -175,7 +175,7 @@ async def migrate(context):
     
     4. Search and update:
     
-        actor_id = "actor:migration:{prefix}-{name}"
+        author_id = "author:migration:{prefix}-{name}"
         
         # Find entity by name
         entity = await context.search.find_entity_by_name(
@@ -188,7 +188,7 @@ async def migrate(context):
             await context.publication.update_entity(
                 entity_id=entity.id,
                 updates=updates,
-                actor_id=actor_id,
+                author_id=author_id,
                 change_description="Update title"
             )
             context.log(f"Updated {{entity.id}}")
@@ -214,15 +214,15 @@ async def migrate(context):
     # Example: Read data from CSV
     # data = context.read_csv("data.csv")
     
-    # Example: Create actor for this migration
-    # actor_id = "actor:migration:{prefix}-{name}"
+    # Example: Create author for this migration
+    # author_id = "author:migration:{prefix}-{name}"
     
     # Example: Process each row
     # for row in data:
     #     entity = Entity(...)
     #     await context.publication.create_entity(
     #         entity=entity,
-    #         actor_id=actor_id,
+    #         author_id=author_id,
     #         change_description="Description of change"
     #     )
     

@@ -298,7 +298,7 @@ async def migrate(context):
     ministers = context.read_csv("ministers.csv")
     
     # Use publication service directly
-    actor_id = "actor:migration:005-add-ministers"
+    author_id = "author:migration:005-add-ministers"
     
     for row in ministers:
         entity = Entity(...)
@@ -306,7 +306,7 @@ async def migrate(context):
         # Direct service call (no wrapper)
         await context.publication.create_entity(
             entity=entity,
-            actor_id=actor_id,
+            author_id=author_id,
             change_description="Import minister"
         )
     
@@ -403,7 +403,7 @@ nes-db/
 │   │   └── ... (500k+ files)
 │   ├── version/
 │   │   └── ... (1M+ files)
-│   └── actor/
+│   └── author/
 │       └── ... (1k+ files)
 └── README.md
 ```
@@ -575,9 +575,9 @@ async def migrate(context):
         context: MigrationContext with access to services and data
         
     Available context methods:
-        - context.create_entity(entity, actor_id, change_description)
-        - context.update_entity(entity_id, updates, actor_id, change_description)
-        - context.create_relationship(relationship, actor_id, change_description)
+        - context.create_entity(entity, author_id, change_description)
+        - context.update_entity(entity_id, updates, author_id, change_description)
+        - context.create_relationship(relationship, author_id, change_description)
         - context.get_entity(entity_id)
         - context.search_entities(query, **filters)
         - context.find_entity_by_name(name, entity_type)
@@ -592,13 +592,13 @@ async def migrate(context):
     # Example: Read data from CSV
     # data = context.read_csv("data.csv")
     
-    # Example: Create actor for this migration
-    # actor_id = "actor:migration:{prefix}-{name}"
+    # Example: Create author for this migration
+    # author_id = "author:migration:{prefix}-{name}"
     
     # Example: Process each row
     # for row in data:
     #     entity = Entity(...)
-    #     await context.create_entity(entity, actor_id, "Description")
+    #     await context.create_entity(entity, author_id, "Description")
     
     context.log("Migration completed")
 ```
@@ -627,8 +627,8 @@ async def migrate(context):
     # Read data from CSV
     locations = context.read_csv("locations.csv")
     
-    # Create actor for this migration
-    actor_id = "actor:migration:000-initial-locations"
+    # Create author for this migration
+    author_id = "author:migration:000-initial-locations"
     
     # Process each location
     for loc_data in locations:
@@ -648,7 +648,7 @@ async def migrate(context):
         
         await context.create_entity(
             entity=entity,
-            actor_id=actor_id,
+            author_id=author_id,
             change_description=f"Initial import of {loc_data['name_en']}"
         )
     
@@ -981,14 +981,14 @@ class MigrationContext:
     async def create_entity(
         self,
         entity: Entity,
-        actor_id: str,
+        author_id: str,
         change_description: str
     ) -> Entity:
         """Create entity with error handling."""
         try:
             result = await self.publication_service.create_entity(
                 entity=entity,
-                actor_id=actor_id,
+                author_id=author_id,
                 change_description=change_description
             )
             self.entities_created += 1
@@ -1286,11 +1286,11 @@ class MigrationContext:
     def __init__(self, publication_service: PublicationService, ...):
         self.publication_service = publication_service
         
-    async def create_entity(self, entity: Entity, actor_id: str, change_description: str):
+    async def create_entity(self, entity: Entity, author_id: str, change_description: str):
         """Delegate to Publication Service."""
         return await self.publication_service.create_entity(
             entity=entity,
-            actor_id=actor_id,
+            author_id=author_id,
             change_description=change_description
         )
 ```
@@ -1298,16 +1298,16 @@ class MigrationContext:
 **Benefits**:
 - All validation rules enforced
 - Automatic versioning
-- Consistent actor attribution
+- Consistent author attribution
 - Referential integrity maintained
 
-### Actor Attribution
+### Author Attribution
 
-Migrations will create special actor records:
+Migrations will create special author records:
 
 ```python
-actor = Actor(
-    id="actor:migration:000-initial-locations",
+author = Author(
+    id="author:migration:000-initial-locations",
     type="migration",
     name="Migration: 000-initial-locations",
     metadata={
@@ -1484,7 +1484,7 @@ async def migrate(context):
         
         await context.create_entity(
             entity=entity,
-            actor_id="actor:migration:003-normalize-names",
+            author_id="author:migration:003-normalize-names",
             change_description=f"Normalized name using GenAI: {raw['name']}"
         )
 ```
@@ -1549,7 +1549,7 @@ The Migration System will:
 async def bulk_create_entities(
     self,
     entities: List[Entity],
-    actor_id: str,
+    author_id: str,
     change_description: str,
     batch_size: int = 100
 ) -> List[Entity]:
@@ -1558,7 +1558,7 @@ async def bulk_create_entities(
     for i in range(0, len(entities), batch_size):
         batch = entities[i:i+batch_size]
         for entity in batch:
-            result = await self.create_entity(entity, actor_id, change_description)
+            result = await self.create_entity(entity, author_id, change_description)
             results.append(result)
         self.log(f"Processed {min(i+batch_size, len(entities))}/{len(entities)} entities")
     return results
@@ -1676,7 +1676,7 @@ This section describes the complete end-to-end workflow for updating data in the
 
 #### Phase 1: Contribution (Steps 1-5)
 
-**Actor**: Community Contributor
+**Author**: Community Contributor
 
 **Location**: Service API Repository (fork)
 
@@ -1705,11 +1705,11 @@ This section describes the complete end-to-end workflow for updating data in the
    # Edit migrations/005-add-new-ministers/migrate.py
    async def migrate(context):
        ministers = context.read_csv("ministers_2024.csv")
-       actor_id = "actor:migration:005-add-new-ministers"
+       author_id = "author:migration:005-add-new-ministers"
        
        for row in ministers:
            entity = Entity(...)
-           await context.create_entity(entity, actor_id, "Import minister")
+           await context.create_entity(entity, author_id, "Import minister")
    ```
 
 4. **Document Migration**
@@ -1734,7 +1734,7 @@ This section describes the complete end-to-end workflow for updating data in the
 
 #### Phase 2: Automated Build and Review (Steps 6-9)
 
-**Actor**: CI/CD System (GitHub Actions) + Maintainer
+**Author**: CI/CD System (GitHub Actions) + Maintainer
 
 **Location**: Service API Repository (PR branch)
 
@@ -1796,7 +1796,7 @@ This section describes the complete end-to-end workflow for updating data in the
 
 #### Phase 3: Automated Persistence (Steps 10-14)
 
-**Actor**: Automated Service (GitHub Actions or Scheduled Job)
+**Author**: Automated Service (GitHub Actions or Scheduled Job)
 
 **Location**: Service API Repository + Database Repository
 
@@ -1882,7 +1882,7 @@ This section describes the complete end-to-end workflow for updating data in the
 
 #### Phase 4: Data Consumption (Steps 16-17)
 
-**Actor**: API Server / Data Consumer
+**Author**: API Server / Data Consumer
 
 **Location**: Production environment
 
@@ -2135,8 +2135,8 @@ nes-db/
 │   │   │   │   └── ...
 │   │   └── relationship/
 │   │       └── ...
-│   └── actor/
-│       ├── migration-005-add-ministers.json  (actor record for migration)
+│   └── author/
+│       ├── migration-005-add-ministers.json  (author record for migration)
 │       └── ...
 └── .git/
     └── (Git history with migration commits)
@@ -2152,7 +2152,7 @@ nes-db/
 - **Entities**: `v2/entity/{type}/{slug}.json`
 - **Relationships**: `v2/relationship/{id}.json`
 - **Versions**: `v2/version/entity/{type}/{slug}/v{N}.json`
-- **Actors**: `v2/actor/{actor-id}.json`
+- **Authors**: `v2/author/{author-id}.json`
 
 **Git Commit** (in Database Repository):
 ```
@@ -2196,7 +2196,7 @@ PR: #42
 - Creates 25 files in `nes-db/v2/entity/person/minister-*.json`
 - Creates 50 files in `nes-db/v2/relationship/*.json`
 - Creates 25 files in `nes-db/v2/version/entity/person/minister-*/v1.json`
-- Creates 1 file in `nes-db/v2/actor/migration-005-add-ministers.json`
+- Creates 1 file in `nes-db/v2/author/migration-005-add-ministers.json`
 - All 101 files committed in single Git commit
 - This commit IS the migration snapshot
 

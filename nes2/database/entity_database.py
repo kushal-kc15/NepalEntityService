@@ -2,7 +2,7 @@
 
 This module defines the abstract interface that all database implementations
 must follow. It provides a consistent API for entity, relationship, version,
-and actor operations.
+and author operations.
 """
 
 from abc import ABC, abstractmethod
@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Union
 
 from nes2.core.models.entity import Entity
 from nes2.core.models.relationship import Relationship
-from nes2.core.models.version import Actor, Version
+from nes2.core.models.version import Author, Version
 
 
 class EntityDatabase(ABC):
@@ -219,54 +219,54 @@ class EntityDatabase(ABC):
         pass
 
     @abstractmethod
-    async def put_actor(self, actor: Actor) -> Actor:
-        """Store an actor in the database.
+    async def put_author(self, author: Author) -> Author:
+        """Store an author in the database.
         
         Args:
-            actor: The actor to store
+            author: The author to store
             
         Returns:
-            The stored actor
+            The stored author
         """
         pass
 
     @abstractmethod
-    async def get_actor(self, actor_id: str) -> Optional[Actor]:
-        """Retrieve an actor by its ID.
+    async def get_author(self, author_id: str) -> Optional[Author]:
+        """Retrieve an author by its ID.
         
         Args:
-            actor_id: The unique identifier of the actor
+            author_id: The unique identifier of the author
             
         Returns:
-            The actor if found, None otherwise
+            The author if found, None otherwise
         """
         pass
 
     @abstractmethod
-    async def delete_actor(self, actor_id: str) -> bool:
-        """Delete an actor from the database.
+    async def delete_author(self, author_id: str) -> bool:
+        """Delete an author from the database.
         
         Args:
-            actor_id: The unique identifier of the actor to delete
+            author_id: The unique identifier of the author to delete
             
         Returns:
-            True if the actor was deleted, False if it didn't exist
+            True if the author was deleted, False if it didn't exist
         """
         pass
 
     @abstractmethod
-    async def list_actors(
+    async def list_authors(
         self,
         limit: int = 100,
         offset: int = 0,
-    ) -> List[Actor]:
-        """List actors with pagination.
+    ) -> List[Author]:
+        """List authors with pagination.
         
         Args:
-            limit: Maximum number of actors to return
-            offset: Number of actors to skip
+            limit: Maximum number of authors to return
+            offset: Number of authors to skip
             
         Returns:
-            List of actors
+            List of authors
         """
         pass

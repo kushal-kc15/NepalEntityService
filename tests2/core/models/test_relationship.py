@@ -5,7 +5,7 @@ from datetime import date, datetime, UTC
 from pydantic import ValidationError
 
 from nes2.core.models.relationship import Relationship
-from nes2.core.models.version import Actor, VersionSummary, VersionType
+from nes2.core.models.version import Author, VersionSummary, VersionType
 
 
 def test_relationship_basic_structure():
@@ -19,7 +19,7 @@ def test_relationship_basic_structure():
             entity_or_relationship_id="relationship:person/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF",
             type=VersionType.RELATIONSHIP,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -44,7 +44,7 @@ def test_relationship_with_temporal_data():
             entity_or_relationship_id="relationship:person/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF",
             type=VersionType.RELATIONSHIP,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -66,7 +66,7 @@ def test_relationship_computed_id():
             entity_or_relationship_id="relationship:person/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF",
             type=VersionType.RELATIONSHIP,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),
@@ -90,7 +90,7 @@ def test_relationship_with_attributes(sample_relationship):
             entity_or_relationship_id="relationship:person/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF",
             type=VersionType.RELATIONSHIP,
             version_number=1,
-            actor=Actor(slug="system"),
+            author=Author(slug="system"),
             change_description="Initial",
             created_at=datetime.now(UTC)
         ),

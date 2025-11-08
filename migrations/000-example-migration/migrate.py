@@ -5,8 +5,6 @@ Author: system@nepalentity.org
 Date: 2024-11-08
 """
 
-from nes2.models.entity import Entity, EntityType, Name, NameKind, NameParts
-
 # Migration metadata (used for Git commit message)
 AUTHOR = "system@nepalentity.org"
 DATE = "2024-11-08"
@@ -25,35 +23,37 @@ async def migrate(context):
     """
     context.log("Starting migration: Creating BP Koirala entity")
     
-    # Create actor for this migration
-    actor_id = "actor:migration:000-example-migration"
+    # Create author for this migration
+    author_id = "migration-000-example-migration"
     
-    # Create BP Koirala entity
-    bp_koirala = Entity(
-        slug="bishweshwar-prasad-koirala",
-        type=EntityType.PERSON,
-        names=[
-            Name(
-                kind=NameKind.PRIMARY,
-                ne=NameParts(full="विश्वेश्वर प्रसाद कोइराला"),
-                en=NameParts(
-                    full="Bishweshwar Prasad Koirala",
-                    given="Bishweshwar Prasad",
-                    family="Koirala"
-                )
-            ),
-            Name(
-                kind=NameKind.COMMON,
-                ne=NameParts(full="बी पी कोइराला"),
-                en=NameParts(full="BP Koirala")
-            )
+    # Create BP Koirala entity data
+    entity_data = {
+        "slug": "bishweshwar-prasad-koirala",
+        "type": "person",
+        "names": [
+            {
+                "kind": "PRIMARY",
+                "en": {
+                    "full": "Bishweshwar Prasad Koirala",
+                    "given": "Bishweshwar Prasad",
+                    "family": "Koirala"
+                },
+                "ne": {
+                    "full": "विश्वेश्वर प्रसाद कोइराला"
+                }
+            },
+            {
+                "kind": "ALIAS",
+                "en": {"full": "BP Koirala"},
+                "ne": {"full": "बी पी कोइराला"}
+            }
         ]
-    )
+    }
     
     # Create the entity using the publication service
-    created_entity = await context.create_entity(
-        entity=bp_koirala,
-        actor_id=actor_id,
+    created_entity = await context.publication.create_entity(
+        entity_data=entity_data,
+        author_id=author_id,
         change_description="Initial migration: Create BP Koirala entity"
     )
     

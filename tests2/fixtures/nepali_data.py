@@ -12,8 +12,8 @@ NEPALI_POLITICIANS = [
     {
         "slug": "pushpa-kamal-dahal",
         "names": {
-            "en": {"full": "Pushpa Kamal Dahal", "first": "Pushpa Kamal", "last": "Dahal"},
-            "ne": {"full": "पुष्पकमल दाहाल", "first": "पुष्पकमल", "last": "दाहाल"}
+            "en": {"full": "Pushpa Kamal Dahal", "given": "Pushpa Kamal", "family": "Dahal"},
+            "ne": {"full": "पुष्पकमल दाहाल", "given": "पुष्पकमल", "family": "दाहाल"}
         },
         "aliases": [
             {"en": "Prachanda", "ne": "प्रचण्ड"}
@@ -25,8 +25,8 @@ NEPALI_POLITICIANS = [
     {
         "slug": "sher-bahadur-deuba",
         "names": {
-            "en": {"full": "Sher Bahadur Deuba", "first": "Sher Bahadur", "last": "Deuba"},
-            "ne": {"full": "शेरबहादुर देउवा", "first": "शेरबहादुर", "last": "देउवा"}
+            "en": {"full": "Sher Bahadur Deuba", "given": "Sher Bahadur", "family": "Deuba"},
+            "ne": {"full": "शेरबहादुर देउवा", "given": "शेरबहादुर", "family": "देउवा"}
         },
         "party": "nepali-congress",
         "constituency": "Dadeldhura-1",
@@ -35,8 +35,8 @@ NEPALI_POLITICIANS = [
     {
         "slug": "khadga-prasad-oli",
         "names": {
-            "en": {"full": "Khadga Prasad Sharma Oli", "first": "Khadga Prasad", "last": "Oli"},
-            "ne": {"full": "खड्ग प्रसाद शर्मा ओली", "first": "खड्ग प्रसाद", "last": "ओली"}
+            "en": {"full": "Khadga Prasad Sharma Oli", "given": "Khadga Prasad", "family": "Oli"},
+            "ne": {"full": "खड्ग प्रसाद शर्मा ओली", "given": "खड्ग प्रसाद", "family": "ओली"}
         },
         "aliases": [
             {"en": "KP Sharma Oli", "ne": "के पी शर्मा ओली"}
@@ -48,8 +48,8 @@ NEPALI_POLITICIANS = [
     {
         "slug": "ram-chandra-poudel",
         "names": {
-            "en": {"full": "Ram Chandra Poudel", "first": "Ram Chandra", "last": "Poudel"},
-            "ne": {"full": "राम चन्द्र पौडेल", "first": "राम चन्द्र", "last": "पौडेल"}
+            "en": {"full": "Ram Chandra Poudel", "given": "Ram Chandra", "family": "Poudel"},
+            "ne": {"full": "राम चन्द्र पौडेल", "given": "राम चन्द्र", "family": "पौडेल"}
         },
         "party": "nepali-congress",
         "constituency": "Tanahun-1",
@@ -58,8 +58,8 @@ NEPALI_POLITICIANS = [
     {
         "slug": "baburam-bhattarai",
         "names": {
-            "en": {"full": "Baburam Bhattarai", "first": "Baburam", "last": "Bhattarai"},
-            "ne": {"full": "बाबुराम भट्टराई", "first": "बाबुराम", "last": "भट्टराई"}
+            "en": {"full": "Baburam Bhattarai", "given": "Baburam", "family": "Bhattarai"},
+            "ne": {"full": "बाबुराम भट्टराई", "given": "बाबुराम", "family": "भट्टराई"}
         },
         "party": "nepal-samajbadi-party",
         "constituency": "Gorkha-1",
@@ -68,8 +68,8 @@ NEPALI_POLITICIANS = [
     {
         "slug": "bimalendra-nidhi",
         "names": {
-            "en": {"full": "Bimalendra Nidhi", "first": "Bimalendra", "last": "Nidhi"},
-            "ne": {"full": "विमलेन्द्र निधि", "first": "विमलेन्द्र", "last": "निधि"}
+            "en": {"full": "Bimalendra Nidhi", "given": "Bimalendra", "family": "Nidhi"},
+            "ne": {"full": "विमलेन्द्र निधि", "given": "विमलेन्द्र", "family": "निधि"}
         },
         "party": "nepali-congress",
         "constituency": "Dhanusha-3",
@@ -78,8 +78,8 @@ NEPALI_POLITICIANS = [
     {
         "slug": "rabi-lamichhane",
         "names": {
-            "en": {"full": "Rabi Lamichhane", "first": "Rabi", "last": "Lamichhane"},
-            "ne": {"full": "रवि लामिछाने", "first": "रवि", "last": "लामिछाने"}
+            "en": {"full": "Rabi Lamichhane", "given": "Rabi", "family": "Lamichhane"},
+            "ne": {"full": "रवि लामिछाने", "given": "रवि", "family": "लामिछाने"}
         },
         "party": "rastriya-swatantra-party",
         "constituency": "Chitwan-2",
@@ -88,8 +88,8 @@ NEPALI_POLITICIANS = [
     {
         "slug": "agni-prasad-sapkota",
         "names": {
-            "en": {"full": "Agni Prasad Sapkota", "first": "Agni Prasad", "last": "Sapkota"},
-            "ne": {"full": "अग्नि प्रसाद सापकोटा", "first": "अग्नि प्रसाद", "last": "सापकोटा"}
+            "en": {"full": "Agni Prasad Sapkota", "given": "Agni Prasad", "family": "Sapkota"},
+            "ne": {"full": "अग्नि प्रसाद सापकोटा", "given": "अग्नि प्रसाद", "family": "सापकोटा"}
         },
         "party": "nepal-communist-party-maoist-centre",
         "constituency": "Sindhupalchok-1",

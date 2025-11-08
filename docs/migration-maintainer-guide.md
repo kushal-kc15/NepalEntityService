@@ -96,7 +96,7 @@ When a migration PR is submitted, check:
 - [ ] Migration script has AUTHOR, DATE, DESCRIPTION metadata
 - [ ] Implements async `migrate(context)` function
 - [ ] Includes error handling
-- [ ] Uses appropriate actor ID
+- [ ] Uses appropriate author ID
 - [ ] Logs progress messages
 
 **Documentation**:

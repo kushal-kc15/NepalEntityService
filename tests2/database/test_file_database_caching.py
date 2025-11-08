@@ -17,7 +17,7 @@ from time import sleep
 
 from nes2.core.models.base import Name, NameKind
 from nes2.core.models.person import Person
-from nes2.core.models.version import Actor, VersionSummary, VersionType
+from nes2.core.models.version import Author, VersionSummary, VersionType
 
 
 class TestCacheHitMissBehavior:
@@ -43,7 +43,7 @@ class TestCacheHitMissBehavior:
                 entity_or_relationship_id="entity:person/ram-chandra-poudel",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -77,7 +77,7 @@ class TestCacheHitMissBehavior:
                 entity_or_relationship_id="entity:person/sher-bahadur-deuba",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -131,7 +131,7 @@ class TestCacheHitMissBehavior:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -182,7 +182,7 @@ class TestCacheTTLExpiration:
                 entity_or_relationship_id="entity:person/ram-chandra-poudel",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -221,7 +221,7 @@ class TestCacheTTLExpiration:
                 entity_or_relationship_id="entity:person/sher-bahadur-deuba",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -257,7 +257,7 @@ class TestCacheTTLExpiration:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -310,7 +310,7 @@ class TestCacheInvalidationOnUpdates:
                 entity_or_relationship_id="entity:person/ram-chandra-poudel",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -342,7 +342,7 @@ class TestCacheInvalidationOnUpdates:
                 entity_or_relationship_id="entity:person/sher-bahadur-deuba",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -376,7 +376,7 @@ class TestCacheInvalidationOnUpdates:
                 entity_or_relationship_id="entity:person/ram-chandra-poudel",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -390,7 +390,7 @@ class TestCacheInvalidationOnUpdates:
                 entity_or_relationship_id="entity:organization/political_party/nepali-congress",
                 type=VersionType.ENTITY,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -410,7 +410,7 @@ class TestCacheInvalidationOnUpdates:
                 entity_or_relationship_id="relationship:entity:person/ram-chandra-poudel:entity:organization/political_party/nepali-congress:MEMBER_OF",
                 type=VersionType.RELATIONSHIP,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -443,7 +443,7 @@ class TestCacheInvalidationOnUpdates:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -501,7 +501,7 @@ class TestCacheWarming:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -548,7 +548,7 @@ class TestCacheWarming:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -565,7 +565,7 @@ class TestCacheWarming:
                     entity_or_relationship_id=f"entity:organization/political_party/party-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -611,7 +611,7 @@ class TestCacheWarming:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -655,7 +655,7 @@ class TestCacheWarming:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),

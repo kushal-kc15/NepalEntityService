@@ -20,7 +20,7 @@ from nes2.core.models.person import Person
 from nes2.core.models.organization import PoliticalParty
 from nes2.core.models.location import Location
 from nes2.core.models.entity import EntitySubType
-from nes2.core.models.version import Actor, VersionSummary, VersionType
+from nes2.core.models.version import Author, VersionSummary, VersionType
 
 
 class TestBatchReadOperations:
@@ -43,7 +43,7 @@ class TestBatchReadOperations:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -174,7 +174,7 @@ class TestConcurrentReadSupport:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -301,7 +301,7 @@ class TestDirectoryTraversalOptimization:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -317,7 +317,7 @@ class TestDirectoryTraversalOptimization:
                     entity_or_relationship_id=f"entity:organization/political_party/party-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -334,7 +334,7 @@ class TestDirectoryTraversalOptimization:
                     entity_or_relationship_id=f"entity:location/metropolitan_city/location-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -447,7 +447,7 @@ class TestIndexFileUsage:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -608,7 +608,7 @@ class TestBatchReadWithCaching:
                     entity_or_relationship_id=f"entity:person/person-{i}",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),

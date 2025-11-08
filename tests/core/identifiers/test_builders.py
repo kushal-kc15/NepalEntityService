@@ -7,7 +7,7 @@ from nes.core.identifiers import (
     EntityIdComponents,
     RelationshipIdComponents,
     VersionIdComponents,
-    break_actor_id,
+    break_author_id,
     break_entity_id,
     break_relationship_id,
     break_version_id,
@@ -155,21 +155,21 @@ class TestActorId:
         result = build_actor_id("data-migration-bot")
         assert result == "actor:data-migration-bot"
 
-    def test_break_actor_id(self):
-        result = break_actor_id("actor:system-admin")
+    def test_break_author_id(self):
+        result = break_author_id("actor:system-admin")
         assert result == ActorIdComponents(slug="system-admin")
 
-    def test_break_actor_id_with_dashes(self):
-        result = break_actor_id("actor:data-migration-bot")
+    def test_break_author_id_with_dashes(self):
+        result = break_author_id("actor:data-migration-bot")
         assert result == ActorIdComponents(slug="data-migration-bot")
 
-    def test_break_actor_id_invalid_prefix(self):
-        with pytest.raises(ValueError, match="Invalid actor ID format"):
-            break_actor_id("invalid:system-admin")
+    def test_break_author_id_invalid_prefix(self):
+        with pytest.raises(ValueError, match="Invalid author ID format"):
+            break_author_id("invalid:system-admin")
 
     def test_roundtrip_actor_id(self):
         original = "actor:system-admin"
-        components = break_actor_id(original)
+        components = break_author_id(original)
         rebuilt = build_actor_id(components.slug)
         assert rebuilt == original
 
@@ -322,5 +322,5 @@ class TestEdgeCases:
         result = build_actor_id("")
         assert result == "actor:"
 
-        components = break_actor_id(result)
+        components = break_author_id(result)
         assert components.slug == ""

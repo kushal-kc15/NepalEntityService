@@ -28,9 +28,9 @@ async def test_entity_lifecycle_management(temp_db):
 
     now = datetime.now()
 
-    # 1. Create the actor who is performing modifications.
-    actor = Actor(slug="system-user", name="System Administrator")
-    await temp_db.put_actor(actor)
+    # 1. Create the author who is performing modifications.
+    author = Author(slug="system-user", name="System Administrator")
+    await temp_db.put_author(actor)
 
     # 2. Create Entity
     entity = Person(
@@ -50,7 +50,7 @@ async def test_entity_lifecycle_management(temp_db):
             entity_or_relationship_id="entity:person/rabindra-mishra",
             type="ENTITY",
             version_number=1,
-            actor=actor,
+            author=actor,
             change_description="Initial entity creation",
             created_at=now,
         ),
@@ -147,9 +147,9 @@ async def test_organization_lifecycle(temp_db):
 
     now = datetime.now()
 
-    # 1. Create the actor who is performing modifications.
-    actor = Actor(slug="system-user", name="System Administrator")
-    await temp_db.put_actor(actor)
+    # 1. Create the author who is performing modifications.
+    author = Author(slug="system-user", name="System Administrator")
+    await temp_db.put_author(actor)
 
     # 2. Create Organization Entity
     entity = PoliticalParty(
@@ -167,7 +167,7 @@ async def test_organization_lifecycle(temp_db):
             entity_or_relationship_id="entity:organization/political_party/rastriya-swatantra-party",
             type="ENTITY",
             version_number=1,
-            actor=actor,
+            author=actor,
             change_description="Initial organization creation",
             created_at=now,
         ),

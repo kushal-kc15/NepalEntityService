@@ -150,14 +150,14 @@ class NameExtractor:
         structured = {"full": full_name.strip()}
         
         if len(name_parts) == 1:
-            structured["first"] = name_parts[0]
+            structured["given"] = name_parts[0]
         elif len(name_parts) == 2:
-            structured["first"] = name_parts[0]
-            structured["last"] = name_parts[1]
+            structured["given"] = name_parts[0]
+            structured["family"] = name_parts[1]
         elif len(name_parts) >= 3:
-            structured["first"] = name_parts[0]
+            structured["given"] = name_parts[0]
             structured["middle"] = " ".join(name_parts[1:-1])
-            structured["last"] = name_parts[-1]
+            structured["family"] = name_parts[-1]
         
         return structured
     

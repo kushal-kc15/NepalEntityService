@@ -19,7 +19,7 @@ from nes2.core.models.organization import PoliticalParty
 from nes2.core.models.location import Location
 from nes2.core.models.entity import EntitySubType
 from nes2.core.models.relationship import Relationship
-from nes2.core.models.version import Actor, VersionSummary, VersionType
+from nes2.core.models.version import Author, VersionSummary, VersionType
 
 
 class TestListRelationshipsByEntity:
@@ -42,7 +42,7 @@ class TestListRelationshipsByEntity:
                     entity_or_relationship_id="entity:person/ram-chandra-poudel",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -55,7 +55,7 @@ class TestListRelationshipsByEntity:
                     entity_or_relationship_id="entity:person/sher-bahadur-deuba",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -68,7 +68,7 @@ class TestListRelationshipsByEntity:
                     entity_or_relationship_id="entity:organization/political_party/nepali-congress",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -82,7 +82,7 @@ class TestListRelationshipsByEntity:
                     entity_or_relationship_id="entity:location/metropolitan_city/kathmandu-metropolitan-city",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -102,7 +102,7 @@ class TestListRelationshipsByEntity:
                     entity_or_relationship_id="relationship:entity:person/ram-chandra-poudel:entity:organization/political_party/nepali-congress:MEMBER_OF",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -118,7 +118,7 @@ class TestListRelationshipsByEntity:
                     entity_or_relationship_id="relationship:entity:person/sher-bahadur-deuba:entity:organization/political_party/nepali-congress:MEMBER_OF",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -133,7 +133,7 @@ class TestListRelationshipsByEntity:
                     entity_or_relationship_id="relationship:entity:person/ram-chandra-poudel:entity:location/metropolitan_city/kathmandu-metropolitan-city:LOCATED_IN",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -240,7 +240,7 @@ class TestListRelationshipsByType:
                     entity_or_relationship_id="entity:person/ram-chandra-poudel",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -253,7 +253,7 @@ class TestListRelationshipsByType:
                     entity_or_relationship_id="entity:person/sher-bahadur-deuba",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -266,7 +266,7 @@ class TestListRelationshipsByType:
                     entity_or_relationship_id="entity:organization/political_party/nepali-congress",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -280,7 +280,7 @@ class TestListRelationshipsByType:
                     entity_or_relationship_id="entity:location/metropolitan_city/kathmandu-metropolitan-city",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -299,7 +299,7 @@ class TestListRelationshipsByType:
                     entity_or_relationship_id="relationship:entity:person/ram-chandra-poudel:entity:organization/political_party/nepali-congress:MEMBER_OF",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -313,7 +313,7 @@ class TestListRelationshipsByType:
                     entity_or_relationship_id="relationship:entity:person/sher-bahadur-deuba:entity:organization/political_party/nepali-congress:MEMBER_OF",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -328,7 +328,7 @@ class TestListRelationshipsByType:
                     entity_or_relationship_id="relationship:entity:person/ram-chandra-poudel:entity:location/metropolitan_city/kathmandu-metropolitan-city:LOCATED_IN",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -342,7 +342,7 @@ class TestListRelationshipsByType:
                     entity_or_relationship_id="relationship:entity:person/sher-bahadur-deuba:entity:location/metropolitan_city/kathmandu-metropolitan-city:LOCATED_IN",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -436,7 +436,7 @@ class TestTemporalFiltering:
                     entity_or_relationship_id="entity:person/ram-chandra-poudel",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -449,7 +449,7 @@ class TestTemporalFiltering:
                     entity_or_relationship_id="entity:person/sher-bahadur-deuba",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -462,7 +462,7 @@ class TestTemporalFiltering:
                     entity_or_relationship_id="entity:organization/political_party/nepali-congress",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -483,7 +483,7 @@ class TestTemporalFiltering:
                     entity_or_relationship_id="relationship:entity:person/ram-chandra-poudel:entity:organization/political_party/nepali-congress:MEMBER_OF",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -500,7 +500,7 @@ class TestTemporalFiltering:
                     entity_or_relationship_id="relationship:entity:person/sher-bahadur-deuba:entity:organization/political_party/nepali-congress:MEMBER_OF",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -605,7 +605,7 @@ class TestBidirectionalQueries:
                     entity_or_relationship_id="entity:person/ram-chandra-poudel",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -618,7 +618,7 @@ class TestBidirectionalQueries:
                     entity_or_relationship_id="entity:person/sher-bahadur-deuba",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -631,7 +631,7 @@ class TestBidirectionalQueries:
                     entity_or_relationship_id="entity:organization/political_party/nepali-congress",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -645,7 +645,7 @@ class TestBidirectionalQueries:
                     entity_or_relationship_id="entity:location/metropolitan_city/kathmandu-metropolitan-city",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -664,7 +664,7 @@ class TestBidirectionalQueries:
                     entity_or_relationship_id="relationship:entity:person/ram-chandra-poudel:entity:organization/political_party/nepali-congress:MEMBER_OF",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -679,7 +679,7 @@ class TestBidirectionalQueries:
                     entity_or_relationship_id="relationship:entity:person/sher-bahadur-deuba:entity:organization/political_party/nepali-congress:MEMBER_OF",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -694,7 +694,7 @@ class TestBidirectionalQueries:
                     entity_or_relationship_id="relationship:entity:person/ram-chandra-poudel:entity:location/metropolitan_city/kathmandu-metropolitan-city:LOCATED_IN",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -709,7 +709,7 @@ class TestBidirectionalQueries:
                     entity_or_relationship_id="relationship:entity:location/metropolitan_city/kathmandu-metropolitan-city:entity:person/ram-chandra-poudel:AFFILIATED_WITH",
                     type=VersionType.RELATIONSHIP,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -812,7 +812,7 @@ class TestBidirectionalQueries:
                 entity_or_relationship_id="relationship:entity:person/sher-bahadur-deuba:entity:person/ram-chandra-poudel:AFFILIATED_WITH",
                 type=VersionType.RELATIONSHIP,
                 version_number=1,
-                actor=Actor(slug="system"),
+                author=Author(slug="system"),
                 change_description="Initial",
                 created_at=datetime.now(UTC)
             ),
@@ -857,7 +857,7 @@ class TestRelationshipQueryPagination:
                     entity_or_relationship_id="entity:organization/political_party/nepali-congress",
                     type=VersionType.ENTITY,
                     version_number=1,
-                    actor=Actor(slug="system"),
+                    author=Author(slug="system"),
                     change_description="Initial",
                     created_at=datetime.now(UTC)
                 ),
@@ -875,7 +875,7 @@ class TestRelationshipQueryPagination:
                         entity_or_relationship_id=f"entity:person/person-{i}",
                         type=VersionType.ENTITY,
                         version_number=1,
-                        actor=Actor(slug="system"),
+                        author=Author(slug="system"),
                         change_description="Initial",
                         created_at=datetime.now(UTC)
                     ),
@@ -895,7 +895,7 @@ class TestRelationshipQueryPagination:
                         entity_or_relationship_id=f"relationship:entity:person/person-{i}:entity:organization/political_party/nepali-congress:MEMBER_OF",
                         type=VersionType.RELATIONSHIP,
                         version_number=1,
-                        actor=Actor(slug="system"),
+                        author=Author(slug="system"),
                         change_description="Initial",
                         created_at=datetime.now(UTC)
                     ),

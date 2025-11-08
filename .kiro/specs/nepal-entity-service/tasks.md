@@ -93,7 +93,7 @@
     - Write tests for entity storage and retrieval
     - Write tests for relationship storage and retrieval
     - Write tests for version storage and retrieval
-    - Write tests for actor storage and retrieval
+    - Write tests for author storage and retrieval
     - _Requirements: Database abstraction, TDD_
 
   - [x] 2.2 Implement database foundation (Green)

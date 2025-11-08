@@ -15,7 +15,7 @@ class RelationshipIdComponents(NamedTuple):
     type: str
 
 
-class ActorIdComponents(NamedTuple):
+class AuthorIdComponents(NamedTuple):
     slug: str
 
 
@@ -108,28 +108,28 @@ def break_relationship_id(relationship_id: str) -> RelationshipIdComponents:
     return RelationshipIdComponents(source=source, target=target, type=rel_type)
 
 
-def build_actor_id(slug: str) -> str:
-    """Build actor ID in format: actor:<slug>.
+def build_author_id(slug: str) -> str:
+    """Build author ID in format: author:<slug>.
 
     Example:
-        >>> build_actor_id("csv-importer")
-        "actor:csv-importer"
+        >>> build_author_id("csv-importer")
+        "author:csv-importer"
     """
-    return f"actor:{slug}"
+    return f"author:{slug}"
 
 
-def break_actor_id(actor_id: str) -> ActorIdComponents:
-    """Break actor ID into components: ActorIdComponents(slug).
+def break_author_id(author_id: str) -> AuthorIdComponents:
+    """Break author ID into components: AuthorIdComponents(slug).
 
     Example:
-        >>> break_actor_id("actor:csv-importer")
-        ActorIdComponents(slug='csv-importer')
+        >>> break_author_id("author:csv-importer")
+        AuthorIdComponents(slug='csv-importer')
     """
-    if not actor_id.startswith("actor:"):
-        raise ValueError("Invalid actor ID format")
+    if not author_id.startswith("author:"):
+        raise ValueError("Invalid author ID format")
 
-    slug = actor_id[6:]  # Remove "actor:" prefix
-    return ActorIdComponents(slug=slug)
+    slug = author_id[7:]  # Remove "author:" prefix
+    return AuthorIdComponents(slug=slug)
 
 
 def build_version_id(entity_or_relationship_id: str, version_number: int) -> str:

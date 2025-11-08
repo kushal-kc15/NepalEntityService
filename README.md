@@ -59,4 +59,6 @@ This project follows specific design patterns and conventions to maintain consis
 
 ### Import Style
 
-- Prefer absolute imports over relative imports in Python code.
+1. Prefer absolute imports over relative imports in Python code.
+1. Avoid local imports (imports inside functions) when possible. Place imports at the module level for better readability and performance.
+  a. Exception: Local imports are acceptable when needed to avoid circular dependencies or for optional dependencies.

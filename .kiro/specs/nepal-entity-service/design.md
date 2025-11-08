@@ -202,15 +202,15 @@ entity = pub_service.create_entity(
 
 # Relationship operations (uses Relationship Module internally)
 relationship = pub_service.create_relationship(
-    source_id="entity:person:politician:ram-chandra-poudel",
-    target_id="entity:organization:political_party:nepali-congress",
+    source_id="entity:person/ram-chandra-poudel",
+    target_id="entity:organization/political_party/nepali-congress",
     relationship_type="MEMBER_OF",
     author_id="author:system:csv-importer"
 )
 
 # Version operations (uses Version Module internally)
 versions = pub_service.get_entity_versions(
-    entity_id="entity:person:politician:ram-chandra-poudel"
+    entity_id="entity:person/ram-chandra-poudel"
 )
 
 # Coordinated operations across modules
@@ -284,7 +284,7 @@ results = search_service.search_entities(
 # Relationship search
 relationships = search_service.search_relationships(
     relationship_type="MEMBER_OF",
-    target_entity_id="entity:organization:political_party:nepali-congress",
+    target_entity_id="entity:organization/political_party/nepali-congress",
     limit=10,
     offset=0
 )
@@ -532,7 +532,7 @@ normalized_entity = scraping_service.normalize_person_data(
 # Extract relationships from text using LLM
 relationships = scraping_service.extract_relationships(
     text="Ram Chandra Poudel is a member of Nepali Congress",
-    entity_id="entity:person:politician:ram-chandra-poudel"
+    entity_id="entity:person/ram-chandra-poudel"
 )
 
 # Translate Nepali text to English
@@ -741,8 +741,8 @@ print(f"Imported: {politician.id}")
 
 ```json
 {
-  "source_entity_id": "entity:type:subtype:slug",
-  "target_entity_id": "entity:type:subtype:slug",
+  "source_entity_id": "entity:type/subtype/slug",
+  "target_entity_id": "entity:type/subtype/slug",
   "type": "AFFILIATED_WITH|EMPLOYED_BY|MEMBER_OF|...",
   "start_date": "date?",
   "end_date": "date?",
@@ -782,7 +782,7 @@ db = FileDatabase(base_path="./nes-db/v2")
 pub_service = PublicationService(database=db)
 
 # Update an entity (automatically creates version)
-entity = pub_service.get_entity("entity:person:politician:ram-chandra-poudel")
+entity = pub_service.get_entity("entity:person/ram-chandra-poudel")
 entity.names[0].en.full = "Ram Chandra Poudel"
 pub_service.update_entity(
     entity=entity,
@@ -792,8 +792,8 @@ pub_service.update_entity(
 
 # Create a relationship (automatically creates version)
 relationship = pub_service.create_relationship(
-    source_entity_id="entity:person:politician:ram-chandra-poudel",
-    target_entity_id="entity:organization:political_party:nepali-congress",
+    source_entity_id="entity:person/ram-chandra-poudel",
+    target_entity_id="entity:organization/political_party/nepali-congress",
     relationship_type="MEMBER_OF",
     start_date="2000-01-01",
     author_id="author:system:csv-importer"
@@ -811,7 +811,7 @@ for entity in entities:
 
 # Get version history
 versions = pub_service.get_entity_versions(
-    entity_id="entity:person:politician:ram-chandra-poudel"
+    entity_id="entity:person/ram-chandra-poudel"
 )
 ```
 

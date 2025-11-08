@@ -44,11 +44,11 @@ def test_build_relationship_id():
     from nes2.core.identifiers.builders import build_relationship_id
     
     rel_id = build_relationship_id(
-        "entity:person/politician/ram-chandra-poudel",
+        "entity:person/ram-chandra-poudel",
         "entity:organization/political_party/nepali-congress",
         "MEMBER_OF"
     )
-    assert rel_id == "relationship:person/politician/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF"
+    assert rel_id == "relationship:person/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF"
 
 
 def test_break_relationship_id():
@@ -56,9 +56,9 @@ def test_break_relationship_id():
     from nes2.core.identifiers.builders import break_relationship_id
     
     components = break_relationship_id(
-        "relationship:person/politician/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF"
+        "relationship:person/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF"
     )
-    assert components.source == "entity:person/politician/ram-chandra-poudel"
+    assert components.source == "entity:person/ram-chandra-poudel"
     assert components.target == "entity:organization/political_party/nepali-congress"
     assert components.type == "MEMBER_OF"
 
@@ -67,16 +67,16 @@ def test_build_version_id():
     """Test building version ID."""
     from nes2.core.identifiers.builders import build_version_id
     
-    version_id = build_version_id("entity:person/politician/ram-chandra-poudel", 1)
-    assert version_id == "version:entity:person/politician/ram-chandra-poudel:1"
+    version_id = build_version_id("entity:person/ram-chandra-poudel", 1)
+    assert version_id == "version:entity:person/ram-chandra-poudel:1"
 
 
 def test_break_version_id():
     """Test breaking version ID."""
     from nes2.core.identifiers.builders import break_version_id
     
-    components = break_version_id("version:entity:person/politician/ram-chandra-poudel:2")
-    assert components.entity_or_relationship_id == "entity:person/politician/ram-chandra-poudel"
+    components = break_version_id("version:entity:person/ram-chandra-poudel:2")
+    assert components.entity_or_relationship_id == "entity:person/ram-chandra-poudel"
     assert components.version_number == 2
 
 

@@ -15,6 +15,18 @@ from .base import (
     ProvenanceMethod,
 )
 from .entity import Entity, EntitySubType, EntityType, ExternalIdentifier, IdentifierScheme
+from .location import ADMINISTRATIVE_LEVELS, Location, LocationType
+from .organization import GovernmentBody, GovernmentType, Organization, PoliticalParty
+from .person import (
+    Candidacy,
+    Education,
+    ElectoralDetails,
+    Gender,
+    Person,
+    PersonDetails,
+    Position,
+    Symbol,
+)
 from .relationship import Relationship, RelationshipType
 from .version import Actor, Version, VersionSummary, VersionType
 
@@ -38,6 +50,24 @@ __all__ = [
     "EntityType",
     "ExternalIdentifier",
     "IdentifierScheme",
+    # Person models
+    "Person",
+    "PersonDetails",
+    "Gender",
+    "Education",
+    "Position",
+    "ElectoralDetails",
+    "Candidacy",
+    "Symbol",
+    # Organization models
+    "Organization",
+    "PoliticalParty",
+    "GovernmentBody",
+    "GovernmentType",
+    # Location models
+    "Location",
+    "LocationType",
+    "ADMINISTRATIVE_LEVELS",
     # Relationship models
     "Relationship",
     "RelationshipType",

@@ -36,7 +36,7 @@ def build_entity_id(type: str, subtype: str | None, slug: str) -> str:
 
     Example:
         >>> build_entity_id("person", "politician", "ram-chandra-poudel")
-        "entity:person/politician/ram-chandra-poudel"
+        "entity:person/ram-chandra-poudel"
         >>> build_entity_id("person", None, "ram-chandra-poudel")
         "entity:person/ram-chandra-poudel"
     """
@@ -47,7 +47,7 @@ def break_entity_id(entity_id: str) -> EntityIdComponents:
     """Break entity ID into components: EntityIdComponents(type, subtype, slug).
 
     Example:
-        >>> break_entity_id("entity:person/politician/ram-chandra-poudel")
+        >>> break_entity_id("entity:person/ram-chandra-poudel")
         EntityIdComponents(type='person', subtype='politician', slug='ram-chandra-poudel')
         >>> break_entity_id("entity:person/ram-chandra-poudel")
         EntityIdComponents(type='person', subtype=None, slug='ram-chandra-poudel')
@@ -68,8 +68,8 @@ def build_relationship_id(source: str, target: str, type: str) -> str:
     """Build relationship ID in format: relationship:<source>:<target>:<type>.
 
     Example:
-        >>> build_relationship_id("entity:person/politician/ram-chandra-poudel", "entity:organization/political_party/nepali-congress", "MEMBER_OF")
-        "relationship:person/politician/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF"
+        >>> build_relationship_id("entity:person/ram-chandra-poudel", "entity:organization/political_party/nepali-congress", "MEMBER_OF")
+        "relationship:person/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF"
     """
     # Extract ID parts without "entity:" prefix
     source_part = (
@@ -85,8 +85,8 @@ def break_relationship_id(relationship_id: str) -> RelationshipIdComponents:
     """Break relationship ID into components: RelationshipIdComponents(source, target, type).
 
     Example:
-        >>> break_relationship_id("relationship:person/politician/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF")
-        RelationshipIdComponents(source='entity:person/politician/ram-chandra-poudel', target='entity:organization/political_party/nepali-congress', type='MEMBER_OF')
+        >>> break_relationship_id("relationship:person/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF")
+        RelationshipIdComponents(source='entity:person/ram-chandra-poudel', target='entity:organization/political_party/nepali-congress', type='MEMBER_OF')
     """
     if not relationship_id.startswith("relationship:"):
         raise ValueError("Invalid relationship ID format")
@@ -136,10 +136,10 @@ def build_version_id(entity_or_relationship_id: str, version_number: int) -> str
     """Build version ID in format: version:<entity_or_relationship_id>:<version_number>.
 
     Example:
-        >>> build_version_id("entity:person/politician/ram-chandra-poudel", 1)
-        "version:entity:person/politician/ram-chandra-poudel:1"
-        >>> build_version_id("relationship:person/politician/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF", 2)
-        "version:relationship:person/politician/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF:2"
+        >>> build_version_id("entity:person/ram-chandra-poudel", 1)
+        "version:entity:person/ram-chandra-poudel:1"
+        >>> build_version_id("relationship:person/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF", 2)
+        "version:relationship:person/ram-chandra-poudel:organization/political_party/nepali-congress:MEMBER_OF:2"
     """
     return f"version:{entity_or_relationship_id}:{version_number}"
 
@@ -148,8 +148,8 @@ def break_version_id(version_id: str) -> VersionIdComponents:
     """Break version ID into components: VersionIdComponents(entity_or_relationship_id, version_number).
 
     Example:
-        >>> break_version_id("version:entity:person/politician/ram-chandra-poudel:1")
-        VersionIdComponents(entity_or_relationship_id='entity:person/politician/ram-chandra-poudel', version_number=1)
+        >>> break_version_id("version:entity:person/ram-chandra-poudel:1")
+        VersionIdComponents(entity_or_relationship_id='entity:person/ram-chandra-poudel', version_number=1)
     """
     if not version_id.startswith("version:"):
         raise ValueError("Invalid version ID format")

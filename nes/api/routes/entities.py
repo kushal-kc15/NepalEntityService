@@ -28,7 +28,7 @@ class EntityListResponse(BaseModel):
 async def entities(
     id: Optional[str] = Query(
         None,
-        description="Entity ID in format `entity:type:subtype:slug` (e.g., `entity:person:politician:harka-sampang`, `entity:organization:party:rastriya-swatantra-party`)",
+        description="Entity ID in format `entity/type/subtype/slug` (e.g., `entity:person/harka-sampang`, `entity:organization/political_party/rastriya-swatantra-party`)",
     ),
     version: Optional[int] = Query(
         None,

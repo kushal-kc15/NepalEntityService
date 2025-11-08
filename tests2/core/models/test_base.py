@@ -3,10 +3,20 @@
 import pytest
 from pydantic import ValidationError
 
+from nes2.core.models.base import (
+    Contact,
+    ContactType,
+    LangText,
+    LangTextValue,
+    Name,
+    NameKind,
+    NameParts,
+    ProvenanceMethod,
+)
+
 
 def test_name_requires_at_least_one_language():
     """Test that Name model requires at least one language."""
-    from nes2.core.models.base import Name, NameKind
     
     # Should fail without any language
     with pytest.raises(ValidationError):
@@ -38,7 +48,6 @@ def test_name_requires_at_least_one_language():
 
 def test_name_parts_structure():
     """Test NameParts model structure."""
-    from nes2.core.models.base import NameParts
     
     # Minimal name with just full
     name_parts = NameParts(full="Ram Chandra Poudel")
@@ -58,7 +67,6 @@ def test_name_parts_structure():
 
 def test_contact_validation():
     """Test Contact model validation."""
-    from nes2.core.models.base import Contact, ContactType
     
     # Valid email
     contact = Contact(type=ContactType.EMAIL, value="test@example.com")
@@ -79,7 +87,6 @@ def test_contact_validation():
 
 def test_lang_text_structure():
     """Test LangText model structure."""
-    from nes2.core.models.base import LangText, LangTextValue, ProvenanceMethod
     
     # English only
     text = LangText(

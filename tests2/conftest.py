@@ -20,7 +20,7 @@ def sample_nepali_person():
     return {
         "slug": "ram-chandra-poudel",
         "type": "person",
-        "sub_type": "politician",
+        "sub_type": None,
         "names": [
             {
                 "kind": "PRIMARY",
@@ -38,7 +38,8 @@ def sample_nepali_person():
         ],
         "attributes": {
             "party": "nepali-congress",
-            "constituency": "Tanahun-1"
+            "constituency": "Tanahun-1",
+            "role": "politician"
         }
     }
 
@@ -97,7 +98,7 @@ def sample_nepali_location():
 def sample_relationship():
     """Sample relationship between entities."""
     return {
-        "source_entity_id": "entity:person/politician/ram-chandra-poudel",
+        "source_entity_id": "entity:person/ram-chandra-poudel",
         "target_entity_id": "entity:organization/political_party/nepali-congress",
         "type": "MEMBER_OF",
         "start_date": "2000-01-01",
@@ -111,7 +112,7 @@ def sample_relationship():
 def sample_version():
     """Sample version metadata."""
     return {
-        "entity_id": "entity:person/politician/ram-chandra-poudel",
+        "entity_id": "entity:person/ram-chandra-poudel",
         "version": 1,
         "created_at": "2024-01-01T00:00:00Z",
         "created_by": "author:system:csv-importer",
@@ -124,22 +125,22 @@ def authentic_nepali_politicians():
     """List of authentic Nepali politician names for testing."""
     return [
         {
-            "slug": "pushpa-kamal-dahal",
-            "en": "Pushpa Kamal Dahal",
-            "ne": "पुष्पकमल दाहाल",
-            "party": "CPN (Maoist Centre)"
+            "slug": "harka-sampang",
+            "en": "Harka Sampang",
+            "ne": "हर्क साम्पाङ",
+            "party": "Shram Sanskriti Party"
         },
         {
-            "slug": "khadga-prasad-oli",
-            "en": "Khadga Prasad Oli",
-            "ne": "खड्ग प्रसाद ओली",
-            "party": "CPN-UML"
+            "slug": "toshima-karki",
+            "en": "Toshima Karki",
+            "ne": "तोषिमा वाग्ले",
+            "party": "Rastriya Swatantra Party"
         },
         {
-            "slug": "sher-bahadur-deuba",
-            "en": "Sher Bahadur Deuba",
-            "ne": "शेरबहादुर देउवा",
-            "party": "Nepali Congress"
+            "slug": "bishwo-bhakta-dulal",
+            "en": "Bishwo Bhakta Dulal (Ahuti)",
+            "ne": "विश्वभक्त दुलाल (आहुति)",
+            "party": "Nepal Scientific Socialist Communist Party"
         },
         {
             "slug": "baburam-bhattarai",
@@ -160,14 +161,19 @@ def authentic_nepali_parties():
             "ne": "नेपाली कांग्रेस"
         },
         {
-            "slug": "cpn-uml",
-            "en": "Communist Party of Nepal (Unified Marxist-Leninist)",
-            "ne": "नेपाल कम्युनिष्ट पार्टी (एकीकृत मार्क्सवादी-लेनिनवादी)"
+            "slug": "shram-sanskriti-party",
+            "en": "Shram Sanskriti Party",
+            "ne": "श्रम संस्कृति पार्टी"
         },
         {
-            "slug": "cpn-maoist-centre",
-            "en": "Communist Party of Nepal (Maoist Centre)",
-            "ne": "नेपाल कम्युनिष्ट पार्टी (माओवादी केन्द्र)"
+            "slug": "rastriya-swatantra-party",
+            "en": "Rastriya Swatantra Party",
+            "ne": "राष्ट्रिय स्वतन्त्र पार्टी"
+        },
+        {
+            "slug": "nepal-scientific-socialist-communist-party",
+            "en": "Nepal Scientific Socialist Communist Party",
+            "ne": "नेपाल वैज्ञानिक समाजवादी कम्युनिष्ट पार्टी"
         }
     ]
 

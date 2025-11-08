@@ -6,8 +6,7 @@ from nes2.core.models.entity import EntitySubType, EntityType
 # This maps entity types to their allowed subtypes
 ENTITY_TYPE_MAP = {
     EntityType.PERSON: {
-        None,  # Person without subtype
-        EntitySubType.POLITICIAN,
+        None,  # Person entities do not have subtypes
     },
     EntityType.ORGANIZATION: {
         None,  # Organization without subtype

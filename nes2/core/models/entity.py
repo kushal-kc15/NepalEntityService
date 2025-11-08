@@ -1,5 +1,6 @@
 """Entity model using Pydantic for nes2."""
 
+from abc import ABC
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
@@ -11,6 +12,7 @@ from pydantic import (
     Field,
     computed_field,
     field_validator,
+    model_validator,
 )
 
 from nes2.core.identifiers import build_entity_id
@@ -52,16 +54,13 @@ class EntityType(str, Enum):
 
 
 class EntitySubType(str, Enum):
-    """Subtypes for entities."""
-
-    # Person subtypes
-    POLITICIAN = "politician"
+    """Subtypes for entities. Note: Person entities do not have subtypes."""
 
     # Organization subtypes
     POLITICAL_PARTY = "political_party"
     GOVERNMENT_BODY = "government_body"
 
-    # Location subtypes (using LocationType values)
+    # Location subtypes
     PROVINCE = "province"
     DISTRICT = "district"
     METROPOLITAN_CITY = "metropolitan_city"
@@ -75,8 +74,11 @@ class EntitySubType(str, Enum):
 Attributes = Dict[str, Any]
 
 
-class Entity(BaseModel):
-    """Base entity model. At least one name with kind='PRIMARY' should be provided for all entities."""
+class Entity(BaseModel, ABC):
+    """Base entity model. Cannot be instantiated directly - use Person, Organization, or Location.
+    
+    At least one name with kind='PRIMARY' should be provided for all entities.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
@@ -138,9 +140,19 @@ class Entity(BaseModel):
     @computed_field
     @property
     def id(self) -> str:
-        return build_entity_id(
-            self.type.value, self.sub_type.value if self.sub_type else None, self.slug
-        )
+        # Handle both enum and string types
+        type_val = self.type.value if hasattr(self.type, 'value') else self.type
+        subtype_val = self.sub_type.value if (self.sub_type and hasattr(self.sub_type, 'value')) else self.sub_type
+        return build_entity_id(type_val, subtype_val, self.slug)
+
+    @model_validator(mode="after")
+    def validate_not_base_entity(self) -> "Entity":
+        """Prevent direct instantiation of Entity class."""
+        if self.__class__.__name__ == "Entity":
+            raise ValueError(
+                "Cannot instantiate Entity directly. Use Person, Organization, or Location instead."
+            )
+        return self
 
     @field_validator("names")
     @classmethod

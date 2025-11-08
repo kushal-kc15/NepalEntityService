@@ -15,15 +15,15 @@ This script will:
 
 If flake8 reports any issues, fix them manually before committing.
 
-## Check Format Script
+## Check Format (CI Mode)
 
-Run the check script to verify formatting without modifying files (used in CI):
+Run the script with `--check` flag to verify formatting without modifying files (used in CI):
 
 ```bash
-./scripts/check-format.sh
+./scripts/format.sh --check
 ```
 
-This script will:
+This will:
 - Check black formatting (no changes)
 - Check import sorting (no changes)
 - Check for linting issues with flake8

@@ -48,9 +48,7 @@ class Relationship(BaseModel):
     @computed_field
     @property
     def id(self) -> str:
-        from nes.core.identifiers import (
-            build_relationship_id as _build_relationship_id,
-        )
+        from nes.core.identifiers import build_relationship_id as _build_relationship_id
 
         return _build_relationship_id(
             self.source_entity_id, self.target_entity_id, self.type

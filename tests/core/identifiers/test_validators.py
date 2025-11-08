@@ -46,10 +46,7 @@ def test_validate_relationship_id_valid():
 
 def test_validate_version_id_valid():
     """Test validating valid version IDs."""
-    from nes.core.identifiers.validators import (
-        is_valid_version_id,
-        validate_version_id,
-    )
+    from nes.core.identifiers.validators import is_valid_version_id, validate_version_id
 
     version_id = "version:entity:person/ram-chandra-poudel:1"
     assert is_valid_version_id(version_id)

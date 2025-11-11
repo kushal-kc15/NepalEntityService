@@ -2,18 +2,25 @@
 
 import json
 import logging
+import os
 from typing import Any, Dict, Optional
+
+from openai import AsyncOpenAI
 
 from .base import BaseLLMProvider
 
-from openai import AsyncOpenAI   # assume openai python SDK installed
-import os
-from dotenv import load_dotenv
-
 logger = logging.getLogger(__name__)
 
+
 class OpenAIProvider(BaseLLMProvider):
-    """OpenAI LLM provider for data extraction and normalization using Structured Outputs."""
+    """
+    OpenAI LLM provider for data extraction and normalization using Structured Outputs.
+
+    Environment variables:
+        OPENAI_API_KEY: Required. The API key for OpenAI or compatible endpoint.
+        OPENAI_BASE_URL: Optional. Custom API endpoint base URL (for self-hosted or proxy setups).
+        OPENAI_MODEL: Optional. Overrides the default model_id (e.g., 'gpt-4o-mini').
+    """
 
     def __init__(
         self,
@@ -33,8 +40,6 @@ class OpenAIProvider(BaseLLMProvider):
             api_key: OpenAI API key (optional, uses env if not provided)
         """
 
-        # Load environment variables from .env file
-        load_dotenv()
         key = api_key or os.getenv("OPENAI_API_KEY")
         if not key:
             raise RuntimeError("OPENAI_API_KEY environment variable must be set")
@@ -118,8 +123,11 @@ class OpenAIProvider(BaseLLMProvider):
         """
         # Build the messages
         messages = [
-            {"role": "system", "content": "You are a data extraction assistant. Extract structured information."},
-            {"role": "user", "content": f"{instructions}\n\nText to analyze:\n{text}"}
+            {
+                "role": "system",
+                "content": "You are a data extraction assistant. Extract structured information.",
+            },
+            {"role": "user", "content": f"{instructions}\n\nText to analyze:\n{text}"},
         ]
 
         logger.debug("Making structured output call with schema: %s", schema)
@@ -135,9 +143,9 @@ class OpenAIProvider(BaseLLMProvider):
                 "json_schema": {
                     "name": "ExtractionSchema",
                     "schema": {**schema, "additionalProperties": False},
-                    "strict": True
-                }
-            }
+                    "strict": True,
+                },
+            },
         )
 
         # Extract content: parse JSON directly
@@ -145,7 +153,9 @@ class OpenAIProvider(BaseLLMProvider):
         try:
             data = json.loads(content)
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON from OpenAI response: {e}, content: {content}")
+            logger.error(
+                f"Failed to parse JSON from OpenAI response: {e}, content: {content}"
+            )
             return {}
 
         return data
@@ -171,8 +181,14 @@ class OpenAIProvider(BaseLLMProvider):
         target_name = lang_names.get(target_lang, target_lang)
 
         messages = [
-            {"role": "system", "content": f"You are a professional translator from {source_name} to {target_name}."},
-            {"role": "user", "content": f"Translate the following text from {source_name} to {target_name} without any explanation:\n\n{text}"}
+            {
+                "role": "system",
+                "content": f"You are a professional translator from {source_name} to {target_name}.",
+            },
+            {
+                "role": "user",
+                "content": f"Translate the following text from {source_name} to {target_name} without any explanation:\n\n{text}",
+            },
         ]
 
         resp = await self.client.chat.completions.create(

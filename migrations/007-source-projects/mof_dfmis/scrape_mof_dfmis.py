@@ -6,14 +6,15 @@ MoF DFMIS API for projects related to Nepal. It follows the existing architectur
 in the nes project and transforms DFMIS data to match the standardized project schema used by other sources.
 """
 
-import os
 import asyncio
 import json
 import logging
-from datetime import datetime, date
+import os
+from datetime import date, datetime
+from html import unescape
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlencode
-from html import unescape
+
 try:
     from html.parser import HTMLParser
 except ImportError:
@@ -21,14 +22,21 @@ except ImportError:
 
 import aiohttp
 
-from nes.core.models.project import (
-    Project, ProjectStage, FinancingComponent, FinancingInstrument,
-    FinancingInstrumentType, ProjectDateEvent, ProjectLocation,
-    SectorMapping, CrossCuttingTag, DonorExtension
-)
-from nes.core.models.base import Name, NameParts, NameKind, LangText, LangTextValue
+from nes.core.models.base import LangText, LangTextValue, Name, NameKind, NameParts
 from nes.core.models.entity import EntitySubType, EntityType
-from nes.core.models.version import VersionSummary, VersionType, Author
+from nes.core.models.project import (
+    CrossCuttingTag,
+    DonorExtension,
+    FinancingComponent,
+    FinancingInstrument,
+    FinancingInstrumentType,
+    Project,
+    ProjectDateEvent,
+    ProjectLocation,
+    ProjectStage,
+    SectorMapping,
+)
+from nes.core.models.version import Author, VersionSummary, VersionType
 from nes.services.scraping.web_scraper import RateLimiter, RetryHandler
 
 # Configure logging
@@ -47,7 +55,7 @@ class HTMLStripper(HTMLParser):
         self.fed.append(d)
 
     def get_data(self):
-        return ''.join(self.fed)
+        return "".join(self.fed)
 
 
 def strip_html_tags(html_content: str) -> str:
@@ -95,6 +103,7 @@ class MOFDFMISAPIClient:
         # Create a session that can store cookies for authentication
         # Disable SSL verification for dfims.mof.gov.np due to certificate issues
         import ssl
+
         connector = aiohttp.TCPConnector(ssl=False)  # Disable SSL verification
 
         self.session = aiohttp.ClientSession(
@@ -112,7 +121,7 @@ class MOFDFMISAPIClient:
                 "sec-ch-ua-platform": '"macOS"',
                 "sec-fetch-dest": "empty",
                 "sec-fetch-site": "same-origin",
-            }
+            },
         )
         return self
 
@@ -156,7 +165,9 @@ class MOFDFMISAPIClient:
             logger.error(f"Error accessing main page for session: {e}")
             return False
 
-    async def _make_request(self, url: str, params: Optional[Dict] = None) -> Optional[Dict]:
+    async def _make_request(
+        self, url: str, params: Optional[Dict] = None
+    ) -> Optional[Dict]:
         """Make a request to the MoF DFMIS API with rate limiting, session cookies, and error handling.
 
         Args:
@@ -167,7 +178,9 @@ class MOFDFMISAPIClient:
             JSON response data or None if request fails
         """
         if not self.session:
-            raise RuntimeError("Client not initialized. Use within async context manager.")
+            raise RuntimeError(
+                "Client not initialized. Use within async context manager."
+            )
 
         # First, try to get session cookies by accessing the main page
         await self._get_session_cookies()
@@ -205,7 +218,7 @@ class MOFDFMISAPIClient:
             # Attempt to get CSRF token from session cookies
             csrf_token = None
             for cookie in self.session.cookie_jar:
-                if cookie.key.lower() == 'csrftoken':
+                if cookie.key.lower() == "csrftoken":
                     csrf_token = cookie.value
                     break
 
@@ -223,21 +236,37 @@ class MOFDFMISAPIClient:
                 if response.status == 200:
                     return await response.json()
                 elif response.status == 401:
-                    logger.warning(f"Unauthorized access to {full_url}. Need proper authentication.")
+                    logger.warning(
+                        f"Unauthorized access to {full_url}. Need proper authentication."
+                    )
                     # Try with additional headers that might be needed
-                    headers.update({
-                        "Authorization": f"Bearer {os.getenv('MOF_DFMIS_AUTH_TOKEN')}" if os.getenv('MOF_DFMIS_AUTH_TOKEN') else "Bearer null",
-                    })
+                    headers.update(
+                        {
+                            "Authorization": (
+                                f"Bearer {os.getenv('MOF_DFMIS_AUTH_TOKEN')}"
+                                if os.getenv("MOF_DFMIS_AUTH_TOKEN")
+                                else "Bearer null"
+                            ),
+                        }
+                    )
                     # Retry with updated headers
-                    async with self.session.get(full_url, headers=headers) as retry_response:
+                    async with self.session.get(
+                        full_url, headers=headers
+                    ) as retry_response:
                         if retry_response.status == 200:
                             return await retry_response.json()
                 elif response.status == 403:
-                    logger.warning(f"Forbidden access to {full_url}. May require login or special permissions.")
+                    logger.warning(
+                        f"Forbidden access to {full_url}. May require login or special permissions."
+                    )
                 elif response.status == 404:
-                    logger.warning(f"Endpoint not found: {full_url}. Trying alternative endpoint.")
+                    logger.warning(
+                        f"Endpoint not found: {full_url}. Trying alternative endpoint."
+                    )
 
-                logger.warning(f"API request failed with status {response.status}: {full_url}")
+                logger.warning(
+                    f"API request failed with status {response.status}: {full_url}"
+                )
                 logger.warning(f"Response text: {await response.text()}")
                 return None
         except asyncio.TimeoutError:
@@ -283,10 +312,14 @@ class MOFDFMISProjectScraper:
         # Check if all_projects.json exists, and use it if it does
         raw_output_path = os.path.join(os.path.dirname(__file__), "all_projects.json")
         if os.path.exists(raw_output_path):
-            logger.info(f"Found existing {raw_output_path}, loading projects from file...")
-            with open(raw_output_path, 'r', encoding='utf-8') as f:
+            logger.info(
+                f"Found existing {raw_output_path}, loading projects from file..."
+            )
+            with open(raw_output_path, "r", encoding="utf-8") as f:
                 all_raw_projects = json.load(f)
-            logger.info(f"Loaded {len(all_raw_projects)} raw DFMIS projects from {raw_output_path}")
+            logger.info(
+                f"Loaded {len(all_raw_projects)} raw DFMIS projects from {raw_output_path}"
+            )
         else:
             logger.info("No cached all_projects.json found, fetching from API...")
             all_raw_projects = []  # Store raw projects for reference
@@ -304,20 +337,24 @@ class MOFDFMISProjectScraper:
                         "search_term": "",
                         "ordering": "id",
                         "sort_order": "asc",
-                        "sortBy": "id"
+                        "sortBy": "id",
                     }
 
                     data = await self.client._make_request(self.DFMIS_API_URL, params)
 
                     if data is None:
-                        logger.warning(f"Failed to fetch page {page}, stopping pagination.")
+                        logger.warning(
+                            f"Failed to fetch page {page}, stopping pagination."
+                        )
                         break
 
                     results = data.get("results", [])
                     count = data.get("count", 0)
 
                     if not results:
-                        logger.info(f"No more results found, stopping pagination at page {page}")
+                        logger.info(
+                            f"No more results found, stopping pagination at page {page}"
+                        )
                         break
 
                     # Store raw project data before normalization
@@ -327,7 +364,9 @@ class MOFDFMISProjectScraper:
                         if normalized:
                             all_projects.append(normalized)
 
-                    logger.info(f"Processed {len(results)} projects from page {page}. Total so far: {len(all_projects)}/{count}")
+                    logger.info(
+                        f"Processed {len(results)} projects from page {page}. Total so far: {len(all_projects)}/{count}"
+                    )
 
                     # If we got fewer results than the page size, we're probably on the last page
                     if len(results) < items_per_page:
@@ -344,17 +383,23 @@ class MOFDFMISProjectScraper:
 
                 # Save raw projects to file for future use
                 os.makedirs(os.path.dirname(raw_output_path), exist_ok=True)
-                with open(raw_output_path, 'w', encoding='utf-8') as f:
+                with open(raw_output_path, "w", encoding="utf-8") as f:
                     json.dump(all_raw_projects, f, ensure_ascii=False, indent=2)
-                logger.info(f"Saved {len(all_raw_projects)} raw DFMIS projects to {raw_output_path}")
+                logger.info(
+                    f"Saved {len(all_raw_projects)} raw DFMIS projects to {raw_output_path}"
+                )
 
-                logger.info(f"Completed fetching from MoF DFMIS. Total projects: {len(all_projects)}")
+                logger.info(
+                    f"Completed fetching from MoF DFMIS. Total projects: {len(all_projects)}"
+                )
 
             except Exception as e:
                 logger.error(f"Error fetching projects from MoF DFMIS API: {e}")
                 # If there was an error but we have some projects, return what we have
                 if all_projects:
-                    logger.info(f"Returning {len(all_projects)} projects collected before error")
+                    logger.info(
+                        f"Returning {len(all_projects)} projects collected before error"
+                    )
 
             return all_projects
 
@@ -367,78 +412,95 @@ class MOFDFMISProjectScraper:
 
         return all_projects
 
-    def _extract_agencies(self, agency_list: List[Dict[str, Any]], field_name: str) -> str:
+    def _extract_agencies(
+        self, agency_list: List[Dict[str, Any]], field_name: str
+    ) -> str:
         """Extract agency names from a list of agency objects.
-        
+
         Args:
             agency_list: List of agency objects from the API
             field_name: The field name containing the agency name (e.g., 'organization__name')
-        
+
         Returns:
             Comma-separated string of agency names
         """
         if not agency_list or not isinstance(agency_list, list):
             return ""
-        
+
         names = []
         for agency in agency_list:
             if isinstance(agency, dict) and field_name in agency:
                 name = agency[field_name]
                 if name:
                     names.append(str(name))
-        
+
         return ", ".join(names)
 
-    def _extract_agency_details(self, agency_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _extract_agency_details(
+        self, agency_list: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
         """Extract full agency details including organization metadata.
-        
+
         Args:
             agency_list: List of agency objects from the API
-        
+
         Returns:
             List of agency detail dictionaries with name, architecture, and group
         """
         if not agency_list or not isinstance(agency_list, list):
             return []
-        
+
         details = []
         for agency in agency_list:
             if isinstance(agency, dict):
                 org_name = agency.get("organization__name", "")
                 if org_name:
-                    details.append({
-                        "name": org_name,
-                        "architecture": agency.get("organization__development_cooperation_group__architecture__name", ""),
-                        "group": agency.get("organization__development_cooperation_group__name", ""),
-                        "percentage": agency.get("percentage"),
-                    })
+                    details.append(
+                        {
+                            "name": org_name,
+                            "architecture": agency.get(
+                                "organization__development_cooperation_group__architecture__name",
+                                "",
+                            ),
+                            "group": agency.get(
+                                "organization__development_cooperation_group__name", ""
+                            ),
+                            "percentage": agency.get("percentage"),
+                        }
+                    )
         return details
 
-    def _extract_location_details(self, locations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _extract_location_details(
+        self, locations: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
         """Extract location details from raw location data.
-        
+
         Args:
             locations: List of location objects from the API
-        
+
         Returns:
             List of location detail dictionaries
         """
         if not locations or not isinstance(locations, list):
             return []
-        
+
         details = []
         for loc in locations:
             if isinstance(loc, dict):
-                details.append({
-                    "location_type": loc.get("location_type", ""),
-                    "province": loc.get("province__name"),
-                    "district": loc.get("district__name"),
-                    "municipality": loc.get("municipality__name"),
-                    "percentage": loc.get("percentage"),
-                })
+                details.append(
+                    {
+                        "location_type": loc.get("location_type", ""),
+                        "province": loc.get("province__name"),
+                        "district": loc.get("district__name"),
+                        "municipality": loc.get("municipality__name"),
+                        "percentage": loc.get("percentage"),
+                    }
+                )
         return details
 
-    def _normalize_dfmis_project(self, project_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def _normalize_dfmis_project(
+        self, project_data: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
         """Normalize a single DFMIS project to match the new Pydantic project model.
 
         Args:
@@ -457,22 +519,26 @@ class MOFDFMISProjectScraper:
             # Extract title
             title = details.get("name", project_data.get("name", "")).strip()
             if not title:
-                logger.debug(f"Skipping project with no title: {project_data.get('id', 'unknown')}")
+                logger.debug(
+                    f"Skipping project with no title: {project_data.get('id', 'unknown')}"
+                )
                 return None
 
             # Convert DFMIS status to ProjectStage enum
-            status_str = project_data.get("status", details.get("project_status", "")).upper()
+            status_str = project_data.get(
+                "status", details.get("project_status", "")
+            ).upper()
 
             # DFMIS status mapping to ProjectStage enum values
             status_mapping = {
-                'PLANNED': 'PLANNING',
-                'ONGOING': 'ONGOING',
-                'COMPLETED': 'COMPLETED',
-                'CANCELLED': 'CANCELLED',
-                'PIPELINE': 'PIPELINE',
-                'APPROVED': 'APPROVED',
-                'SUSPENDED': 'SUSPENDED',
-                'TERMINATED': 'TERMINATED'
+                "PLANNED": "PLANNING",
+                "ONGOING": "ONGOING",
+                "COMPLETED": "COMPLETED",
+                "CANCELLED": "CANCELLED",
+                "PIPELINE": "PIPELINE",
+                "APPROVED": "APPROVED",
+                "SUSPENDED": "SUSPENDED",
+                "TERMINATED": "TERMINATED",
             }
 
             # Check if we have a mapping, otherwise use status_str directly
@@ -488,19 +554,11 @@ class MOFDFMISProjectScraper:
             slug = f"dfmis-{project_id}"
 
             # Create names list (required by Entity base class)
-            names = [
-                Name(
-                    kind=NameKind.PRIMARY,
-                    en=NameParts(full=title)
-                )
-            ]
+            names = [Name(kind=NameKind.PRIMARY, en=NameParts(full=title))]
             # Add Nepali name if available
             if details.get("name_ne"):
                 names.append(
-                    Name(
-                        kind=NameKind.ALTERNATE,
-                        ne=NameParts(full=details["name_ne"])
-                    )
+                    Name(kind=NameKind.ALTERNATE, ne=NameParts(full=details["name_ne"]))
                 )
 
             # Create version summary (required by Entity base class)
@@ -510,35 +568,36 @@ class MOFDFMISProjectScraper:
                 version_number=1,
                 author=Author(slug="dfmis-import", name="MoF DFMIS Import"),
                 change_description="Import from MoF DFMIS",
-                created_at=datetime.now()
+                created_at=datetime.now(),
             )
 
             # Extract description from DFMIS details (convert string to LangText)
             description_text = (
-                details.get("input", "") or
-                details.get("output", "") or
-                details.get("outcome", "") or
-                details.get("impact", "")
+                details.get("input", "")
+                or details.get("output", "")
+                or details.get("outcome", "")
+                or details.get("impact", "")
             )
 
             # Strip HTML tags from description for plain text storage
-            plain_description = strip_html_tags(description_text) if description_text else ""
+            plain_description = (
+                strip_html_tags(description_text) if description_text else ""
+            )
 
-            description = LangText(
-                en=LangTextValue(value=plain_description) if plain_description else None
-            ) if plain_description else None
+            description = (
+                LangText(
+                    en=(
+                        LangTextValue(value=plain_description)
+                        if plain_description
+                        else None
+                    )
+                )
+                if plain_description
+                else None
+            )
 
-            # Extract location info for ProjectLocation model
-            location_data = []
-            locations = project_data.get("locations", [])
-            for loc in locations:
-                if loc:  # Only process if location exists
-                    # Since DFMIS doesn't provide lat/lng, we might need to skip or use defaults
-                    # For now, we'll create the location model with available data if we have coordinates
-                    if loc.get("province__name") or loc.get("district__name") or loc.get("municipality__name"):
-                        # We'll need to skip creating ProjectLocation without coordinates for now
-                        # ProjectLocation model requires latitude and longitude
-                        pass
+            # NOTE: DFMIS doesn't provide lat/lng coordinates required by ProjectLocation model
+            # Location relationships are created during migration using _migration_metadata instead
 
             # Extract sectors
             sector_mappings = []
@@ -549,8 +608,7 @@ class MOFDFMISProjectScraper:
                     if sector_name:
                         sector_mappings.append(
                             SectorMapping(
-                                normalized_sector=sector_name,
-                                donor_sector=sector_name
+                                normalized_sector=sector_name, donor_sector=sector_name
                             )
                         )
 
@@ -575,13 +633,15 @@ class MOFDFMISProjectScraper:
                             instrument_type=instrument_type,
                             currency=commitment.get("signing_currency"),
                             amount=commitment_amount,
-                            tying_status=commitment.get("tied_status")
+                            tying_status=commitment.get("tied_status"),
                         )
 
                         financing_components.append(
                             FinancingComponent(
-                                name=commitment.get("financing_instrument", "Project Support"),
-                                financing=financing_instrument
+                                name=commitment.get(
+                                    "financing_instrument", "Project Support"
+                                ),
+                                financing=financing_instrument,
                             )
                         )
 
@@ -589,12 +649,14 @@ class MOFDFMISProjectScraper:
             date_events = []
             if details.get("agreement_date"):
                 try:
-                    date_obj = date.fromisoformat(details["agreement_date"].split("T")[0]) if "T" in details["agreement_date"] else date.fromisoformat(details["agreement_date"])
+                    date_obj = (
+                        date.fromisoformat(details["agreement_date"].split("T")[0])
+                        if "T" in details["agreement_date"]
+                        else date.fromisoformat(details["agreement_date"])
+                    )
                     date_events.append(
                         ProjectDateEvent(
-                            date=date_obj,
-                            type="APPROVAL",
-                            source="MoF DFMIS"
+                            date=date_obj, type="APPROVAL", source="MoF DFMIS"
                         )
                     )
                 except ValueError:
@@ -602,12 +664,14 @@ class MOFDFMISProjectScraper:
 
             if details.get("effectiveness_date"):
                 try:
-                    date_obj = date.fromisoformat(details["effectiveness_date"].split("T")[0]) if "T" in details["effectiveness_date"] else date.fromisoformat(details["effectiveness_date"])
+                    date_obj = (
+                        date.fromisoformat(details["effectiveness_date"].split("T")[0])
+                        if "T" in details["effectiveness_date"]
+                        else date.fromisoformat(details["effectiveness_date"])
+                    )
                     date_events.append(
                         ProjectDateEvent(
-                            date=date_obj,
-                            type="START",
-                            source="MoF DFMIS"
+                            date=date_obj, type="START", source="MoF DFMIS"
                         )
                     )
                 except ValueError:
@@ -615,34 +679,50 @@ class MOFDFMISProjectScraper:
 
             if details.get("completion_date"):
                 try:
-                    date_obj = date.fromisoformat(details["completion_date"].split("T")[0]) if "T" in details["completion_date"] else date.fromisoformat(details["completion_date"])
+                    date_obj = (
+                        date.fromisoformat(details["completion_date"].split("T")[0])
+                        if "T" in details["completion_date"]
+                        else date.fromisoformat(details["completion_date"])
+                    )
                     date_events.append(
                         ProjectDateEvent(
-                            date=date_obj,
-                            type="COMPLETION",
-                            source="MoF DFMIS"
+                            date=date_obj, type="COMPLETION", source="MoF DFMIS"
                         )
                     )
                 except ValueError:
                     pass  # Invalid date format, skip
 
             # Extract agencies with full metadata
-            implementing_agency = self._extract_agencies(project_data.get("implementing_agency", []), "organization__name")
-            executing_agency = self._extract_agencies(project_data.get("executing_agency", []), "organization__name")
-            
+            implementing_agency = self._extract_agencies(
+                project_data.get("implementing_agency", []), "organization__name"
+            )
+            executing_agency = self._extract_agencies(
+                project_data.get("executing_agency", []), "organization__name"
+            )
+
             # Extract detailed agency info for migration (includes architecture/group)
-            implementing_agency_details = self._extract_agency_details(project_data.get("implementing_agency", []))
-            executing_agency_details = self._extract_agency_details(project_data.get("executing_agency", []))
-            government_agency_details = self._extract_agency_details(project_data.get("government_agency", []))
-            
+            implementing_agency_details = self._extract_agency_details(
+                project_data.get("implementing_agency", [])
+            )
+            executing_agency_details = self._extract_agency_details(
+                project_data.get("executing_agency", [])
+            )
+            government_agency_details = self._extract_agency_details(
+                project_data.get("government_agency", [])
+            )
+
             # Extract location details
-            location_details = self._extract_location_details(project_data.get("locations", []))
+            location_details = self._extract_location_details(
+                project_data.get("locations", [])
+            )
 
             # Extract donor information with full metadata
             development_agencies = project_data.get("development_agency", [])
             donor_names = []
             donor_extensions = []
-            development_agency_details = self._extract_agency_details(development_agencies)
+            development_agency_details = self._extract_agency_details(
+                development_agencies
+            )
             for agency in development_agencies:
                 if isinstance(agency, dict):
                     name = agency.get("organization__name", "")
@@ -652,7 +732,7 @@ class MOFDFMISProjectScraper:
                         donor_extension = DonorExtension(
                             donor=name,
                             donor_project_id=str(project_id),
-                            raw_payload=agency
+                            raw_payload=agency,
                         )
                         donor_extensions.append(donor_extension)
 
@@ -676,13 +756,17 @@ class MOFDFMISProjectScraper:
                 # NOTE: Not adding tags for now
                 donors=donor_names if donor_names else None,
                 donor_extensions=donor_extensions if donor_extensions else None,
-                project_url=f"https://dfims.mof.gov.np/projects/{project_id}" if project_id else None
+                project_url=(
+                    f"https://dfims.mof.gov.np/projects/{project_id}"
+                    if project_id
+                    else None
+                ),
             )
 
             # Convert to dict for compatibility with existing code structure
             # Enable serialization of datetime objects
-            result = project.model_dump(by_alias=True, exclude_unset=True, mode='json')
-            
+            result = project.model_dump(by_alias=True, exclude_unset=True, mode="json")
+
             # Add detailed agency/location info for migration (not part of Project model)
             # These are used by migrate.py to create relationships with proper org subtypes
             result["_migration_metadata"] = {
@@ -692,7 +776,7 @@ class MOFDFMISProjectScraper:
                 "government_agencies": government_agency_details,
                 "locations": location_details,
             }
-            
+
             return result
 
         except Exception as e:
@@ -701,7 +785,9 @@ class MOFDFMISProjectScraper:
             return None
 
 
-async def scrape_and_save_dfmis_projects(output_file: str = "dfmis_projects.jsonl") -> int:
+async def scrape_and_save_dfmis_projects(
+    output_file: str = "dfmis_projects.jsonl",
+) -> int:
     """Scrape and transform DFMIS projects and save to a JSONL file in source directory.
 
     Args:
@@ -715,7 +801,9 @@ async def scrape_and_save_dfmis_projects(output_file: str = "dfmis_projects.json
     # Define the source directory - this is relative to the project root
     # We want to save to migrations/007-source-projects/source/
     project_root = os.path.join(os.path.dirname(__file__), "..", "..", "..")
-    source_dir = os.path.join(project_root, "migrations", "007-source-projects", "source")
+    source_dir = os.path.join(
+        project_root, "migrations", "007-source-projects", "source"
+    )
     os.makedirs(source_dir, exist_ok=True)
 
     # Create the full output path
@@ -725,11 +813,13 @@ async def scrape_and_save_dfmis_projects(output_file: str = "dfmis_projects.json
     projects = await scraper.search_dfmis_projects()
 
     # Save projects to file in JSONL format
-    with open(output_path, 'w', encoding='utf-8') as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         for project in projects:
             f.write(json.dumps(project, ensure_ascii=False) + "\n")
 
-    logger.info(f"Saved {len(projects)} DFMIS projects to {output_path} in JSONL format")
+    logger.info(
+        f"Saved {len(projects)} DFMIS projects to {output_path} in JSONL format"
+    )
     return len(projects)
 
 

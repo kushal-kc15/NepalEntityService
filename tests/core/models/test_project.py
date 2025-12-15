@@ -108,9 +108,13 @@ def test_project_with_financing():
     assert project.financing is not None
     assert len(project.financing) == 2
     assert project.financing[0].name == "Main Component"
-    assert project.financing[0].financing.instrument_type == FinancingInstrumentType.LOAN
+    assert (
+        project.financing[0].financing.instrument_type == FinancingInstrumentType.LOAN
+    )
     assert project.financing[0].financing.amount == 1000000.0
-    assert project.financing[1].financing.instrument_type == FinancingInstrumentType.GRANT
+    assert (
+        project.financing[1].financing.instrument_type == FinancingInstrumentType.GRANT
+    )
 
 
 def test_project_with_dates():
@@ -363,7 +367,9 @@ def test_project_full_example():
             ),
         ],
         dates=[
-            ProjectDateEvent(date=date(2022, 3, 15), type="APPROVAL", source="MoF DFMIS"),
+            ProjectDateEvent(
+                date=date(2022, 3, 15), type="APPROVAL", source="MoF DFMIS"
+            ),
             ProjectDateEvent(date=date(2022, 7, 1), type="START", source="MoF DFMIS"),
         ],
         locations=[
@@ -426,7 +432,9 @@ def test_project_stages():
     for stage in ProjectStage:
         project = Project(
             slug=f"stage-{stage.value}",
-            names=[Name(kind=NameKind.PRIMARY, en={"full": f"Stage {stage.value} Project"})],
+            names=[
+                Name(kind=NameKind.PRIMARY, en={"full": f"Stage {stage.value} Project"})
+            ],
             stage=stage,
             version_summary=VersionSummary(
                 entity_or_relationship_id=f"entity:project/development_project/stage-{stage.value}",

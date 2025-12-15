@@ -17,6 +17,7 @@ from pydantic import AnyUrl, BaseModel, ConfigDict, Field
 
 from .entity import Entity, EntitySubType, EntityType
 
+
 class ProjectStage(str, Enum):
     PIPELINE = "pipeline"
     PLANNING = "planning"
@@ -35,6 +36,7 @@ class FinancingInstrumentType(str, Enum):
     MIXED = "mixed"
     OTHER = "other"
     UNKNOWN = "unknown"
+
 
 class FinancingInstrument(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -55,12 +57,14 @@ class FinancingComponent(BaseModel):
     name: str = Field(..., description="Main, Consulting, TA, Emergency, etc.")
     financing: FinancingInstrument
 
+
 class ProjectDateEvent(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     date: date
     type: str = Field(..., description="APPROVAL, START, COMPLETION, CLOSING, etc.")
     source: Optional[str] = Field(None, description="WB, ADB, JICA, NPC")
+
 
 class ProjectLocation(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -74,6 +78,7 @@ class ProjectLocation(BaseModel):
     ward: Optional[str] = None
 
     source: Optional[str] = Field(None, description="NPC, ADB, WB")
+
 
 class SectorMapping(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -91,9 +96,7 @@ class SectorMapping(BaseModel):
 class CrossCuttingTag(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    category: str = Field(
-        ..., description="THEME, POLICY, GENDER, CLIMATE, GOVERNANCE"
-    )
+    category: str = Field(..., description="THEME, POLICY, GENDER, CLIMATE, GOVERNANCE")
     normalized_tag: Optional[str] = None
     donor_tag: Optional[str] = None
     donor: Optional[str] = None
@@ -121,7 +124,7 @@ class Project(Entity):
     )
     sub_type: EntitySubType = Field(
         default=EntitySubType.DEVELOPMENT_PROJECT,
-        description="Project subtype classification"
+        description="Project subtype classification",
     )
 
     stage: ProjectStage = Field(default=ProjectStage.UNKNOWN)
@@ -140,9 +143,7 @@ class Project(Entity):
     sectors: Optional[List[SectorMapping]] = None
     tags: Optional[List[CrossCuttingTag]] = None
 
-    donors: Optional[List[str]] = Field(
-        None, description="List of contributing donors"
-    )
+    donors: Optional[List[str]] = Field(None, description="List of contributing donors")
     donor_extensions: Optional[List[DonorExtension]] = None
 
     project_url: Optional[AnyUrl] = None

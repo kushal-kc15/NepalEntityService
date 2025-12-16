@@ -25,14 +25,14 @@ import aiohttp
 from nes.core.models.base import LangText, LangTextValue, Name, NameKind, NameParts
 from nes.core.models.entity import EntitySubType, EntityType
 from nes.core.models.project import (
+    AssistanceType,
+    BudgetType,
     CrossCuttingTag,
     DonorExtension,
-    FinancingComponent,
-    FinancingInstrument,
-    FinancingInstrumentType,
+    FinancingCommitment,
+    FinancingTerms,
     Project,
     ProjectDateEvent,
-    ProjectLocation,
     ProjectStage,
     SectorMapping,
 )
@@ -596,8 +596,8 @@ class MOFDFMISProjectScraper:
                 else None
             )
 
-            # NOTE: DFMIS doesn't provide lat/lng coordinates required by ProjectLocation model
-            # Location relationships are created during migration using _migration_metadata instead
+            # NOTE: Location relationships are created during migration using _migration_metadata
+            # Projects link to existing location entities via LOCATED_IN relationships
 
             # Extract sectors
             sector_mappings = []
@@ -613,35 +613,69 @@ class MOFDFMISProjectScraper:
                         )
 
             # Extract financing information from commitment data
-            financing_components = []
+            financing_commitments = []
             commitment_info = project_data.get("commitment", [])
             for commitment in commitment_info:
                 if isinstance(commitment, dict):
                     commitment_amount = commitment.get("commitment")
-                    assistance_type = commitment.get("assistance_type", "").lower()
+                    assistance_type_raw = commitment.get("assistance_type", "").lower()
+                    donor_name = commitment.get("donor__name", "Unknown")
 
                     if commitment_amount is not None:
-                        # Determine instrument type based on assistance type
-                        if "grant" in assistance_type:
-                            instrument_type = FinancingInstrumentType.GRANT
-                        elif "loan" in assistance_type:
-                            instrument_type = FinancingInstrumentType.LOAN
+                        # Map assistance type
+                        if "grant" in assistance_type_raw:
+                            assistance_type = AssistanceType.GRANT
+                        elif "loan" in assistance_type_raw:
+                            assistance_type = AssistanceType.LOAN
+                        elif "technical" in assistance_type_raw:
+                            assistance_type = AssistanceType.TECHNICAL_ASSISTANCE
                         else:
-                            instrument_type = FinancingInstrumentType.OTHER
+                            assistance_type = AssistanceType.OTHER
 
-                        financing_instrument = FinancingInstrument(
-                            instrument_type=instrument_type,
-                            currency=commitment.get("signing_currency"),
-                            amount=commitment_amount,
-                            tying_status=commitment.get("tied_status"),
-                        )
+                        # Map budget type
+                        budget_type_raw = commitment.get("budget_type", "").lower()
+                        if "off" in budget_type_raw:
+                            budget_type = BudgetType.OFF_BUDGET
+                        elif "on" in budget_type_raw:
+                            budget_type = BudgetType.ON_BUDGET
+                        else:
+                            budget_type = BudgetType.UNKNOWN
 
-                        financing_components.append(
-                            FinancingComponent(
-                                name=commitment.get(
-                                    "financing_instrument", "Project Support"
+                        # Build financing terms if loan
+                        terms = None
+                        if assistance_type == AssistanceType.LOAN:
+                            terms = FinancingTerms(
+                                tying_status=commitment.get("tied_status"),
+                            )
+
+                        # Parse transaction date
+                        transaction_date = None
+                        if commitment.get("transaction_date"):
+                            try:
+                                td = commitment["transaction_date"]
+                                transaction_date = (
+                                    date.fromisoformat(td.split("T")[0])
+                                    if "T" in td
+                                    else date.fromisoformat(td)
+                                )
+                            except ValueError:
+                                pass
+
+                        financing_commitments.append(
+                            FinancingCommitment(
+                                donor=donor_name,
+                                amount=commitment_amount,
+                                currency=commitment.get("signing_currency"),
+                                assistance_type=assistance_type,
+                                financing_instrument=commitment.get(
+                                    "financing_instrument"
                                 ),
-                                financing=financing_instrument,
+                                budget_type=budget_type,
+                                terms=terms,
+                                transaction_date=transaction_date,
+                                transaction_type="commitment",
+                                is_actual=commitment.get("actual", True),
+                                source="DFMIS",
                             )
                         )
 
@@ -736,6 +770,10 @@ class MOFDFMISProjectScraper:
                         )
                         donor_extensions.append(donor_extension)
 
+            # Extract totals from project data
+            total_commitment = project_data.get("total_commitment")
+            total_disbursement = project_data.get("total_disbursement")
+
             # Create project instance using the new model (with Entity base class)
             # Note: The id field will be computed from type, subtype, and slug
             project = Project(
@@ -749,12 +787,13 @@ class MOFDFMISProjectScraper:
                 description=description,  # Convert to LangText now
                 implementing_agency=implementing_agency or None,
                 executing_agency=executing_agency or None,
-                financing=financing_components if financing_components else None,
+                financing=financing_commitments if financing_commitments else None,
+                total_commitment=total_commitment,
+                total_disbursement=total_disbursement,
                 dates=date_events if date_events else None,
-                # NOTE: Not adding locations since DFMIS doesn't provide coordinates required by ProjectLocation
+                # NOTE: Locations are linked via LOCATED_IN relationships during migration
                 sectors=sector_mappings if sector_mappings else None,
                 # NOTE: Not adding tags for now
-                donors=donor_names if donor_names else None,
                 donor_extensions=donor_extensions if donor_extensions else None,
                 project_url=(
                     f"https://dfims.mof.gov.np/projects/{project_id}"

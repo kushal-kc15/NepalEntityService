@@ -64,6 +64,7 @@ async def search_relationships(
         "FUNDED_BY",
         "IMPLEMENTED_BY",
         "EXECUTED_BY",
+        "OVERSEEN_BY",
     ]
     if relationship_type and relationship_type not in valid_types:
         raise HTTPException(

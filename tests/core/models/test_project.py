@@ -8,14 +8,14 @@ from pydantic import ValidationError
 from nes.core.models.base import Name, NameKind
 from nes.core.models.entity import EntitySubType
 from nes.core.models.project import (
+    AssistanceType,
+    BudgetType,
     CrossCuttingTag,
     DonorExtension,
-    FinancingComponent,
-    FinancingInstrument,
-    FinancingInstrumentType,
+    FinancingCommitment,
+    FinancingTerms,
     Project,
     ProjectDateEvent,
-    ProjectLocation,
     ProjectStage,
     SectorMapping,
 )
@@ -68,30 +68,28 @@ def test_project_with_stage():
 
 
 def test_project_with_financing():
-    """Test Project with financing components."""
+    """Test Project with financing commitments."""
 
     project = Project(
         slug="financed-project",
         names=[Name(kind=NameKind.PRIMARY, en={"full": "Financed Project"})],
         financing=[
-            FinancingComponent(
-                name="Main Component",
-                financing=FinancingInstrument(
-                    instrument_type=FinancingInstrumentType.LOAN,
-                    currency="USD",
-                    amount=1000000.0,
+            FinancingCommitment(
+                donor="World Bank",
+                amount=1000000.0,
+                currency="USD",
+                assistance_type=AssistanceType.LOAN,
+                terms=FinancingTerms(
                     interest_rate=2.5,
                     repayment_period_years=20,
                     grace_period_years=5,
                 ),
             ),
-            FinancingComponent(
-                name="Technical Assistance",
-                financing=FinancingInstrument(
-                    instrument_type=FinancingInstrumentType.GRANT,
-                    currency="USD",
-                    amount=50000.0,
-                ),
+            FinancingCommitment(
+                donor="JICA",
+                amount=50000.0,
+                currency="USD",
+                assistance_type=AssistanceType.GRANT,
             ),
         ],
         version_summary=VersionSummary(
@@ -107,14 +105,11 @@ def test_project_with_financing():
 
     assert project.financing is not None
     assert len(project.financing) == 2
-    assert project.financing[0].name == "Main Component"
-    assert (
-        project.financing[0].financing.instrument_type == FinancingInstrumentType.LOAN
-    )
-    assert project.financing[0].financing.amount == 1000000.0
-    assert (
-        project.financing[1].financing.instrument_type == FinancingInstrumentType.GRANT
-    )
+    assert project.financing[0].donor == "World Bank"
+    assert project.financing[0].assistance_type == AssistanceType.LOAN
+    assert project.financing[0].amount == 1000000.0
+    assert project.financing[0].terms.interest_rate == 2.5
+    assert project.financing[1].assistance_type == AssistanceType.GRANT
 
 
 def test_project_with_dates():
@@ -158,39 +153,6 @@ def test_project_with_dates():
     assert project.dates[0].source == "WB"
 
 
-def test_project_with_locations():
-    """Test Project with location data."""
-
-    project = Project(
-        slug="located-project",
-        names=[Name(kind=NameKind.PRIMARY, en={"full": "Located Project"})],
-        locations=[
-            ProjectLocation(
-                latitude=27.7172,
-                longitude=85.3240,
-                province="Bagmati",
-                district="Kathmandu",
-                municipality="Kathmandu Metropolitan City",
-                source="NPC",
-            ),
-        ],
-        version_summary=VersionSummary(
-            entity_or_relationship_id="entity:project/development_project/located-project",
-            type=VersionType.ENTITY,
-            version_number=1,
-            author=Author(slug="system"),
-            change_description="Initial",
-            created_at=datetime.now(UTC),
-        ),
-        created_at=datetime.now(UTC),
-    )
-
-    assert project.locations is not None
-    assert len(project.locations) == 1
-    assert project.locations[0].latitude == 27.7172
-    assert project.locations[0].district == "Kathmandu"
-
-
 def test_project_with_sectors():
     """Test Project with sector mappings."""
 
@@ -203,6 +165,7 @@ def test_project_with_sectors():
                 donor_sector="Transportation Infrastructure",
                 donor_subsector="Roads",
                 donor="WB",
+                percentage=100.0,
             ),
         ],
         version_summary=VersionSummary(
@@ -220,6 +183,7 @@ def test_project_with_sectors():
     assert len(project.sectors) == 1
     assert project.sectors[0].normalized_sector == "Transport"
     assert project.sectors[0].donor == "WB"
+    assert project.sectors[0].percentage == 100.0
 
 
 def test_project_with_tags():
@@ -257,13 +221,26 @@ def test_project_with_tags():
     assert project.tags[1].category == "GENDER"
 
 
-def test_project_with_donors():
-    """Test Project with donor information."""
+def test_project_with_donor_extensions():
+    """Test Project with donor extensions for traceability."""
 
     project = Project(
         slug="donor-project",
         names=[Name(kind=NameKind.PRIMARY, en={"full": "Donor Project"})],
-        donors=["World Bank", "ADB"],
+        financing=[
+            FinancingCommitment(
+                donor="World Bank",
+                amount=1000000.0,
+                currency="USD",
+                assistance_type=AssistanceType.LOAN,
+            ),
+            FinancingCommitment(
+                donor="ADB",
+                amount=500000.0,
+                currency="USD",
+                assistance_type=AssistanceType.GRANT,
+            ),
+        ],
         donor_extensions=[
             DonorExtension(
                 donor="World Bank",
@@ -286,9 +263,9 @@ def test_project_with_donors():
         created_at=datetime.now(UTC),
     )
 
-    assert project.donors is not None
-    assert len(project.donors) == 2
-    assert "World Bank" in project.donors
+    assert project.financing is not None
+    assert len(project.financing) == 2
+    assert project.financing[0].donor == "World Bank"
     assert project.donor_extensions is not None
     assert project.donor_extensions[0].donor_project_id == "P123456"
 
@@ -338,8 +315,31 @@ def test_project_with_url():
     assert str(project.project_url) == "https://dfims.mof.gov.np/projects/123"
 
 
+def test_project_with_totals():
+    """Test Project with aggregate totals."""
+
+    project = Project(
+        slug="totals-project",
+        names=[Name(kind=NameKind.PRIMARY, en={"full": "Totals Project"})],
+        total_commitment=1500000.0,
+        total_disbursement=750000.0,
+        version_summary=VersionSummary(
+            entity_or_relationship_id="entity:project/development_project/totals-project",
+            type=VersionType.ENTITY,
+            version_number=1,
+            author=Author(slug="system"),
+            change_description="Initial",
+            created_at=datetime.now(UTC),
+        ),
+        created_at=datetime.now(UTC),
+    )
+
+    assert project.total_commitment == 1500000.0
+    assert project.total_disbursement == 750000.0
+
+
 def test_project_full_example():
-    """Test creating a fully populated Project entity."""
+    """Test creating a fully populated Project entity (DFMIS-style)."""
 
     project = Project(
         slug="dfmis-12345",
@@ -354,39 +354,43 @@ def test_project_full_example():
         implementing_agency="Ministry of Physical Infrastructure and Transport",
         executing_agency="Department of Roads",
         financing=[
-            FinancingComponent(
-                name="Main Loan",
-                financing=FinancingInstrument(
-                    instrument_type=FinancingInstrumentType.LOAN,
-                    currency="USD",
-                    amount=50000000.0,
+            FinancingCommitment(
+                donor="World Bank",
+                donor_id="entity:organization/international_org/world-bank",
+                amount=50000000.0,
+                currency="USD",
+                assistance_type=AssistanceType.LOAN,
+                financing_instrument="Project Support",
+                budget_type=BudgetType.ON_BUDGET,
+                terms=FinancingTerms(
                     interest_rate=1.5,
                     repayment_period_years=25,
                     grace_period_years=5,
+                    tying_status="untied",
                 ),
+                transaction_date=date(2022, 3, 15),
+                transaction_type="commitment",
+                is_actual=True,
+                source="DFMIS",
             ),
         ],
+        total_commitment=50000000.0,
+        total_disbursement=10000000.0,
         dates=[
-            ProjectDateEvent(
-                date=date(2022, 3, 15), type="APPROVAL", source="MoF DFMIS"
-            ),
-            ProjectDateEvent(date=date(2022, 7, 1), type="START", source="MoF DFMIS"),
-        ],
-        locations=[
-            ProjectLocation(
-                latitude=27.7172,
-                longitude=85.3240,
-                province="Bagmati",
-                district="Kathmandu",
-            ),
+            ProjectDateEvent(date=date(2022, 3, 15), type="APPROVAL", source="DFMIS"),
+            ProjectDateEvent(date=date(2022, 7, 1), type="START", source="DFMIS"),
         ],
         sectors=[
             SectorMapping(
                 normalized_sector="Transport",
                 donor_sector="Infrastructure - Roads",
+                percentage=100.0,
             ),
         ],
-        donors=["World Bank"],
+        tags=[
+            CrossCuttingTag(category="CLIMATE", normalized_tag="neutral"),
+            CrossCuttingTag(category="GENDER", normalized_tag="neutral"),
+        ],
         donor_extensions=[
             DonorExtension(
                 donor="World Bank",
@@ -410,20 +414,33 @@ def test_project_full_example():
     assert project.stage == ProjectStage.ONGOING
     assert project.id == "entity:project/development_project/dfmis-12345"
     assert len(project.financing) == 1
+    assert project.financing[0].donor == "World Bank"
+    assert project.financing[0].terms.interest_rate == 1.5
     assert len(project.dates) == 2
-    assert len(project.locations) == 1
 
 
-def test_financing_instrument_types():
-    """Test all financing instrument types."""
+def test_assistance_types():
+    """Test all assistance types."""
 
-    for instrument_type in FinancingInstrumentType:
-        instrument = FinancingInstrument(
-            instrument_type=instrument_type,
+    for assistance_type in AssistanceType:
+        commitment = FinancingCommitment(
+            donor="Test Donor",
+            assistance_type=assistance_type,
             currency="USD",
             amount=100000.0,
         )
-        assert instrument.instrument_type == instrument_type
+        assert commitment.assistance_type == assistance_type
+
+
+def test_budget_types():
+    """Test all budget types."""
+
+    for budget_type in BudgetType:
+        commitment = FinancingCommitment(
+            donor="Test Donor",
+            budget_type=budget_type,
+        )
+        assert commitment.budget_type == budget_type
 
 
 def test_project_stages():
@@ -449,24 +466,13 @@ def test_project_stages():
         assert project.stage == stage
 
 
-def test_project_location_requires_coordinates():
-    """Test that ProjectLocation requires latitude and longitude."""
+def test_financing_commitment_requires_donor():
+    """Test that FinancingCommitment requires a donor."""
 
     with pytest.raises(ValidationError):
-        ProjectLocation(
-            province="Bagmati",
-            district="Kathmandu",
-        )
-
-
-def test_financing_component_requires_name():
-    """Test that FinancingComponent requires a name."""
-
-    with pytest.raises(ValidationError):
-        FinancingComponent(
-            financing=FinancingInstrument(
-                instrument_type=FinancingInstrumentType.GRANT,
-            ),
+        FinancingCommitment(
+            amount=100000.0,
+            currency="USD",
         )
 
 
@@ -495,3 +501,20 @@ def test_donor_extension_requires_donor():
         DonorExtension(
             donor_project_id="P123456",
         )
+
+
+def test_financing_with_disbursement():
+    """Test financing commitment as disbursement transaction."""
+
+    commitment = FinancingCommitment(
+        donor="JICA",
+        amount=500000.0,
+        currency="USD",
+        assistance_type=AssistanceType.GRANT,
+        transaction_type="disbursement",
+        transaction_date=date(2023, 6, 15),
+        is_actual=True,
+    )
+
+    assert commitment.transaction_type == "disbursement"
+    assert commitment.is_actual is True

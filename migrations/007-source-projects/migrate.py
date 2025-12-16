@@ -5,8 +5,10 @@ Author: Nepal Development Project Team
 Date: 2025-01-26
 """
 
+import html
 import json
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from typing import Any, Dict, List, Optional, Set
 
 from nes.core.models import (
@@ -34,6 +36,21 @@ CHANGE_DESCRIPTION = "Initial sourcing from MoF DFMIS API"
 name_extractor = NameExtractor()
 
 
+class _HTMLStripper(HTMLParser):
+    """Simple HTML tag stripper for converting HTML content to plain text."""
+
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.fed = []
+
+    def handle_data(self, d):
+        self.fed.append(d)
+
+    def get_data(self):
+        return "".join(self.fed)
+
+
 def _parse_date(date_input):
     """Parse date from various formats and return a date object."""
     if not date_input:
@@ -57,28 +74,8 @@ def _strip_html_tags(text: str) -> str:
     if not text:
         return text
 
-    import html
-
     unescaped = html.unescape(text)
-
-    try:
-        from html.parser import HTMLParser
-    except ImportError:
-        from HTMLParser import HTMLParser
-
-    class HTMLStripper(HTMLParser):
-        def __init__(self):
-            super().__init__()
-            self.reset()
-            self.fed = []
-
-        def handle_data(self, d):
-            self.fed.append(d)
-
-        def get_data(self):
-            return "".join(self.fed)
-
-    stripper = HTMLStripper()
+    stripper = _HTMLStripper()
     stripper.feed(unescaped)
     return stripper.get_data().strip()
 
@@ -228,7 +225,6 @@ def _map_organization_subtype(
                 return EntitySubType.INTERNATIONAL_ORG
 
     # 4. Default based on role
-    # 4. Default based on role
     # Donors are typically international orgs (foreign aid)
     # Implementing/executing agencies are typically local NGOs
     if is_donor:
@@ -259,20 +255,23 @@ class ProjectMigration:
             await self._setup_author()
             await self._build_location_lookups()
             await self._build_organization_cache()
-            self._load_raw_projects()  # Load raw data for location info
-            await self._migrate_projects()
+
+            # Load project data
+            projects = self._load_projects()
+
+            # Phase 1: Extract and prepare organizations from all projects
+            org_data = self._extract_organizations_from_projects(projects)
+            self._validate_organization_slugs(org_data)
+            await self._create_organizations(org_data)
+
+            # Phase 2: Create projects and relationships
+            await self._migrate_projects(projects)
             await self._verify()
             self.context.log("Migration completed successfully")
         except Exception as e:
             self.context.log(f"Migration failed: {e}")
             await self._rollback()
             raise
-
-    def _load_raw_projects(self) -> None:
-        """No longer needed - migration metadata is now in the transformed JSONL file."""
-        # The scraper now includes _migration_metadata in dfmis_projects.jsonl
-        # which contains all agency/location details needed for relationships
-        self.context.log("Using migration metadata from transformed JSONL file")
 
     async def _setup_author(self) -> None:
         """Create the migration author."""
@@ -349,9 +348,8 @@ class ProjectMigration:
             f"Built organization cache: {len(self.organization_cache)} entries"
         )
 
-    async def _migrate_projects(self) -> None:
-        """Import projects from the pre-transformed JSONL file."""
-        # Load projects from JSONL file
+    def _load_projects(self) -> List[Dict[str, Any]]:
+        """Load projects from the pre-transformed JSONL file."""
         projects = []
         source_file = self.context.migration_dir / "source" / "dfmis_projects.jsonl"
         try:
@@ -371,8 +369,189 @@ class ProjectMigration:
             raise
 
         if not projects:
-            self.context.log("WARNING: No projects found in source data.")
-            return
+            raise ValueError(
+                "No projects found in source data - check dfmis_projects.jsonl"
+            )
+
+        return projects
+
+    def _extract_organizations_from_projects(
+        self, projects: List[Dict[str, Any]]
+    ) -> Dict[str, Dict[str, Any]]:
+        """Extract all unique organizations from project data.
+
+        Returns a dict mapping org_name (lowercase) to org metadata.
+        """
+        orgs: Dict[str, Dict[str, Any]] = {}
+
+        for project_data in projects:
+            migration_meta = project_data.get("_migration_metadata", {})
+
+            # Extract from development_agencies (donors)
+            for agency in migration_meta.get("development_agencies", []):
+                if isinstance(agency, dict) and agency.get("name"):
+                    name = agency["name"]
+                    key = name.strip().lower()
+                    if key not in orgs and key not in self.organization_cache:
+                        orgs[key] = {
+                            "name": name,
+                            "architecture": agency.get("architecture", ""),
+                            "group": agency.get("group", ""),
+                            "is_donor": True,
+                        }
+
+            # Extract from implementing_agencies
+            for agency in migration_meta.get("implementing_agencies", []):
+                if isinstance(agency, dict) and agency.get("name"):
+                    name = agency["name"]
+                    key = name.strip().lower()
+                    if key not in orgs and key not in self.organization_cache:
+                        orgs[key] = {
+                            "name": name,
+                            "architecture": agency.get("architecture", ""),
+                            "group": agency.get("group", ""),
+                            "is_donor": False,
+                        }
+
+            # Extract from executing_agencies
+            for agency in migration_meta.get("executing_agencies", []):
+                if isinstance(agency, dict) and agency.get("name"):
+                    name = agency["name"]
+                    key = name.strip().lower()
+                    if key not in orgs and key not in self.organization_cache:
+                        orgs[key] = {
+                            "name": name,
+                            "architecture": agency.get("architecture", ""),
+                            "group": agency.get("group", ""),
+                            "is_donor": False,
+                        }
+
+            # Extract from government_agencies
+            for agency in migration_meta.get("government_agencies", []):
+                if isinstance(agency, dict) and agency.get("name"):
+                    name = agency["name"]
+                    key = name.strip().lower()
+                    if key not in orgs and key not in self.organization_cache:
+                        orgs[key] = {
+                            "name": name,
+                            "architecture": agency.get("architecture", ""),
+                            "group": agency.get("group", ""),
+                            "is_donor": False,
+                        }
+
+        self.context.log(f"Extracted {len(orgs)} unique organizations from projects")
+        return orgs
+
+    def _validate_organization_slugs(self, org_data: Dict[str, Dict[str, Any]]) -> None:
+        """Validate organization slugs and detect collisions."""
+        slug_to_orgs: Dict[str, List[str]] = {}
+
+        for key, data in org_data.items():
+            slug = text_to_slug(data["name"])
+            if not slug or len(slug) < 3:
+                slug = f"org-{hash(data['name']) % 100000}"
+            if len(slug) > 100:
+                slug = slug[:100]
+
+            # Store slug for collision detection
+            data["slug"] = slug
+
+            if slug not in slug_to_orgs:
+                slug_to_orgs[slug] = []
+            slug_to_orgs[slug].append(data["name"])
+
+        # Check for collisions
+        collisions = {
+            slug: names for slug, names in slug_to_orgs.items() if len(names) > 1
+        }
+        if collisions:
+            self.context.log(f"WARNING: Found {len(collisions)} slug collisions:")
+            for slug, names in collisions.items():
+                self.context.log(f"  {slug}: {names}")
+                # Resolve by appending hash suffix
+                for i, name in enumerate(names[1:], start=2):
+                    for key, data in org_data.items():
+                        if data["name"] == name:
+                            data["slug"] = f"{slug}-{i}"
+                            self.context.log(f"    Resolved: {name} -> {data['slug']}")
+
+    async def _create_organizations(self, org_data: Dict[str, Dict[str, Any]]) -> None:
+        """Create all organizations in batch."""
+        created_count = 0
+        skipped_count = 0
+
+        for key, data in org_data.items():
+            # Determine subtype
+            subtype = _map_organization_subtype(
+                data.get("architecture", ""),
+                data.get("group", ""),
+                data["name"],
+                data.get("is_donor", False),
+            )
+
+            slug = data["slug"]
+            expected_id = f"entity:organization/{subtype.value}/{slug}"
+
+            # Check if already exists
+            existing = await self.context.db.get_entity(expected_id)
+            if existing:
+                self.organization_cache[key] = expected_id
+                skipped_count += 1
+                continue
+
+            entity_data = {
+                "slug": slug,
+                "names": [
+                    Name(
+                        kind=NameKind.PRIMARY, en=NameParts(full=data["name"])
+                    ).model_dump()
+                ],
+                "attributions": [
+                    Attribution(
+                        title=LangText(
+                            en=LangTextValue(
+                                value="MoF DFMIS Organization", provenance="human"
+                            )
+                        ),
+                        details=LangText(
+                            en=LangTextValue(
+                                value=f"Organization from MoF DFMIS - {data.get('architecture') or 'Development Partner'}",
+                                provenance="human",
+                            )
+                        ),
+                    ).model_dump()
+                ],
+            }
+
+            # Add attributes if available
+            if data.get("architecture") or data.get("group"):
+                entity_data["attributes"] = {}
+                if data.get("architecture"):
+                    entity_data["attributes"]["architecture"] = data["architecture"]
+                if data.get("group"):
+                    entity_data["attributes"]["group"] = data["group"]
+
+            try:
+                org_entity = await self.context.publication.create_entity(
+                    entity_type=EntityType.ORGANIZATION,
+                    entity_subtype=subtype,
+                    entity_data=entity_data,
+                    author_id=self.author_id,
+                    change_description=f"Import organization from MoF DFMIS: {data['name']}",
+                )
+                self.organization_cache[key] = org_entity.id
+                self.created_entity_ids.append(org_entity.id)
+                created_count += 1
+            except ValueError as e:
+                self.context.log(f"  Error creating organization {data['name']}: {e}")
+                raise
+
+        self.context.log(
+            f"Organizations: created {created_count}, skipped {skipped_count} existing"
+        )
+
+    async def _migrate_projects(self, projects: List[Dict[str, Any]]) -> None:
+        """Create project entities and relationships."""
 
         count = 0
         relationship_count = 0
@@ -382,21 +561,16 @@ class ProjectMigration:
                 # Create project entity
                 project_entity = await self._create_project_entity(project_data)
                 if not project_entity:
-                    continue
+                    raise ValueError(
+                        f"Failed to create project - missing slug or names: {project_data.get('slug', 'unknown')}"
+                    )
 
                 self.created_entity_ids.append(project_entity.id)
                 count += 1
 
                 # Create relationships
-                # Debug: verify project_entity.id is a string
-                project_id_str = project_entity.id
-                if not isinstance(project_id_str, str):
-                    self.context.log(
-                        f"  ERROR: project_entity.id is not a string: {type(project_id_str)} = {project_id_str}"
-                    )
-                    continue
                 rel_count = await self._create_project_relationships(
-                    project_id_str, project_data
+                    project_entity.id, project_data
                 )
                 relationship_count += rel_count
 
@@ -407,7 +581,7 @@ class ProjectMigration:
                 self.context.log(
                     f"Error processing project {project_data.get('slug', 'unknown')}: {e}"
                 )
-                continue
+                raise
 
         self.context.log(f"Created {count} project entities")
         self.context.log(f"Created {relationship_count} relationships")
@@ -516,38 +690,22 @@ class ProjectMigration:
         # Remove None values
         entity_data = {k: v for k, v in entity_data.items() if v is not None}
 
-        try:
-            project = await self.context.publication.create_entity(
-                entity_type=EntityType.PROJECT,
-                entity_subtype=EntitySubType.DEVELOPMENT_PROJECT,
-                entity_data=entity_data,
-                author_id=self.author_id,
-                change_description=CHANGE_DESCRIPTION,
-            )
-            self.context.log(f"Created project {project.id}")
-            return project
-        except ValueError as e:
-            if "already exists" in str(e):
-                # Try with a suffix
-                i = 2
-                while i < 10:
-                    entity_data["slug"] = f"{slug}-{i}"
-                    try:
-                        project = await self.context.publication.create_entity(
-                            entity_type=EntityType.PROJECT,
-                            entity_subtype=EntitySubType.DEVELOPMENT_PROJECT,
-                            entity_data=entity_data,
-                            author_id=self.author_id,
-                            change_description=CHANGE_DESCRIPTION,
-                        )
-                        self.context.log(f"Created project {project.id}")
-                        return project
-                    except ValueError as e2:
-                        if "already exists" in str(e2):
-                            i += 1
-                            continue
-                        raise
-            raise
+        # Check if entity already exists (e.g., from a previous partial run)
+        expected_id = f"entity:project/development_project/{slug}"
+        existing = await self.context.db.get_entity(expected_id)
+        if existing:
+            self.context.log(f"Skipping existing project {expected_id}")
+            return existing
+
+        project = await self.context.publication.create_entity(
+            entity_type=EntityType.PROJECT,
+            entity_subtype=EntitySubType.DEVELOPMENT_PROJECT,
+            entity_data=entity_data,
+            author_id=self.author_id,
+            change_description=CHANGE_DESCRIPTION,
+        )
+        self.context.log(f"Created project {project.id}")
+        return project
 
     async def _create_project_relationships(
         self, project_id: str, project_data: Dict[str, Any]
@@ -558,7 +716,7 @@ class ProjectMigration:
         # Get migration metadata from transformed data (includes agency/location details)
         migration_meta = project_data.get("_migration_metadata", {})
 
-        # Helper to create org from agency details
+        # Helper to create org relationship (orgs are pre-created in batch)
         async def create_org_relationship(
             agencies: List[Dict], rel_type: str, is_donor: bool
         ) -> int:
@@ -569,18 +727,7 @@ class ProjectMigration:
                 org_name = agency.get("name", "")
                 if not org_name:
                     continue
-                # Build raw_payload from agency metadata
-                raw_payload = {
-                    "organization__development_cooperation_group__name": agency.get(
-                        "group", ""
-                    ),
-                    "organization__development_cooperation_group__architecture__name": agency.get(
-                        "architecture", ""
-                    ),
-                }
-                org_id = await self._get_or_create_organization(
-                    org_name=org_name, raw_payload=raw_payload, is_donor=is_donor
-                )
+                org_id = self._get_organization_id(org_name)
                 if org_id:
                     try:
                         rel = await self.context.publication.create_relationship(
@@ -626,11 +773,7 @@ class ProjectMigration:
                 donor_name = donor_ext.get("donor", "")
                 if not donor_name:
                     continue
-                org_id = await self._get_or_create_organization(
-                    org_name=donor_name,
-                    raw_payload=donor_ext.get("raw_payload", {}),
-                    is_donor=True,
-                )
+                org_id = self._get_organization_id(donor_name)
                 if org_id:
                     try:
                         rel = await self.context.publication.create_relationship(
@@ -654,9 +797,7 @@ class ProjectMigration:
                 agency_name = agency_name.strip()
                 if not agency_name:
                     continue
-                org_id = await self._get_or_create_organization(
-                    org_name=agency_name, is_donor=False
-                )
+                org_id = self._get_organization_id(agency_name)
                 if org_id:
                     try:
                         rel = await self.context.publication.create_relationship(
@@ -680,9 +821,7 @@ class ProjectMigration:
                 agency_name = agency_name.strip()
                 if not agency_name:
                     continue
-                org_id = await self._get_or_create_organization(
-                    org_name=agency_name, is_donor=False
-                )
+                org_id = self._get_organization_id(agency_name)
                 if org_id:
                     try:
                         rel = await self.context.publication.create_relationship(
@@ -789,135 +928,13 @@ class ProjectMigration:
 
         return None
 
-    async def _get_or_create_organization(
-        self,
-        org_name: str,
-        raw_payload: Optional[Dict[str, Any]] = None,
-        is_donor: bool = False,
-    ) -> Optional[str]:
-        """Get existing organization or create a new one."""
+    def _get_organization_id(self, org_name: str) -> Optional[str]:
+        """Get organization ID from cache. Organizations are pre-created in batch."""
         if not org_name:
             return None
 
-        # Check cache first
         cache_key = org_name.strip().lower()
-        if cache_key in self.organization_cache:
-            return self.organization_cache[cache_key]
-
-        # Search for existing organization
-        search_results = await self.context.search.search_entities(
-            query=org_name, entity_type="organization", limit=10
-        )
-
-        # Look for exact match
-        for result in search_results:
-            # Check type - handle both string and enum comparison
-            result_type = (
-                result.type.value if hasattr(result.type, "value") else str(result.type)
-            )
-            if result_type != "organization":
-                continue
-            for name_entry in result.names:
-                if name_entry.en and name_entry.en.full:
-                    if name_entry.en.full.strip().lower() == cache_key:
-                        self.organization_cache[cache_key] = result.id
-                        return result.id
-
-        # Create new organization
-        slug = text_to_slug(org_name)
-        if not slug or len(slug) < 3:
-            slug = f"org-{int(datetime.now().timestamp())}"
-        if len(slug) > 100:
-            slug = slug[:100]
-
-        # Determine subtype from raw payload and/or org name
-        arch_name = ""
-        group_name = ""
-        if raw_payload:
-            arch_name = raw_payload.get(
-                "organization__development_cooperation_group__architecture__name", ""
-            )
-            group_name = raw_payload.get(
-                "organization__development_cooperation_group__name", ""
-            )
-
-        subtype = _map_organization_subtype(arch_name, group_name, org_name, is_donor)
-
-        entity_data = {
-            "slug": slug,
-            "names": [
-                Name(kind=NameKind.PRIMARY, en=NameParts(full=org_name)).model_dump()
-            ],
-            "attributions": [
-                Attribution(
-                    title=LangText(
-                        en=LangTextValue(
-                            value="MoF DFMIS Organization", provenance="human"
-                        )
-                    ),
-                    details=LangText(
-                        en=LangTextValue(
-                            value=f"Organization from MoF DFMIS - {arch_name or 'Development Partner'}",
-                            provenance="human",
-                        )
-                    ),
-                ).model_dump()
-            ],
-        }
-
-        # Add attributes if available
-        if arch_name or group_name:
-            entity_data["attributes"] = {}
-            if arch_name:
-                entity_data["attributes"]["architecture"] = arch_name
-            if group_name:
-                entity_data["attributes"]["group"] = group_name
-
-        try:
-            org_entity = await self.context.publication.create_entity(
-                entity_type=EntityType.ORGANIZATION,
-                entity_subtype=subtype,
-                entity_data=entity_data,
-                author_id=self.author_id,
-                change_description=f"Import organization from MoF DFMIS: {org_name}",
-            )
-            self.context.log(f"  Created organization: {org_name} ({org_entity.id})")
-            self.organization_cache[cache_key] = org_entity.id
-            self.created_entity_ids.append(org_entity.id)
-            return org_entity.id
-        except ValueError as e:
-            if "already exists" in str(e):
-                # Try with suffix
-                i = 2
-                while i < 20:
-                    entity_data["slug"] = f"{slug}-{i}"
-                    try:
-                        org_entity = await self.context.publication.create_entity(
-                            entity_type=EntityType.ORGANIZATION,
-                            entity_subtype=subtype,
-                            entity_data=entity_data,
-                            author_id=self.author_id,
-                            change_description=f"Import organization from MoF DFMIS: {org_name}",
-                        )
-                        self.context.log(
-                            f"  Created organization: {org_name} ({org_entity.id})"
-                        )
-                        self.organization_cache[cache_key] = org_entity.id
-                        self.created_entity_ids.append(org_entity.id)
-                        return org_entity.id
-                    except ValueError as e2:
-                        if "already exists" in str(e2):
-                            i += 1
-                            continue
-                        self.context.log(
-                            f"  Error creating organization {org_name}: {e2}"
-                        )
-                        return None
-            else:
-                self.context.log(f"  Error creating organization {org_name}: {e}")
-                return None
-
-        return None
+        return self.organization_cache.get(cache_key)
 
     async def _verify(self) -> None:
         """Verify the migration results."""

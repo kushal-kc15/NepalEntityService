@@ -19,6 +19,7 @@ RelationshipType = Literal[
     "FUNDED_BY",
     "IMPLEMENTED_BY",
     "EXECUTED_BY",
+    "OVERSEEN_BY",
 ]
 
 

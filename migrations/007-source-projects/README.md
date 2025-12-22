@@ -4,10 +4,10 @@
 
 Import development project data from multiple sources into the Nepal Entity Service. This migration supports a multi-source architecture for aggregating project data from:
 
-- **MoF DFMIS** (Ministry of Finance - Development Finance Information Management System) ✅ Implemented
-- **World Bank** (planned)
-- **Asian Development Bank (ADB)** (planned)
-- **JICA** (planned)
+- **MoF DFMIS** (Ministry of Finance - Development Finance Information Management System) ✅ Primary source
+- **World Bank** ✅ Implemented
+- **Asian Development Bank (ADB)** ✅ Implemented
+- **JICA** ✅ Implemented
 - **NPC Project Bank** (planned)
 
 ## Data Sources
@@ -16,19 +16,22 @@ Import development project data from multiple sources into the Nepal Entity Serv
 - **API**: https://dfims.mof.gov.np/api/v2/core/projects/
 - **Authority**: Ministry of Finance, Nepal
 - **Data Type**: All development projects registered in Nepal's DFMIS system
-- **Coverage**: ~2,757 projects
+- **Coverage**: 2,753 projects
 
-### World Bank (Planned)
+### World Bank
 - **API**: World Bank Projects API
 - **Data Type**: World Bank-funded projects in Nepal
+- **Coverage**: 279 projects (195 unique after deduplication)
 
-### Asian Development Bank (Planned)
-- **API**: ADB IATI Data
+### Asian Development Bank
+- **API**: ADB IATI Data (https://data.adb.org/iati)
 - **Data Type**: ADB-funded projects in Nepal
+- **Coverage**: 118 projects (25 unique after deduplication)
 
-### JICA (Planned)
-- **API**: JICA Project Database
+### JICA
+- **Source**: JICA Yen Loan data
 - **Data Type**: Japanese ODA projects in Nepal
+- **Coverage**: 15 projects (6 unique after deduplication)
 
 ## Two-Step Process
 
@@ -56,6 +59,57 @@ After scraping, run the migration to import the data:
 ```bash
 poetry run nes migration run 007-source-projects
 ```
+
+## Deduplication Strategy
+
+Since DFMIS is the authoritative source for Nepal's development projects, secondary sources (World Bank, ADB, JICA) are deduplicated against DFMIS to avoid creating duplicate project entries.
+
+### ProjectMatcher Classes
+
+The `project_matcher.py` module provides source-specific matchers:
+
+```python
+from project_matcher import WorldBankMatcher, ADBMatcher, JICAMatcher
+
+# Each matcher knows how to identify its donor in DFMIS data
+class WorldBankMatcher(ProjectMatcher):
+    SOURCE = "WB"
+    DONOR_NAMES = ["world bank", "ibrd", "ida", "international development association"]
+```
+
+### Match Levels (Conservative Approach)
+
+Matches are categorized by confidence level:
+
+| Level | Criteria | Action |
+|-------|----------|--------|
+| `ID_MATCH` | Donor project ID found in DFMIS identifiers | Skip (definite duplicate) |
+| `EXACT_NAME` | Exact name match + same donor | Skip (definite duplicate) |
+| `FUZZY_AMOUNT` | Fuzzy name (>85%) + similar amount (±20%) | Skip (likely duplicate) |
+| `FUZZY_ONLY` | Fuzzy name match only | Skip (possible duplicate) |
+| `NO_MATCH` | No match found | Import as new project |
+
+### Processing Order
+
+Sources are processed in priority order:
+
+```python
+SOURCES = [
+    ("dfmis_projects.jsonl", None, "DFMIS"),           # Primary - no dedup
+    ("world_bank_projects.jsonl", WorldBankMatcher, "World Bank"),
+    ("adb_projects.jsonl", ADBMatcher, "ADB"),
+    ("jica_projects.jsonl", JICAMatcher, "JICA"),
+]
+```
+
+### Deduplication Results (Current)
+
+| Source | Total | Imported | Skipped | Skip Rate |
+|--------|-------|----------|---------|-----------|
+| DFMIS | 2,753 | 2,753 | 0 | 0% |
+| World Bank | 279 | 195 | 84 | 30% |
+| ADB | 118 | 25 | 93 | 79% |
+| JICA | 15 | 6 | 9 | 60% |
 
 ## What Gets Created
 
@@ -115,19 +169,27 @@ class Project(Entity):
 
 ```
 migrations/007-source-projects/
-├── migrate.py              # Main migration script
-├── README.md               # This file
+├── migrate.py                  # Main migration script
+├── project_matcher.py          # Deduplication matchers
+├── README.md                   # This file
 ├── mof_dfmis/
-│   ├── scrape_mof_dfmis.py # DFMIS scraper
-│   └── all_projects.json   # Raw API cache (auto-generated)
-├── world_bank/             # (planned)
-│   └── scrape_world_bank.py
-├── adb/                    # (planned)
-│   └── scrape_adb.py
+│   ├── scrape_mof_dfmis.py     # DFMIS scraper
+│   └── all_projects.json       # Raw API cache
+├── world_bank/
+│   ├── scrape_world_bank.py    # World Bank scraper
+│   └── check_wb_dfmis_overlap.py
+├── asian_development_bank/
+│   ├── scrape_adb.py           # ADB IATI scraper
+│   └── check_adb_dfmis_overlap.py
+├── jica/
+│   ├── scrape_jica.py          # JICA scraper
+│   ├── check_jica_dfmis_overlap.py
+│   └── yen_loan.csv            # Source data
 └── source/
-    ├── dfmis_projects.jsonl    # Transformed DFMIS data
-    ├── world_bank_projects.jsonl  # (planned)
-    └── adb_projects.jsonl         # (planned)
+    ├── dfmis_projects.jsonl
+    ├── world_bank_projects.jsonl
+    ├── adb_projects.jsonl
+    └── jica_projects.jsonl
 ```
 
 ## Adding New Sources
@@ -240,10 +302,11 @@ relationship:...:LOCATED_IN
 
 | Source | Projects | Organizations | Relationships |
 |--------|----------|---------------|---------------|
-| MoF DFMIS | 2,757 | ~500+ | ~17,500+ |
-| World Bank | - | - | - |
-| ADB | - | - | - |
-| JICA | - | - | - |
+| DFMIS | 2,753 | 583 | 17,528 |
+| World Bank | 195 | 55 | 235 |
+| ADB | 25 | 0 | 0 |
+| JICA | 6 | 0 | 0 |
+| **Total** | **2,979** | **638** | **17,763** |
 
 ## Rollback
 

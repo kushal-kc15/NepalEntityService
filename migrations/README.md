@@ -7,7 +7,8 @@ This directory contains versioned migration folders for managing database evolut
 Migrations are a way to systematically update the database content through versioned, reviewable, and reproducible scripts. Each migration is a folder containing:
 - A Python script (`migrate.py`) that performs the data changes
 - A README documenting the purpose and approach
-- Optional data files (CSV, Excel, JSON) used by the migration
+- Optional data files (CSV, Excel, JSON, JSONL) used by the migration
+- Optional helper modules (e.g., scrapers, matchers) for complex migrations
 
 ## Migration Structure
 
@@ -16,12 +17,29 @@ Each migration folder follows this naming convention:
 NNN-descriptive-name/
 ├── migrate.py          # Main migration script (required)
 ├── README.md           # Documentation (required)
-└── data.csv            # Optional data files
+├── source/             # Source data files (optional)
+│   ├── data.jsonl      # JSONL format preferred for large datasets
+│   └── data.csv        # CSV for tabular data
+├── scraper.py          # Data scraper (optional)
+└── helpers.py          # Helper modules (optional)
 ```
 
 Where:
 - `NNN` is a 3-digit numeric prefix (000-999) determining execution order
 - `descriptive-name` is a kebab-case description of what the migration does
+
+## Current Migrations
+
+| Migration | Description | Status |
+|-----------|-------------|--------|
+| `000-example-migration` | Template and example migration structure | Example |
+| `001-source-locations` | Import Nepal administrative locations (provinces, districts, municipalities, wards) | Applied |
+| `002-ward-name-fix` | Fix ward naming inconsistencies | Applied |
+| `003-source-2082-political-parties` | Import political parties from 2082 election data | Applied |
+| `004-source-election-constituencies` | Import election constituencies | Applied |
+| `005-seed-2079-election-candidates` | Import 2079 election candidates | Applied |
+| `006-source-hospitals` | Import hospital data | Applied |
+| `007-source-projects` | Import development projects from multiple sources (DFMIS, World Bank, ADB, JICA) | Applied |
 
 ## Migration Script Template
 
@@ -48,13 +66,15 @@ async def migrate(context):
     # Your migration logic here
     context.log("Migration started")
     
-    # Example: Read data from CSV
-    # data = context.read_csv("data.csv")
+    # Example: Read data from JSONL
+    # projects = []
+    # with open(context.migration_dir / "source" / "data.jsonl") as f:
+    #     for line in f:
+    #         projects.append(json.loads(line))
     
     # Example: Create entities
-    # for row in data:
-    #     entity = Entity(...)
-    #     await context.publication.create_entity(entity, author_id, description)
+    # for project in projects:
+    #     entity = await context.publication.create_entity(...)
     
     context.log("Migration completed")
 ```
@@ -82,7 +102,7 @@ The `context` object passed to your migration provides:
 
 1. **Copy the example migration**:
    ```bash
-   cp -r migrations/000-example-migration migrations/001-your-migration-name
+   cp -r migrations/000-example-migration migrations/NNN-your-migration-name
    ```
 
 2. **Update the metadata** in `migrate.py`:
@@ -99,63 +119,36 @@ The `context` object passed to your migration provides:
    - Dependencies: Does this depend on other migrations?
    - Notes: Any special considerations?
 
-5. **Add data files** if needed (CSV, Excel, JSON)
+5. **Add data files** if needed (prefer JSONL for large datasets)
 
-6. **Test locally** (if you have the database setup):
+6. **Test locally**:
    ```bash
-   nes migration run 001-your-migration-name
+   nes migration run NNN-your-migration-name
    ```
 
 7. **Submit a pull request** with your migration folder
 
-## Migration Workflow
+## Running Migrations
 
-1. **Contributor** creates migration folder and submits PR
-2. **CI/CD** validates migration structure and executes it in test environment
-3. **Maintainer** reviews migration code and generated statistics
-4. **Automated service** executes approved migrations and persists to Database Repository
-5. **Git history** tracks all applied migrations with full metadata
-
-## Checking Migration Status
-
-Use the Migration Manager to check migration status:
-
-```python
-from pathlib import Path
-from nes.services.migration import MigrationManager
-
-manager = MigrationManager(Path("migrations"), Path("nes-db"))
-
-# Discover all migrations
-migrations = await manager.discover_migrations()
-
-# Check which migrations have been applied
-applied = await manager.get_applied_migrations()
-
-# Check which migrations are pending
-pending = await manager.get_pending_migrations()
-
-# Check if a specific migration is applied
-is_applied = await manager.is_migration_applied(migration)
-```
-
-Or run the demo script:
 ```bash
-python examples/migration_manager_demo.py
+# Run a specific migration
+nes migration run 007-source-projects
+
+# List all migrations
+nes migration list
 ```
 
 ## Best Practices
 
 1. **Keep migrations focused**: Each migration should do one thing well
-2. **Document thoroughly**: Future maintainers will thank you
-3. **Include data sources**: Document where the data comes from
-4. **Test before submitting**: Validate your migration locally if possible
-5. **Use descriptive names**: Make it clear what the migration does
-6. **Follow the template**: Use the example migration as a starting point
-
-## Example Migrations
-
-- `000-example-migration/` - Template and example migration structure
+2. **Use JSONL for large datasets**: One JSON object per line, easier to process
+3. **Implement rollback**: Track created entities for cleanup on failure
+4. **Document thoroughly**: Documentation is essential for this open-source project
+5. **Include data sources**: Document where the data comes from
+6. **Test before submitting**: Validate your migration locally
+7. **Use descriptive names**: Make it clear what the migration does
+8. **Preserve source data**: Keep original payloads when needed
+9. **Implement deduplication**: For multi-source migrations, prevent duplicates
 
 ## Questions?
 

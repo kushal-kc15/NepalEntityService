@@ -1,17 +1,37 @@
 """
-Migration: 007-source-projects-mof-dfims
-Description: Import MoF DFMIS (Ministry of Finance - Development Finance Information Management System) projects for Nepal from scraped JSON data
+Migration: 007-source-projects
+Description: Import development projects for Nepal from multiple sources:
+  - MoF DFMIS (primary source - Nepal's official aid management system)
+  - World Bank (secondary - skip duplicates)
+  - Asian Development Bank (secondary - skip duplicates)
+  - JICA (secondary - skip duplicates)
+
 Author: Nepal Development Project Team
 Date: 2025-01-26
 """
 
 import html
 import json
+import sys
 from datetime import datetime, timezone
 from html.parser import HTMLParser
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-from nes.core.models import (
+# Add migration directory to path for local imports
+_migration_dir = Path(__file__).parent
+if str(_migration_dir) not in sys.path:
+    sys.path.insert(0, str(_migration_dir))
+
+from project_matcher import (  # noqa: E402
+    ADBMatcher,
+    JICAMatcher,
+    MatchLevel,
+    ProjectMatcher,
+    WorldBankMatcher,
+)
+
+from nes.core.models import (  # noqa: E402
     Address,
     Attribution,
     ExternalIdentifier,
@@ -20,17 +40,17 @@ from nes.core.models import (
     Name,
     NameParts,
 )
-from nes.core.models.base import NameKind
-from nes.core.models.entity import EntitySubType, EntityType
-from nes.core.models.version import Author
-from nes.core.utils.slug_helper import text_to_slug
-from nes.services.migration.context import MigrationContext
-from nes.services.scraping.normalization import NameExtractor
+from nes.core.models.base import NameKind  # noqa: E402
+from nes.core.models.entity import EntitySubType, EntityType  # noqa: E402
+from nes.core.models.version import Author  # noqa: E402
+from nes.core.utils.slug_helper import text_to_slug  # noqa: E402
+from nes.services.migration.context import MigrationContext  # noqa: E402
+from nes.services.scraping.normalization import NameExtractor  # noqa: E402
 
 # Migration metadata
 AUTHOR = "Nava Yuwa Central"
 DATE = "2025-01-26"
-DESCRIPTION = "Import MoF DFMIS projects for Nepal from scraped JSON data"
+DESCRIPTION = "Import development projects for Nepal from multiple sources"
 CHANGE_DESCRIPTION = "Initial sourcing from MoF DFMIS API"
 
 name_extractor = NameExtractor()
@@ -234,7 +254,30 @@ def _map_organization_subtype(
 
 
 class ProjectMigration:
-    """Migration class for DFMIS projects."""
+    """Migration class for development projects from multiple sources."""
+
+    # Source configuration: (file_name, matcher_class, source_label, change_description)
+    SOURCES = [
+        ("dfmis_projects.jsonl", None, "DFMIS", "Initial sourcing from MoF DFMIS API"),
+        (
+            "world_bank_projects.jsonl",
+            WorldBankMatcher,
+            "World Bank",
+            "Import from World Bank Projects API",
+        ),
+        (
+            "adb_projects.jsonl",
+            ADBMatcher,
+            "ADB",
+            "Import from ADB IATI XML Feed",
+        ),
+        (
+            "jica_projects.jsonl",
+            JICAMatcher,
+            "JICA",
+            "Import from JICA Yen Loan Database",
+        ),
+    ]
 
     def __init__(self, context: MigrationContext):
         self.context = context
@@ -246,32 +289,157 @@ class ProjectMigration:
         self.province_lookup: Dict[str, Any] = {}
         self.district_lookup: Dict[str, Any] = {}
         self.municipality_lookup: Dict[str, Any] = {}
+        # Track all migrated projects for deduplication (converted to matcher format)
+        self.migrated_projects: List[Dict[str, Any]] = []
 
     async def run(self) -> None:
-        """Run the migration."""
-        self.context.log("Migration started: Importing MoF DFMIS projects for Nepal")
+        """Run the migration for all sources."""
+        self.context.log(
+            "Migration started: Importing development projects from multiple sources"
+        )
 
         try:
             await self._setup_author()
             await self._build_location_lookups()
             await self._build_organization_cache()
 
-            # Load project data
-            projects = self._load_projects()
+            # Process each source in order
+            total_created = 0
+            total_skipped = 0
+            total_relationships = 0
 
-            # Phase 1: Extract and prepare organizations from all projects
-            org_data = self._extract_organizations_from_projects(projects)
-            self._validate_organization_slugs(org_data)
-            await self._create_organizations(org_data)
+            for source_file, matcher_class, source_label, change_desc in self.SOURCES:
+                self.context.log(f"\n{'='*60}")
+                self.context.log(f"Processing source: {source_label}")
+                self.context.log(f"{'='*60}")
 
-            # Phase 2: Create projects and relationships
-            await self._migrate_projects(projects)
+                # Load projects for this source
+                projects = self._load_projects_from_file(source_file)
+                if not projects:
+                    self.context.log(f"  No projects found in {source_file}, skipping")
+                    continue
+
+                # Extract and create organizations
+                org_data = self._extract_organizations_from_projects(projects)
+                self._validate_organization_slugs(org_data)
+                await self._create_organizations(org_data)
+
+                # Apply deduplication for secondary sources
+                if matcher_class is not None:
+                    projects, skipped = self._filter_duplicates(
+                        projects, matcher_class, source_label
+                    )
+                    total_skipped += skipped
+
+                # Migrate projects
+                created, rel_count = await self._migrate_projects(
+                    projects, source_label, change_desc
+                )
+                total_created += created
+                total_relationships += rel_count
+
             await self._verify()
+            self.context.log(f"\n{'='*60}")
+            self.context.log("MIGRATION SUMMARY")
+            self.context.log(f"{'='*60}")
+            self.context.log(f"Total projects created: {total_created}")
+            self.context.log(f"Total projects skipped (duplicates): {total_skipped}")
+            self.context.log(f"Total relationships created: {total_relationships}")
             self.context.log("Migration completed successfully")
         except Exception as e:
             self.context.log(f"Migration failed: {e}")
             await self._rollback()
             raise
+
+    def _load_projects_from_file(self, filename: str) -> List[Dict[str, Any]]:
+        """Load projects from a JSONL file in the source directory."""
+        projects = []
+        source_file = self.context.migration_dir / "source" / filename
+        try:
+            with open(source_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        projects.append(json.loads(line))
+            self.context.log(
+                f"  Loaded {len(projects)} projects from source/{filename}"
+            )
+        except FileNotFoundError:
+            self.context.log(f"  WARNING: source/{filename} not found")
+            return []
+
+        return projects
+
+    def _filter_duplicates(
+        self,
+        projects: List[Dict[str, Any]],
+        matcher_class: type,
+        source_label: str,
+    ) -> tuple:
+        """Filter out duplicate projects using the appropriate matcher.
+
+        Args:
+            projects: List of projects to filter
+            matcher_class: Matcher class to use (WorldBankMatcher, ADBMatcher, etc.)
+            source_label: Label for logging
+
+        Returns:
+            Tuple of (filtered_projects, skipped_count)
+        """
+        if not self.migrated_projects:
+            self.context.log(f"  No existing projects to match against, importing all")
+            return projects, 0
+
+        # Create matcher with existing projects
+        matcher = matcher_class(self.migrated_projects)
+
+        filtered = []
+        skipped = 0
+        skip_reasons = {
+            MatchLevel.HIGH_ID: 0,
+            MatchLevel.HIGH_NAME: 0,
+            MatchLevel.MEDIUM: 0,
+            MatchLevel.LOW: 0,
+        }
+
+        for project in projects:
+            result = matcher.find_match(project)
+            if result.should_skip():
+                skipped += 1
+                skip_reasons[result.level] += 1
+            else:
+                filtered.append(project)
+
+        # Log deduplication results
+        self.context.log(f"  Deduplication results for {source_label}:")
+        self.context.log(
+            f"    - ID matches (skip):        {skip_reasons[MatchLevel.HIGH_ID]}"
+        )
+        self.context.log(
+            f"    - Exact name (skip):        {skip_reasons[MatchLevel.HIGH_NAME]}"
+        )
+        self.context.log(
+            f"    - Fuzzy + amount (skip):    {skip_reasons[MatchLevel.MEDIUM]}"
+        )
+        self.context.log(
+            f"    - Fuzzy name only (skip):   {skip_reasons[MatchLevel.LOW]}"
+        )
+        self.context.log(f"    - No match (import):        {len(filtered)}")
+        self.context.log(
+            f"  Total: {len(projects)} -> {len(filtered)} after deduplication"
+        )
+
+        return filtered, skipped
+
+    def _convert_to_matcher_format(
+        self, project_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Convert project data to format expected by matchers.
+
+        Matchers expect: names[], total_commitment, financing[], donor_extensions[]
+        """
+        # Already in correct format from scrapers
+        return project_data
 
     async def _setup_author(self) -> None:
         """Create the migration author."""
@@ -349,31 +517,8 @@ class ProjectMigration:
         )
 
     def _load_projects(self) -> List[Dict[str, Any]]:
-        """Load projects from the pre-transformed JSONL file."""
-        projects = []
-        source_file = self.context.migration_dir / "source" / "dfmis_projects.jsonl"
-        try:
-            with open(source_file, "r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if line:
-                        projects.append(json.loads(line))
-            self.context.log(
-                f"Loaded {len(projects)} projects from source/dfmis_projects.jsonl"
-            )
-        except FileNotFoundError:
-            self.context.log("ERROR: source/dfmis_projects.jsonl not found.")
-            self.context.log(
-                "Please run the scraper first: cd migrations/007-source-projects/mof_dfmis && python scrape_mof_dfmis.py"
-            )
-            raise
-
-        if not projects:
-            raise ValueError(
-                "No projects found in source data - check dfmis_projects.jsonl"
-            )
-
-        return projects
+        """Load projects from the pre-transformed JSONL file (backward compatibility)."""
+        return self._load_projects_from_file("dfmis_projects.jsonl")
 
     def _extract_organizations_from_projects(
         self, projects: List[Dict[str, Any]]
@@ -550,23 +695,42 @@ class ProjectMigration:
             f"Organizations: created {created_count}, skipped {skipped_count} existing"
         )
 
-    async def _migrate_projects(self, projects: List[Dict[str, Any]]) -> None:
-        """Create project entities and relationships."""
+    async def _migrate_projects(
+        self,
+        projects: List[Dict[str, Any]],
+        source_label: str = "DFMIS",
+        change_description: str = CHANGE_DESCRIPTION,
+    ) -> tuple:
+        """Create project entities and relationships.
 
+        Args:
+            projects: List of project data to migrate
+            source_label: Label for the source (DFMIS, World Bank, ADB, JICA)
+            change_description: Description for version history
+
+        Returns:
+            Tuple of (created_count, relationship_count)
+        """
         count = 0
         relationship_count = 0
 
         for project_data in projects:
             try:
                 # Create project entity
-                project_entity = await self._create_project_entity(project_data)
+                project_entity = await self._create_project_entity(
+                    project_data, source_label, change_description
+                )
                 if not project_entity:
-                    raise ValueError(
-                        f"Failed to create project - missing slug or names: {project_data.get('slug', 'unknown')}"
+                    self.context.log(
+                        f"  Warning: Failed to create project - missing slug or names: {project_data.get('slug', 'unknown')}"
                     )
+                    continue
 
                 self.created_entity_ids.append(project_entity.id)
                 count += 1
+
+                # Track for deduplication against future sources
+                self.migrated_projects.append(project_data)
 
                 # Create relationships
                 rel_count = await self._create_project_relationships(
@@ -575,26 +739,40 @@ class ProjectMigration:
                 relationship_count += rel_count
 
                 if count % 100 == 0:
-                    self.context.log(f"Processed {count} projects...")
+                    self.context.log(f"  Processed {count} {source_label} projects...")
 
             except Exception as e:
                 self.context.log(
-                    f"Error processing project {project_data.get('slug', 'unknown')}: {e}"
+                    f"  Error processing project {project_data.get('slug', 'unknown')}: {e}"
                 )
                 raise
 
-        self.context.log(f"Created {count} project entities")
-        self.context.log(f"Created {relationship_count} relationships")
+        self.context.log(f"  Created {count} {source_label} project entities")
+        self.context.log(f"  Created {relationship_count} relationships")
+        return count, relationship_count
 
     async def _create_project_entity(
-        self, project_data: Dict[str, Any]
+        self,
+        project_data: Dict[str, Any],
+        source_label: str = "DFMIS",
+        change_description: str = CHANGE_DESCRIPTION,
     ) -> Optional[Any]:
-        """Create a project entity from the pre-transformed data."""
+        """Create a project entity from the pre-transformed data.
+
+        Args:
+            project_data: Project data dictionary
+            source_label: Label for the source (DFMIS, World Bank, ADB, JICA)
+            change_description: Description for version history
+
+        Returns:
+            Created project entity or None if failed
+        """
         slug = project_data.get("slug", "")
         if not slug:
             return None
 
-        # Ensure slug is valid
+        # Ensure slug is valid (lowercase, alphanumeric with hyphens only)
+        slug = slug.lower()
         if len(slug) > 100:
             slug = slug[:100]
         if len(slug) < 3:
@@ -625,25 +803,35 @@ class ProjectMigration:
         # Build description
         description = None
         desc_data = project_data.get("description")
-        if desc_data and isinstance(desc_data, dict):
-            en_desc = desc_data.get("en", {})
-            if en_desc and en_desc.get("value"):
-                # Strip HTML and truncate if needed
-                clean_desc = _strip_html_tags(en_desc.get("value", ""))
+        if desc_data:
+            if isinstance(desc_data, dict):
+                en_desc = desc_data.get("en", {})
+                if en_desc and en_desc.get("value"):
+                    clean_desc = _strip_html_tags(en_desc.get("value", ""))
+                    if clean_desc:
+                        description = LangText(
+                            en=LangTextValue(
+                                value=clean_desc[:5000], provenance="imported"
+                            )
+                        ).model_dump()
+            elif isinstance(desc_data, str):
+                # Handle string descriptions (from WB, ADB, JICA)
+                clean_desc = _strip_html_tags(desc_data)
                 if clean_desc:
                     description = LangText(
                         en=LangTextValue(value=clean_desc[:5000], provenance="imported")
                     ).model_dump()
 
-        # Build attributions
+        # Build attributions based on source
+        attribution_title = source_label
+        attribution_details = f"Imported from {source_label} on {DATE}"
         attributions = [
             Attribution(
-                title=LangText(en=LangTextValue(value="MoF DFMIS", provenance="human")),
+                title=LangText(
+                    en=LangTextValue(value=attribution_title, provenance="human")
+                ),
                 details=LangText(
-                    en=LangTextValue(
-                        value=f"Imported from Nepal Ministry of Finance DFMIS on {DATE}",
-                        provenance="human",
-                    )
+                    en=LangTextValue(value=attribution_details, provenance="human")
                 ),
             ).model_dump()
         ]
@@ -652,18 +840,20 @@ class ProjectMigration:
         identifiers = []
         project_url = project_data.get("project_url")
         if project_url:
-            # Extract project ID from URL
-            project_id = (
-                slug.replace("dfmis-", "") if slug.startswith("dfmis-") else slug
-            )
+            # Extract project ID from slug
+            project_id = slug
+            for prefix in ["dfmis-", "wb-", "adb-", "jica-"]:
+                if slug.startswith(prefix):
+                    project_id = slug[len(prefix) :]
+                    break
             identifiers.append(
                 ExternalIdentifier(
                     scheme="other",
                     value=project_id,
-                    url=project_url,
+                    url=str(project_url),
                     name=LangText(
                         en=LangTextValue(
-                            value="MoF DFMIS Project ID", provenance="human"
+                            value=f"{source_label} Project ID", provenance="human"
                         )
                     ),
                 ).model_dump()
@@ -680,11 +870,13 @@ class ProjectMigration:
             "implementing_agency": project_data.get("implementing_agency"),
             "executing_agency": project_data.get("executing_agency"),
             "financing": project_data.get("financing"),
+            "total_commitment": project_data.get("total_commitment"),
+            "total_disbursement": project_data.get("total_disbursement"),
             "dates": project_data.get("dates"),
             "sectors": project_data.get("sectors"),
-            "donors": project_data.get("donors"),
+            "tags": project_data.get("tags"),
             "donor_extensions": project_data.get("donor_extensions"),
-            "project_url": project_url,
+            "project_url": str(project_url) if project_url else None,
         }
 
         # Remove None values
@@ -694,7 +886,7 @@ class ProjectMigration:
         expected_id = f"entity:project/development_project/{slug}"
         existing = await self.context.db.get_entity(expected_id)
         if existing:
-            self.context.log(f"Skipping existing project {expected_id}")
+            self.context.log(f"  Skipping existing project {expected_id}")
             return existing
 
         project = await self.context.publication.create_entity(
@@ -702,9 +894,8 @@ class ProjectMigration:
             entity_subtype=EntitySubType.DEVELOPMENT_PROJECT,
             entity_data=entity_data,
             author_id=self.author_id,
-            change_description=CHANGE_DESCRIPTION,
+            change_description=change_description,
         )
-        self.context.log(f"Created project {project.id}")
         return project
 
     async def _create_project_relationships(
@@ -990,9 +1181,19 @@ class ProjectMigration:
 
 async def migrate(context: MigrationContext) -> None:
     """
-    Import MoF DFMIS projects for Nepal from scraped JSON data
+    Import development projects for Nepal from multiple sources.
 
-    Data source: MoF DFMIS API (dfims.mof.gov.np/api/v2/core/projects/)
+    Sources (in order of priority):
+    1. MoF DFMIS (primary) - Nepal's official aid management system
+    2. World Bank - skip duplicates found in DFMIS
+    3. Asian Development Bank - skip duplicates found in DFMIS/WB
+    4. JICA - skip duplicates found in DFMIS/WB/ADB
+
+    Data sources:
+    - DFMIS: dfims.mof.gov.np/api/v2/core/projects/
+    - World Bank: search.worldbank.org/api/v3/projects
+    - ADB: www.adb.org/iati/iati-activities-np.xml
+    - JICA: JICA Yen Loan Database (CSV)
     """
     migration = ProjectMigration(context)
     await migration.run()

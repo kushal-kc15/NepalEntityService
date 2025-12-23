@@ -522,6 +522,383 @@ All changes should include descriptions:
 }
 ```
 
+## Project Model
+
+Projects represent development projects in Nepal, aggregating data from multiple sources into a unified DFMIS-compatible structure.
+
+### Design Philosophy
+
+The Project model is designed to:
+
+1. **Align with DFMIS** - Nepal's Ministry of Finance Development Finance Information Management System is the target schema
+2. **Support multiple donors** - A single project can have financing from World Bank, ADB, JICA, and bilateral donors
+3. **Preserve source data** - Original donor payloads are kept in `donor_extensions` for traceability
+4. **Use relationships for linking** - Agencies and locations are linked via entity relationships, not embedded
+
+### Project Schema
+
+```json
+{
+  "id": "entity:project/development_project/dfmis-12345",
+  "slug": "dfmis-12345",
+  "type": "project",
+  "sub_type": "development_project",
+  "stage": "ongoing",
+  "implementing_agency": "Department of Roads",
+  "executing_agency": "Ministry of Physical Infrastructure",
+  "financing": [
+    {
+      "donor": "World Bank",
+      "donor_id": "entity:organization/international_org/world-bank",
+      "amount": 150000000,
+      "currency": "USD",
+      "assistance_type": "loan",
+      "budget_type": "on_budget",
+      "terms": {
+        "interest_rate": 1.25,
+        "repayment_period_years": 30,
+        "grace_period_years": 5,
+        "tying_status": "untied"
+      }
+    }
+  ],
+  "total_commitment": 150000000,
+  "total_disbursement": 45000000,
+  "dates": [
+    {"date": "2020-03-15", "type": "APPROVAL", "source": "WB"},
+    {"date": "2020-09-01", "type": "EFFECTIVENESS", "source": "WB"},
+    {"date": "2025-12-31", "type": "CLOSING", "source": "WB"}
+  ],
+  "sectors": [
+    {
+      "normalized_sector": "Transport",
+      "donor_sector": "Roads and highways",
+      "percentage": 100
+    }
+  ],
+  "donor_extensions": [
+    {
+      "donor": "WB",
+      "donor_project_id": "P123456",
+      "raw_payload": {"...": "original WB API response"}
+    }
+  ],
+  "project_url": "https://projects.worldbank.org/en/projects-operations/project-detail/P123456"
+}
+```
+
+### Project Lifecycle Stages
+
+The `stage` field tracks where a project is in its lifecycle:
+
+| Stage | Description |
+|-------|-------------|
+| `pipeline` | Under consideration, not yet approved |
+| `planning` | Approved but not yet started |
+| `approved` | Formally approved, awaiting effectiveness |
+| `ongoing` | Currently being implemented |
+| `completed` | Successfully finished |
+| `suspended` | Temporarily halted |
+| `terminated` | Ended before completion |
+| `cancelled` | Cancelled before starting |
+| `unknown` | Status not available |
+
+### Financing Model
+
+The `financing` array captures all financial commitments and disbursements. Each entry represents a single commitment from a donor.
+
+#### Assistance Types
+
+| Type | Description |
+|------|-------------|
+| `grant` | Non-repayable funding |
+| `loan` | Repayable funding with terms |
+| `technical_assistance` | Expert support, training, capacity building |
+| `in_kind` | Non-monetary contributions (equipment, materials) |
+| `mixed` | Combination of grant and loan |
+| `other` | Other assistance types |
+
+#### Budget Types
+
+| Type | Description |
+|------|-------------|
+| `on_budget` | Recorded in Nepal's national budget |
+| `off_budget` | Not recorded in national budget (direct implementation) |
+
+#### Financing Terms (for loans)
+
+```json
+{
+  "interest_rate": 1.25,
+  "repayment_period_years": 30,
+  "grace_period_years": 5,
+  "tying_status": "untied"
+}
+```
+
+**Tying Status Values**:
+- `tied` - Must be spent in donor country
+- `untied` - Can be spent anywhere
+- `partially_tied` - Some restrictions apply
+- `general_untied` - Untied with general conditions
+
+### Date Events
+
+Projects have multiple milestone dates from different sources:
+
+```json
+{
+  "dates": [
+    {"date": "2020-03-15", "type": "APPROVAL", "source": "WB"},
+    {"date": "2020-06-01", "type": "AGREEMENT", "source": "DFMIS"},
+    {"date": "2020-09-01", "type": "EFFECTIVENESS", "source": "WB"},
+    {"date": "2020-10-15", "type": "START", "source": "DFMIS"},
+    {"date": "2025-12-31", "type": "CLOSING", "source": "WB"},
+    {"date": "2026-06-30", "type": "COMPLETION", "source": "DFMIS"}
+  ]
+}
+```
+
+**Common Date Types**:
+- `APPROVAL` - Board/government approval date
+- `AGREEMENT` - Loan/grant agreement signed
+- `EFFECTIVENESS` - Agreement becomes effective
+- `START` - Implementation begins
+- `COMPLETION` - Physical completion
+- `CLOSING` - Financial closing (final disbursement)
+
+### Sector Classification
+
+Projects are classified by sector, preserving both normalized (MoF) and original donor classifications:
+
+```json
+{
+  "sectors": [
+    {
+      "normalized_sector": "Transport",
+      "donor_sector": "Roads and highways",
+      "donor_subsector": "National highways",
+      "donor": "WB",
+      "percentage": 70
+    },
+    {
+      "normalized_sector": "Urban Development",
+      "donor_sector": "Urban transport",
+      "donor": "WB",
+      "percentage": 30
+    }
+  ]
+}
+```
+
+### Cross-Cutting Tags
+
+Policy markers and thematic tags:
+
+```json
+{
+  "tags": [
+    {"category": "CLIMATE", "normalized_tag": "climate_adaptation", "donor_tag": "Climate co-benefits"},
+    {"category": "GENDER", "normalized_tag": "gender_mainstreaming", "donor_tag": "GEN-2"},
+    {"category": "SDG", "normalized_tag": "sdg_9", "donor_tag": "SDG 9: Industry, Innovation"}
+  ]
+}
+```
+
+**Tag Categories**:
+- `GENDER` - Gender equality markers
+- `CLIMATE` - Climate change markers
+- `DISABILITY` - Disability inclusion
+- `SDG` - Sustainable Development Goals
+- `GOVERNANCE` - Governance themes
+- `THEME` - Other thematic areas
+
+### Donor Extensions
+
+Original donor data is preserved for traceability and future re-processing:
+
+```json
+{
+  "donor_extensions": [
+    {
+      "donor": "WB",
+      "donor_project_id": "P123456",
+      "raw_payload": {
+        "id": "P123456",
+        "project_name": "Nepal: Strategic Roads Connectivity",
+        "boardapprovaldate": "2020-03-15",
+        "totalamt": 150000000,
+        "...": "complete original API response"
+      }
+    },
+    {
+      "donor": "ADB",
+      "donor_project_id": "NEP-12345",
+      "raw_payload": {
+        "iati_identifier": "XM-DAC-46004-NEP-12345",
+        "...": "complete IATI activity"
+      }
+    }
+  ]
+}
+```
+
+### Project Relationships
+
+Projects link to other entities via relationships:
+
+| Relationship Type | Target Entity | Description |
+|-------------------|---------------|-------------|
+| `FUNDED_BY` | Organization | Donor providing financing |
+| `IMPLEMENTED_BY` | Organization | Agency implementing the project |
+| `EXECUTED_BY` | Organization | Agency executing the project |
+| `OVERSEEN_BY` | Organization | Government ministry with oversight |
+| `LOCATED_IN` | Location | Geographic location(s) of project |
+
+**Example Relationships**:
+
+```json
+[
+  {
+    "source_entity_id": "entity:project/development_project/dfmis-12345",
+    "target_entity_id": "entity:organization/international_org/world-bank",
+    "type": "FUNDED_BY"
+  },
+  {
+    "source_entity_id": "entity:project/development_project/dfmis-12345",
+    "target_entity_id": "entity:organization/government_body/department-of-roads",
+    "type": "IMPLEMENTED_BY"
+  },
+  {
+    "source_entity_id": "entity:project/development_project/dfmis-12345",
+    "target_entity_id": "entity:location/district/kathmandu",
+    "type": "LOCATED_IN"
+  }
+]
+```
+
+### Data Source Mappings
+
+The Project model unifies data from multiple sources:
+
+| Field | DFMIS | World Bank | ADB (IATI) | JICA |
+|-------|-------|------------|------------|------|
+| `stage` | `project_status` | `status` | `activity_status` | Derived |
+| `financing[].amount` | `commitment[].amount` | `totalamt` | `budget[].value` | `Amount of approval` |
+| `financing[].donor` | `commitment[].organization` | "World Bank" | `participating_org` | "JICA" |
+| `dates[]` | Multiple date fields | `boardapprovaldate`, `closingdate` | `activity_date[]` | `Date of approval` |
+| `sectors[]` | `sector__name` | `major_sectors[]` | `sector[]` | `sector`, `subsector` |
+
+### Complete Project Example
+
+```json
+{
+  "id": "entity:project/development_project/dfmis-12345",
+  "slug": "dfmis-12345",
+  "type": "project",
+  "sub_type": "development_project",
+  "names": [
+    {
+      "kind": "PRIMARY",
+      "en": {"full": "Nepal: Strategic Roads Connectivity and Trade Improvement Project"},
+      "ne": {"full": "नेपाल: रणनीतिक सडक सम्पर्क र व्यापार सुधार परियोजना"}
+    }
+  ],
+  "description": {
+    "en": {
+      "value": "The project aims to improve road connectivity and reduce travel time along strategic corridors in Nepal's Terai region.",
+      "provenance": "imported"
+    }
+  },
+  "stage": "ongoing",
+  "implementing_agency": "Department of Roads",
+  "executing_agency": "Ministry of Physical Infrastructure and Transport",
+  "financing": [
+    {
+      "donor": "World Bank",
+      "donor_id": "entity:organization/international_org/world-bank",
+      "amount": 150000000,
+      "currency": "USD",
+      "assistance_type": "loan",
+      "financing_instrument": "Investment Project Financing",
+      "budget_type": "on_budget",
+      "terms": {
+        "interest_rate": 1.25,
+        "repayment_period_years": 30,
+        "grace_period_years": 5,
+        "tying_status": "untied"
+      },
+      "transaction_date": "2020-03-15",
+      "transaction_type": "commitment",
+      "is_actual": true,
+      "source": "WB"
+    },
+    {
+      "donor": "Government of Nepal",
+      "amount": 30000000,
+      "currency": "USD",
+      "assistance_type": "grant",
+      "budget_type": "on_budget",
+      "transaction_type": "commitment",
+      "source": "DFMIS"
+    }
+  ],
+  "total_commitment": 180000000,
+  "total_disbursement": 67500000,
+  "dates": [
+    {"date": "2020-03-15", "type": "APPROVAL", "source": "WB"},
+    {"date": "2020-06-01", "type": "AGREEMENT", "source": "DFMIS"},
+    {"date": "2020-09-01", "type": "EFFECTIVENESS", "source": "WB"},
+    {"date": "2025-12-31", "type": "CLOSING", "source": "WB"}
+  ],
+  "sectors": [
+    {
+      "normalized_sector": "Transport",
+      "donor_sector": "Roads and highways",
+      "donor_subsector": "National highways",
+      "donor": "WB",
+      "percentage": 100
+    }
+  ],
+  "tags": [
+    {"category": "CLIMATE", "normalized_tag": "climate_adaptation"},
+    {"category": "GENDER", "normalized_tag": "gender_mainstreaming"}
+  ],
+  "donor_extensions": [
+    {
+      "donor": "WB",
+      "donor_project_id": "P123456",
+      "raw_payload": {
+        "id": "P123456",
+        "project_name": "Nepal: Strategic Roads Connectivity",
+        "countryshortname": "Nepal",
+        "regionname": "South Asia",
+        "boardapprovaldate": "2020-03-15",
+        "closingdate": "2025-12-31",
+        "totalamt": 150000000,
+        "grantamt": 0,
+        "status": "Active"
+      }
+    }
+  ],
+  "project_url": "https://projects.worldbank.org/en/projects-operations/project-detail/P123456",
+  "identifiers": [
+    {
+      "scheme": "other",
+      "value": "12345",
+      "url": "https://dfims.mof.gov.np/project/12345",
+      "name": {"en": {"value": "MoF DFMIS Project ID"}}
+    }
+  ],
+  "attributions": [
+    {
+      "title": {"en": {"value": "MoF DFMIS"}},
+      "details": {"en": {"value": "Imported from Nepal Ministry of Finance DFMIS"}}
+    }
+  ]
+}
+```
+
 ## Next Steps
 
 - [API Reference](/docs) - Interactive OpenAPI documentation

@@ -23,6 +23,7 @@ from nes.core.models.organization import (
     PoliticalParty,
 )
 from nes.core.models.person import Person
+from nes.core.models.project import Project
 from nes.core.models.relationship import Relationship, RelationshipType
 from nes.core.models.version import Author, Version, VersionSummary, VersionType
 from nes.database.entity_database import EntityDatabase
@@ -48,16 +49,20 @@ class PublicationService:
 
     async def create_entity(
         self,
-        entity_type: EntityType,
-        entity_data: Dict[str, Any],
-        author_id: str,
+        entity_type: Optional[EntityType] = None,
+        entity_data: Optional[Dict[str, Any]] = None,
+        author_id: Optional[str] = None,
         change_description: str = "Initial entity creation",
         entity_subtype: Optional[EntitySubType] = None,
     ) -> Entity:
         """Create a new entity with automatic versioning.
 
+        Supports two calling conventions for backward compatibility:
+        1. New style (keyword args): create_entity(entity_data={...}, author_id="...", ...)
+        2. Old style (positional): create_entity(EntityType.PERSON, {...}, "author:id", "desc")
+
         Args:
-            entity_type: Type of the entity
+            entity_type: Type of the entity (optional if 'type' is in entity_data)
             entity_data: Dictionary containing entity data
             author_id: ID of the author creating the entity
             change_description: Description of this change
@@ -69,6 +74,23 @@ class PublicationService:
         Raises:
             ValueError: If entity data is invalid or required fields are missing
         """
+        # Validate required arguments
+        if entity_data is None:
+            raise ValueError("entity_data is required")
+        if author_id is None:
+            raise ValueError("author_id is required")
+
+        # Extract entity_type from entity_data if not provided explicitly
+        if entity_type is None:
+            if "type" not in entity_data:
+                raise ValueError(
+                    "Entity must have a 'type' field or entity_type parameter"
+                )
+            entity_type = EntityType(entity_data["type"])
+
+        # Extract entity_subtype from entity_data if not provided explicitly
+        if entity_subtype is None and entity_data.get("sub_type"):
+            entity_subtype = EntitySubType(entity_data["sub_type"])
         # Validate required fields
         if "slug" not in entity_data:
             raise ValueError("Entity must have a 'slug' field")
@@ -281,6 +303,10 @@ class PublicationService:
             "CHILD_OF",
             "SUPERVISES",
             "LOCATED_IN",
+            "FUNDED_BY",
+            "IMPLEMENTED_BY",
+            "EXECUTED_BY",
+            "OVERSEEN_BY",
         ]
         if relationship_type not in valid_types:
             raise ValueError(
@@ -648,5 +674,7 @@ class PublicationService:
                 return Organization.model_validate(entity_data)
         elif entity_type == "location" or entity_type == EntityType.LOCATION:
             return Location.model_validate(entity_data)
+        elif entity_type == "project" or entity_type == EntityType.PROJECT:
+            return Project.model_validate(entity_data)
         else:
             raise ValueError(f"Unknown entity type: {entity_type}")

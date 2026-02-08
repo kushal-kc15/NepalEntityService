@@ -2,6 +2,18 @@
 
 A comprehensive Python package for managing Nepali public entities with optional API and scraping capabilities.
 
+## About the Meta Repository
+
+**For Jawafdehi team members and interns**: This service is part of the [Jawafdehi meta-repository](https://github.com/NewNepal-org/jawafdehi-meta), which provides documentation, specs, and shared resources across the Jawafdehi product family. Working from the meta repo setup is strongly encouraged for rich AI-powered development context.
+
+**For open source contributors**: NES is our primary open source target! You can contribute directly to this repository by cloning it and submitting a PR. The meta repo is optional for external contributors - just fork this repo, make your changes, and submit a pull request.
+
+## About the Meta Repository
+
+**For Jawafdehi team members and interns**: This service is part of the [Jawafdehi meta-repository](https://github.com/NewNepal-org/jawafdehi-meta), which provides documentation, specs, and shared resources. Working from the meta repo setup is strongly encouraged for rich AI-powered development context.
+
+**For open source contributors**: NES is our primary open source target! You can contribute directly to this repository by cloning it and submitting a PR. The meta repo is optional for external contributors - just fork this repo, make your changes, and submit a pull request.
+
 ## Quick Start
 
 ```bash

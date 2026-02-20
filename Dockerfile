@@ -16,7 +16,6 @@ RUN pip install poetry && \
     poetry install --extras api --only=main
 
 COPY docs/ ./docs/
-COPY .kiro/ ./.kiro/
 
 EXPOSE 8080
 

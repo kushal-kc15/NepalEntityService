@@ -108,6 +108,15 @@ class InMemoryCachedReadDatabase(EntityDatabase):
         await self._ensure_cache_warmed()
         return self._entity_cache.get(entity_id)
 
+    async def get_all_tags(self) -> List[str]:
+        """Return all unique tag values across all entities, sorted."""
+        await self._ensure_cache_warmed()
+        tags: set = set()
+        for entity in self._entity_cache.values():
+            if entity.tags:
+                tags.update(entity.tags)
+        return sorted(tags)
+
     async def delete_entity(self, entity_id: str) -> bool:
         """Not supported - read-only database."""
         raise ValueError("Read-only database does not support write operations")

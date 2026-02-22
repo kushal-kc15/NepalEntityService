@@ -111,6 +111,17 @@ class EntityDatabase(ABC):
         """
         pass
 
+    async def get_all_tags(self) -> List[str]:
+        """Return all unique tag values across all entities, sorted."""
+        entities = await self.list_entities(limit=999999)
+        tags: set = set()
+        for entity in entities:
+            if entity.tags:
+                for tag in entity.tags:
+                    if isinstance(tag, str):
+                        tags.add(tag)
+        return sorted(tags)
+
     @abstractmethod
     async def put_relationship(self, relationship: Relationship) -> Relationship:
         """Store a relationship in the database.

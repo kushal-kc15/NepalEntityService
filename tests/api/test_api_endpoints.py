@@ -861,6 +861,7 @@ class TestTagsEndpoint:
         """Test that all tags present across entities are returned."""
         entities_response = await client.get("/api/entities?limit=1000")
         entities_data = entities_response.json()
+        assert len(entities_data["entities"]) > 0, "Test requires at least one entity"
         expected_tags = set()
         for entity in entities_data["entities"]:
             for tag in entity.get("tags") or []:

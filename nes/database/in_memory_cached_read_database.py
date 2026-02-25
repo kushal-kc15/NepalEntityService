@@ -58,6 +58,7 @@ class InMemoryCachedReadDatabase(EntityDatabase):
         self.underlying_db = underlying_db
         self._entity_cache: Dict[str, Entity] = {}
         self._relationship_cache: Dict[str, Relationship] = {}
+        self._tags_cache: List[str] = []
         self._cache_warmed = False
 
         # Configure Beaker cache for CPU-heavy operations
@@ -83,6 +84,13 @@ class InMemoryCachedReadDatabase(EntityDatabase):
             relationships = await self.underlying_db.list_relationships(limit=999999)
             for relationship in relationships:
                 self._relationship_cache[relationship.id] = relationship
+
+            # Compute available tags once during warming
+            tags: set = set()
+            for entity in self._entity_cache.values():
+                if entity.tags:
+                    tags.update(entity.tags)
+            self._tags_cache = sorted(tags)
 
             self._cache_warmed = True
 
@@ -111,11 +119,7 @@ class InMemoryCachedReadDatabase(EntityDatabase):
     async def get_all_tags(self) -> List[str]:
         """Return all unique tag values across all entities, sorted."""
         await self._ensure_cache_warmed()
-        tags: set = set()
-        for entity in self._entity_cache.values():
-            if entity.tags:
-                tags.update(entity.tags)
-        return sorted(tags)
+        return self._tags_cache
 
     async def delete_entity(self, entity_id: str) -> bool:
         """Not supported - read-only database."""

@@ -86,10 +86,12 @@ class InMemoryCachedReadDatabase(EntityDatabase):
                 self._relationship_cache[relationship.id] = relationship
 
             # Compute available tags once during warming
-            tags: set = set()
+            tags: set[str] = set()
             for entity in self._entity_cache.values():
                 if entity.tags:
-                    tags.update(entity.tags)
+                    for tag in entity.tags:
+                        if isinstance(tag, str):
+                            tags.add(tag)
             self._tags_cache = sorted(tags)
 
             self._cache_warmed = True
@@ -119,7 +121,7 @@ class InMemoryCachedReadDatabase(EntityDatabase):
     async def get_all_tags(self) -> List[str]:
         """Return all unique tag values across all entities, sorted."""
         await self._ensure_cache_warmed()
-        return self._tags_cache
+        return list(self._tags_cache)
 
     async def delete_entity(self, entity_id: str) -> bool:
         """Not supported - read-only database."""

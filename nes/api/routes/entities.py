@@ -169,6 +169,13 @@ async def list_entities(
         )
 
 
+@router.get("/tags")
+async def list_tags(search_service: SearchService = Depends(get_search_service)):
+    """Return all unique tag values present in the database."""
+    tags = await search_service.get_all_tags()
+    return {"tags": tags}
+
+
 @router.get("/{entity_id:path}")
 async def get_entity(
     entity_id: str = Path(

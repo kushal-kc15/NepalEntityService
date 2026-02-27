@@ -817,3 +817,57 @@ class TestTagFilteringAPI:
 
         assert "detail" in data
         assert "error" in data["detail"]
+
+
+# ============================================================================
+# Tags Endpoint Tests
+# ============================================================================
+
+
+class TestTagsEndpoint:
+    """Tests for GET /api/entities/tags endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_list_tags_response_shape(self, client):
+        """Test that /api/entities/tags returns a dict with a tags list."""
+        response = await client.get("/api/entities/tags")
+        data = response.json()
+        assert "tags" in data
+        assert isinstance(data["tags"], list)
+
+    @pytest.mark.asyncio
+    async def test_list_tags_contains_known_tags(self, client):
+        """Test that known tags from test data are present."""
+        response = await client.get("/api/entities/tags")
+        data = response.json()
+        assert "politician" in data["tags"]
+
+    @pytest.mark.asyncio
+    async def test_list_tags_are_sorted(self, client):
+        """Test that returned tags are sorted alphabetically."""
+        response = await client.get("/api/entities/tags")
+        data = response.json()
+        assert data["tags"] == sorted(data["tags"])
+
+    @pytest.mark.asyncio
+    async def test_list_tags_no_duplicates(self, client):
+        """Test that returned tags contain no duplicates."""
+        response = await client.get("/api/entities/tags")
+        data = response.json()
+        assert len(data["tags"]) == len(set(data["tags"]))
+
+    @pytest.mark.asyncio
+    async def test_list_tags_contains_all_tags_from_entities(self, client):
+        """Test that all tags present across entities are returned."""
+        entities_response = await client.get("/api/entities?limit=1000")
+        entities_data = entities_response.json()
+        assert len(entities_data["entities"]) > 0, "Test requires at least one entity"
+        expected_tags = set()
+        for entity in entities_data["entities"]:
+            for tag in entity.get("tags") or []:
+                expected_tags.add(tag)
+
+        tags_response = await client.get("/api/entities/tags")
+        returned_tags = set(tags_response.json()["tags"])
+
+        assert expected_tags == returned_tags

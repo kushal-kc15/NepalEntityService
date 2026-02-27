@@ -116,6 +116,10 @@ class SearchService:
             offset=offset,
         )
 
+    async def get_all_tags(self) -> List[str]:
+        """Return all unique tag values across all entities."""
+        return await self.database.get_all_tags()
+
     async def get_entity(self, entity_id: str) -> Optional[Entity]:
         """Get a specific entity by its ID.
 

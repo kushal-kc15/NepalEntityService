@@ -20,8 +20,9 @@ from datetime import UTC, datetime
 import pytest
 
 from nes.core.models.base import Name, NameKind
+from nes.core.models.entity import EntitySubType
 from nes.core.models.entity_type_map import ALLOWED_ENTITY_PREFIXES
-from nes.core.models.organization import Organization, PoliticalParty
+from nes.core.models.organization import GovernmentBody, Organization, PoliticalParty
 from nes.core.models.person import Person
 from nes.core.models.version import Author, VersionSummary, VersionType
 from nes.database.file_database import FileDatabase
@@ -85,21 +86,15 @@ def political_party_entity():
 
 
 @pytest.fixture
-def three_level_org_entity(monkeypatch):
-    """3-level path: entity/organization/nepal_govt/moha/department-of-immigration.json"""
-    import nes.core.models.entity_type_map as etm
-
-    monkeypatch.setattr(
-        etm,
-        "ALLOWED_ENTITY_PREFIXES",
-        ALLOWED_ENTITY_PREFIXES | {"organization/nepal_govt/moha"},
-    )
-    entity = Organization(
+def three_level_org_entity():
+    """3-level path: entity/organization/government/federal/department-of-immigration.json"""
+    entity = GovernmentBody(
         slug="department-of-immigration",
-        entity_prefix="organization/nepal_govt/moha",
+        entity_prefix="organization/government/federal",
+        sub_type=EntitySubType.GOVERNMENT_BODY,
         names=[_name("Department of Immigration", "आप्रवासन विभाग")],
         version_summary=_version_summary(
-            "entity:organization/nepal_govt/moha/department-of-immigration"
+            "entity:organization/government/federal/department-of-immigration"
         ),
         created_at=datetime.now(UTC),
     )
@@ -144,7 +139,7 @@ class TestListEntitiesDepthTraversal:
         results = await db.list_entities()
 
         ids = [e.id for e in results]
-        assert "entity:organization/nepal_govt/moha/department-of-immigration" in ids
+        assert "entity:organization/government/federal/department-of-immigration" in ids
 
     @pytest.mark.asyncio
     async def test_discovers_mixed_depth_entities_in_single_call(
@@ -160,7 +155,7 @@ class TestListEntitiesDepthTraversal:
         ids = {e.id for e in results}
         assert "entity:person/rabi-lamichhane" in ids
         assert "entity:organization/political_party/rastriya-swatantra-party" in ids
-        assert "entity:organization/nepal_govt/moha/department-of-immigration" in ids
+        assert "entity:organization/government/federal/department-of-immigration" in ids
 
     @pytest.mark.asyncio
     async def test_entity_type_filter_includes_three_level_org_entities(
@@ -172,7 +167,7 @@ class TestListEntitiesDepthTraversal:
         results = await db.list_entities(entity_type="organization")
 
         ids = [e.id for e in results]
-        assert "entity:organization/nepal_govt/moha/department-of-immigration" in ids
+        assert "entity:organization/government/federal/department-of-immigration" in ids
 
     @pytest.mark.asyncio
     async def test_entity_type_filter_excludes_other_types(
@@ -187,7 +182,8 @@ class TestListEntitiesDepthTraversal:
         ids = [e.id for e in results]
         assert "entity:person/rabi-lamichhane" in ids
         assert (
-            "entity:organization/nepal_govt/moha/department-of-immigration" not in ids
+            "entity:organization/government/federal/department-of-immigration"
+            not in ids
         )
 
     @pytest.mark.asyncio
@@ -199,13 +195,14 @@ class TestListEntitiesDepthTraversal:
 
         results = await db.list_entities()
 
-        moha_entities = [
+        federal_entities = [
             e
             for e in results
-            if e.id == "entity:organization/nepal_govt/moha/department-of-immigration"
+            if e.id
+            == "entity:organization/government/federal/department-of-immigration"
         ]
-        assert len(moha_entities) == 1
-        assert moha_entities[0].entity_prefix == "organization/nepal_govt/moha"
+        assert len(federal_entities) == 1
+        assert federal_entities[0].entity_prefix == "organization/government/federal"
 
 
 # ---------------------------------------------------------------------------
@@ -284,9 +281,9 @@ class TestEntityFromDictWithEntityPrefix:
         """_entity_from_dict loads an entity that has a 3-level entity_prefix."""
         data = {
             "type": "organization",
-            "sub_type": None,
+            "sub_type": "government_body",  # Required for GovernmentBody
             "slug": "department-of-immigration",
-            "entity_prefix": "organization/nepal_govt/moha",
+            "entity_prefix": "organization/government/federal",
             "names": [
                 {
                     "kind": "PRIMARY",
@@ -296,25 +293,26 @@ class TestEntityFromDictWithEntityPrefix:
             ],
             "created_at": datetime.now(UTC).isoformat(),
             "version_summary": self._base_version_summary_dict(
-                "entity:organization/nepal_govt/moha/department-of-immigration"
+                "entity:organization/government/federal/department-of-immigration"
             ),
         }
 
         entity = db._entity_from_dict(data)
 
         assert entity.slug == "department-of-immigration"
-        assert entity.entity_prefix == "organization/nepal_govt/moha"
+        assert entity.entity_prefix == "organization/government/federal"
         assert (
-            entity.id == "entity:organization/nepal_govt/moha/department-of-immigration"
+            entity.id
+            == "entity:organization/government/federal/department-of-immigration"
         )
 
     def test_three_level_entity_instantiated_as_organization(self, db):
-        """An entity with 3-level org prefix is returned as an Organization instance."""
+        """An entity with 3-level org prefix is returned as a GovernmentBody instance."""
         data = {
             "type": "organization",
-            "sub_type": None,
+            "sub_type": "government_body",  # Required for GovernmentBody
             "slug": "department-of-immigration",
-            "entity_prefix": "organization/nepal_govt/moha",
+            "entity_prefix": "organization/government/federal",
             "names": [
                 {
                     "kind": "PRIMARY",
@@ -324,20 +322,29 @@ class TestEntityFromDictWithEntityPrefix:
             ],
             "created_at": datetime.now(UTC).isoformat(),
             "version_summary": self._base_version_summary_dict(
-                "entity:organization/nepal_govt/moha/department-of-immigration"
+                "entity:organization/government/federal/department-of-immigration"
             ),
         }
 
         entity = db._entity_from_dict(data)
 
-        assert isinstance(entity, Organization)
+        assert isinstance(entity, GovernmentBody)
 
     def test_entity_from_dict_missing_type_raises_value_error(self, db):
-        """_entity_from_dict raises ValueError when 'type' field is absent."""
+        """_entity_from_dict raises ValueError when 'entity_prefix' field is absent."""
         data = {
-            "entity_prefix": "organization/nepal_govt/moha",
             "slug": "department-of-immigration",
+            "names": [
+                {
+                    "kind": "PRIMARY",
+                    "en": {"full": "Department of Immigration"},
+                }
+            ],
+            "created_at": datetime.now(UTC).isoformat(),
+            "version_summary": self._base_version_summary_dict(
+                "entity:organization/government/federal/department-of-immigration"
+            ),
         }
 
-        with pytest.raises(ValueError, match="type"):
+        with pytest.raises(ValueError, match="entity_prefix"):
             db._entity_from_dict(data)

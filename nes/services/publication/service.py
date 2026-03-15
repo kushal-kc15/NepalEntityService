@@ -15,17 +15,9 @@ from typing import Any, Dict, List, Optional
 
 from nes.core.models.base import Name, NameKind
 from nes.core.models.entity import Entity, EntityType
-from nes.core.models.location import Location
-from nes.core.models.organization import (
-    GovernmentBody,
-    Hospital,
-    Organization,
-    PoliticalParty,
-)
-from nes.core.models.person import Person
-from nes.core.models.project import Project
 from nes.core.models.relationship import Relationship, RelationshipType
 from nes.core.models.version import Author, Version, VersionSummary, VersionType
+from nes.core.utils.entity_utils import entity_from_dict
 from nes.database.entity_database import EntityDatabase
 
 logger = logging.getLogger(__name__)
@@ -72,6 +64,10 @@ class PublicationService:
 
         entity_type = EntityType(entity_prefix.split("/")[0])
         entity_data["entity_prefix"] = entity_prefix
+
+        entity_data.pop(
+            "type", None
+        )  # entity_prefix takes precedence; discard any stale sub_type
         entity_data.pop(
             "sub_type", None
         )  # entity_prefix takes precedence; discard any stale sub_type
@@ -84,8 +80,6 @@ class PublicationService:
         validate_entity_id(entity_id)
 
         # Validate required fields
-        if "slug" not in entity_data:
-            raise ValueError("Entity must have a 'slug' field")
         if "names" not in entity_data or not entity_data["names"]:
             raise ValueError("Entity must have at least one name")
 
@@ -122,8 +116,8 @@ class PublicationService:
         entity_data["version_summary"] = version_summary
         entity_data["created_at"] = datetime.now(UTC)
 
-        # Create entity instance based on type
-        entity = self._create_entity_instance(entity_data)
+        # Create entity instance based on entity_prefix
+        entity = entity_from_dict(entity_data)
 
         # Store entity in database
         await self.database.put_entity(entity)
@@ -616,36 +610,3 @@ class PublicationService:
         await self.database.put_author(author)
 
         return author
-
-    def _create_entity_instance(self, entity_data: Dict[str, Any]) -> Entity:
-        """Create an entity instance of the appropriate type.
-
-        Args:
-            entity_data: Dictionary containing entity data
-
-        Returns:
-            Entity instance (Person, Organization, or Location)
-
-        Raises:
-            ValueError: If entity type is invalid
-        """
-        entity_type = entity_data.get("type")
-        entity_prefix = entity_data.get("entity_prefix", "")
-
-        if entity_type == "person" or entity_type == EntityType.PERSON:
-            return Person.model_validate(entity_data)
-        elif entity_type == "organization" or entity_type == EntityType.ORGANIZATION:
-            if entity_prefix == "organization/political_party":
-                return PoliticalParty.model_validate(entity_data)
-            elif entity_prefix == "organization/government_body":
-                return GovernmentBody.model_validate(entity_data)
-            elif entity_prefix == "organization/hospital":
-                return Hospital.model_validate(entity_data)
-            else:
-                return Organization.model_validate(entity_data)
-        elif entity_type == "location" or entity_type == EntityType.LOCATION:
-            return Location.model_validate(entity_data)
-        elif entity_type == "project" or entity_type == EntityType.PROJECT:
-            return Project.model_validate(entity_data)
-        else:
-            raise ValueError(f"Unknown entity type: {entity_type}")

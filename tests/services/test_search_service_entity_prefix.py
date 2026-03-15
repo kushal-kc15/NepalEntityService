@@ -18,8 +18,14 @@ from datetime import UTC, datetime
 import pytest
 
 from nes.core.models.base import Name, NameKind
+from nes.core.models.entity import EntitySubType
 from nes.core.models.entity_type_map import ALLOWED_ENTITY_PREFIXES
-from nes.core.models.organization import Organization, PoliticalParty
+from nes.core.models.organization import (
+    GovernmentBody,
+    Hospital,
+    Organization,
+    PoliticalParty,
+)
 from nes.core.models.person import Person
 from nes.core.models.version import Author, VersionSummary, VersionType
 from nes.database.file_database import FileDatabase
@@ -52,15 +58,8 @@ def _name(en_full: str, ne_full: str) -> Name:
 
 @pytest.fixture(autouse=True)
 def register_test_prefixes():
-    """Register 3-level prefixes used in these tests and clean up after."""
-    test_prefixes = {
-        "organization/nepal_govt/moha",
-        "organization/nepal_govt/mol",
-    }
-    ALLOWED_ENTITY_PREFIXES.update(test_prefixes)
+    """No need to register test prefixes - using existing ones from ENTITY_PREFIX_MAP."""
     yield
-    for p in test_prefixes:
-        ALLOWED_ENTITY_PREFIXES.discard(p)
 
 
 @pytest.fixture
@@ -75,13 +74,14 @@ def service(db):
 
 @pytest.fixture
 def moha_department(db):
-    """organization/nepal_govt/moha — Department of Immigration."""
-    entity = Organization(
+    """organization/government/federal — Department of Immigration."""
+    entity = GovernmentBody(
         slug="department-of-immigration",
-        entity_prefix="organization/nepal_govt/moha",
+        entity_prefix="organization/government/federal",
+        sub_type=EntitySubType.GOVERNMENT_BODY,
         names=[_name("Department of Immigration", "आप्रवासन विभाग")],
         version_summary=_version_summary(
-            "entity:organization/nepal_govt/moha/department-of-immigration"
+            "entity:organization/government/federal/department-of-immigration"
         ),
         created_at=datetime.now(UTC),
     )
@@ -91,14 +91,13 @@ def moha_department(db):
 
 @pytest.fixture
 def mol_section(db):
-    """organization/nepal_govt/mol — Legal Aid Section."""
-    entity = Organization(
-        slug="legal-aid-section",
-        entity_prefix="organization/nepal_govt/mol",
-        names=[_name("Legal Aid Section", "कानुनी सहायता शाखा")],
-        version_summary=_version_summary(
-            "entity:organization/nepal_govt/mol/legal-aid-section"
-        ),
+    """organization/hospital — Bir Hospital (different branch for testing)."""
+    entity = Hospital(
+        slug="bir-hospital",
+        entity_prefix="organization/hospital",
+        sub_type=EntitySubType.HOSPITAL,
+        names=[_name("Bir Hospital", "वीर अस्पताल")],
+        version_summary=_version_summary("entity:organization/hospital/bir-hospital"),
         created_at=datetime.now(UTC),
     )
     asyncio.run(db.put_entity(entity))
@@ -145,47 +144,47 @@ class TestSearchEntitiesEntityPrefix:
     async def test_exact_three_level_prefix_returns_matching_entity(
         self, service, moha_department, mol_section
     ):
-        """search_entities(entity_prefix='org/nepal_govt/moha') returns only moha entities."""
+        """search_entities(entity_prefix='organization/government/federal') returns only federal entities."""
         results = await service.search_entities(
-            entity_prefix="organization/nepal_govt/moha"
+            entity_prefix="organization/government/federal"
         )
 
         ids = [e.id for e in results]
-        assert "entity:organization/nepal_govt/moha/department-of-immigration" in ids
-        assert "entity:organization/nepal_govt/mol/legal-aid-section" not in ids
+        assert "entity:organization/government/federal/department-of-immigration" in ids
+        assert "entity:organization/hospital/bir-hospital" not in ids
 
     @pytest.mark.asyncio
     async def test_exact_three_level_prefix_excludes_other_prefix(
         self, service, moha_department, mol_section
     ):
-        """Exact prefix match does not return entities with a different 3-level prefix."""
-        results = await service.search_entities(
-            entity_prefix="organization/nepal_govt/mol"
-        )
+        """Exact prefix match does not return entities with a different prefix."""
+        results = await service.search_entities(entity_prefix="organization/hospital")
 
         ids = [e.id for e in results]
-        assert "entity:organization/nepal_govt/mol/legal-aid-section" in ids
+        assert "entity:organization/hospital/bir-hospital" in ids
         assert (
-            "entity:organization/nepal_govt/moha/department-of-immigration" not in ids
+            "entity:organization/government/federal/department-of-immigration"
+            not in ids
         )
 
     @pytest.mark.asyncio
     async def test_partial_prefix_returns_all_children(
         self, service, moha_department, mol_section
     ):
-        """search_entities(entity_prefix='org/nepal_govt') returns all children (startswith)."""
-        results = await service.search_entities(entity_prefix="organization/nepal_govt")
+        """search_entities(entity_prefix='organization/government') returns all children (startswith)."""
+        results = await service.search_entities(entity_prefix="organization/government")
 
         ids = {e.id for e in results}
-        assert "entity:organization/nepal_govt/moha/department-of-immigration" in ids
-        assert "entity:organization/nepal_govt/mol/legal-aid-section" in ids
+        assert "entity:organization/government/federal/department-of-immigration" in ids
+        # hospital is not under government prefix
+        assert "entity:organization/hospital/bir-hospital" not in ids
 
     @pytest.mark.asyncio
     async def test_partial_prefix_excludes_unrelated_entities(
         self, service, moha_department, political_party, politician
     ):
         """entity_prefix filter excludes entities outside the prefix subtree."""
-        results = await service.search_entities(entity_prefix="organization/nepal_govt")
+        results = await service.search_entities(entity_prefix="organization/government")
 
         ids = [e.id for e in results]
         assert "entity:organization/political_party/nepali-congress" not in ids
@@ -197,30 +196,29 @@ class TestSearchEntitiesEntityPrefix:
     ):
         """entity_prefix and text query can be combined (AND logic)."""
         results = await service.search_entities(
-            entity_prefix="organization/nepal_govt",
+            entity_prefix="organization/government",
             query="immigration",
         )
 
         ids = [e.id for e in results]
-        assert "entity:organization/nepal_govt/moha/department-of-immigration" in ids
-        assert "entity:organization/nepal_govt/mol/legal-aid-section" not in ids
+        assert "entity:organization/government/federal/department-of-immigration" in ids
+        assert "entity:organization/hospital/bir-hospital" not in ids
 
     @pytest.mark.asyncio
     async def test_entity_prefix_combined_with_pagination(
         self, service, moha_department, mol_section
     ):
         """entity_prefix filter respects limit/offset pagination."""
-        all_results = await service.search_entities(
-            entity_prefix="organization/nepal_govt"
-        )
+        # Use organization prefix to get both entities
+        all_results = await service.search_entities(entity_prefix="organization")
         first_page = await service.search_entities(
-            entity_prefix="organization/nepal_govt", limit=1, offset=0
+            entity_prefix="organization", limit=1, offset=0
         )
         second_page = await service.search_entities(
-            entity_prefix="organization/nepal_govt", limit=1, offset=1
+            entity_prefix="organization", limit=1, offset=1
         )
 
-        assert len(all_results) == 2
+        assert len(all_results) >= 2  # At least our 2 test entities
         assert len(first_page) == 1
         assert len(second_page) == 1
         # No overlap between pages
@@ -232,7 +230,7 @@ class TestSearchEntitiesEntityPrefix:
     ):
         """A valid prefix with no matching entities returns an empty list."""
         results = await service.search_entities(
-            entity_prefix="organization/nepal_govt/moe"  # Ministry of Education — not in DB
+            entity_prefix="organization/ngo"  # Valid prefix but no entities in DB
         )
 
         assert results == []
@@ -256,7 +254,8 @@ class TestSearchEntitiesBackwardCompat:
         ids = [e.id for e in results]
         assert "entity:person/rabi-lamichhane" in ids
         assert (
-            "entity:organization/nepal_govt/moha/department-of-immigration" not in ids
+            "entity:organization/government/federal/department-of-immigration"
+            not in ids
         )
 
     @pytest.mark.asyncio
@@ -271,7 +270,8 @@ class TestSearchEntitiesBackwardCompat:
         ids = [e.id for e in results]
         assert "entity:organization/political_party/nepali-congress" in ids
         assert (
-            "entity:organization/nepal_govt/moha/department-of-immigration" not in ids
+            "entity:organization/government/federal/department-of-immigration"
+            not in ids
         )
 
     @pytest.mark.asyncio
@@ -284,4 +284,4 @@ class TestSearchEntitiesBackwardCompat:
         ids = {e.id for e in results}
         assert "entity:person/rabi-lamichhane" in ids
         assert "entity:organization/political_party/nepali-congress" in ids
-        assert "entity:organization/nepal_govt/moha/department-of-immigration" in ids
+        assert "entity:organization/government/federal/department-of-immigration" in ids

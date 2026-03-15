@@ -31,64 +31,56 @@ from nes.services.publication import PublicationService
 @pytest_asyncio.fixture
 async def test_db_with_prefix_entities(tmp_path):
     """Database populated with entities at 1-, 2-, and 3-level prefix depths."""
-    ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt")
-    ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/moha")
-    ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/mol")
-    try:
-        db = FileDatabase(base_path=str(tmp_path / "test-db"))
-        pub = PublicationService(database=db)
+    db = FileDatabase(base_path=str(tmp_path / "test-db"))
+    pub = PublicationService(database=db)
 
-        # 1-level: person
-        await pub.create_entity(
-            entity_prefix="person",
-            entity_data={
-                "slug": "rabi-lamichhane",
-                "names": [{"kind": "PRIMARY", "en": {"full": "Rabi Lamichhane"}}],
-            },
-            author_id="author:test",
-            change_description="setup",
-        )
+    # 1-level: person
+    await pub.create_entity(
+        entity_prefix="person",
+        entity_data={
+            "slug": "rabi-lamichhane",
+            "names": [{"kind": "PRIMARY", "en": {"full": "Rabi Lamichhane"}}],
+        },
+        author_id="author:test",
+        change_description="setup",
+    )
 
-        # 2-level: organization/political_party
-        await pub.create_entity(
-            entity_prefix="organization/political_party",
-            entity_data={
-                "slug": "nepali-congress",
-                "names": [{"kind": "PRIMARY", "en": {"full": "Nepali Congress"}}],
-            },
-            author_id="author:test",
-            change_description="setup",
-        )
+    # 2-level: organization/political_party
+    await pub.create_entity(
+        entity_prefix="organization/political_party",
+        entity_data={
+            "slug": "nepali-congress",
+            "names": [{"kind": "PRIMARY", "en": {"full": "Nepali Congress"}}],
+        },
+        author_id="author:test",
+        change_description="setup",
+    )
 
-        # 3-level: organization/nepal_govt/moha
-        await pub.create_entity(
-            entity_prefix="organization/nepal_govt/moha",
-            entity_data={
-                "slug": "department-of-immigration",
-                "names": [
-                    {"kind": "PRIMARY", "en": {"full": "Department of Immigration"}}
-                ],
-            },
-            author_id="author:test",
-            change_description="setup",
-        )
+    # 3-level: organization/government/federal (using existing prefix)
+    await pub.create_entity(
+        entity_prefix="organization/government/federal",
+        entity_data={
+            "slug": "department-of-immigration",
+            "sub_type": "government_body",  # Must be explicitly set for GovernmentBody
+            "names": [{"kind": "PRIMARY", "en": {"full": "Department of Immigration"}}],
+        },
+        author_id="author:test",
+        change_description="setup",
+    )
 
-        # 3-level: organization/nepal_govt/mol
-        await pub.create_entity(
-            entity_prefix="organization/nepal_govt/mol",
-            entity_data={
-                "slug": "legal-aid-section",
-                "names": [{"kind": "PRIMARY", "en": {"full": "Legal Aid Section"}}],
-            },
-            author_id="author:test",
-            change_description="setup",
-        )
+    # 2-level: organization/hospital (different branch for testing)
+    await pub.create_entity(
+        entity_prefix="organization/hospital",
+        entity_data={
+            "slug": "bir-hospital",
+            "sub_type": "hospital",  # Required for Hospital
+            "names": [{"kind": "PRIMARY", "en": {"full": "Bir Hospital"}}],
+        },
+        author_id="author:test",
+        change_description="setup",
+    )
 
-        yield db
-    finally:
-        ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt")
-        ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/moha")
-        ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/mol")
+    yield db
 
 
 @pytest_asyncio.fixture
@@ -117,32 +109,31 @@ class TestApiEntityPrefixFilter:
 
     @pytest.mark.asyncio
     async def test_exact_prefix_returns_matching_entities(self, client):
-        """entity_prefix=organization/nepal_govt/moha returns only moha entities."""
+        """entity_prefix=organization/government/federal returns only federal entities."""
         response = await client.get(
             "/api/entities",
-            params={"entity_prefix": "organization/nepal_govt/moha"},
+            params={"entity_prefix": "organization/government/federal"},
         )
 
         assert response.status_code == 200
         data = response.json()
         ids = [e["id"] for e in data["entities"]]
-        assert "entity:organization/nepal_govt/moha/department-of-immigration" in ids
-        assert "entity:organization/nepal_govt/mol/legal-aid-section" not in ids
+        assert "entity:organization/government/federal/department-of-immigration" in ids
+        assert "entity:organization/hospital/bir-hospital" not in ids
         assert "entity:person/rabi-lamichhane" not in ids
 
     @pytest.mark.asyncio
     async def test_partial_prefix_returns_all_children(self, client):
-        """entity_prefix=organization/nepal_govt returns all children (startswith)."""
+        """entity_prefix=organization/government returns all children (startswith)."""
         response = await client.get(
             "/api/entities",
-            params={"entity_prefix": "organization/nepal_govt"},
+            params={"entity_prefix": "organization/government"},
         )
 
         assert response.status_code == 200
         data = response.json()
         ids = {e["id"] for e in data["entities"]}
-        assert "entity:organization/nepal_govt/moha/department-of-immigration" in ids
-        assert "entity:organization/nepal_govt/mol/legal-aid-section" in ids
+        assert "entity:organization/government/federal/department-of-immigration" in ids
         assert "entity:person/rabi-lamichhane" not in ids
         assert "entity:organization/political_party/nepali-congress" not in ids
 
@@ -152,7 +143,7 @@ class TestApiEntityPrefixFilter:
         response = await client.get(
             "/api/entities",
             params={
-                "entity_prefix": "organization/nepal_govt",
+                "entity_prefix": "organization/government",
                 "query": "immigration",
             },
         )
@@ -160,11 +151,11 @@ class TestApiEntityPrefixFilter:
         assert response.status_code == 200
         data = response.json()
         ids = [e["id"] for e in data["entities"]]
-        assert "entity:organization/nepal_govt/moha/department-of-immigration" in ids
-        assert "entity:organization/nepal_govt/mol/legal-aid-section" not in ids
+        assert "entity:organization/government/federal/department-of-immigration" in ids
+        assert "entity:organization/hospital/bir-hospital" not in ids
         # Prefix filter must exclude person entities even when query would match none of them
         assert "entity:person/rabi-lamichhane" not in ids
-        # Only 1 entity should match (prefix=nepal_govt AND query=immigration)
+        # Only 1 entity should match (prefix=government AND query=immigration)
         assert len(data["entities"]) == 1
 
     @pytest.mark.asyncio
@@ -172,7 +163,7 @@ class TestApiEntityPrefixFilter:
         """Entities returned via entity_prefix filter include entity_prefix in their data."""
         response = await client.get(
             "/api/entities",
-            params={"entity_prefix": "organization/nepal_govt/moha"},
+            params={"entity_prefix": "organization/government/federal"},
         )
 
         assert response.status_code == 200
@@ -182,9 +173,9 @@ class TestApiEntityPrefixFilter:
         entity = data["entities"][0]
         assert (
             entity["id"]
-            == "entity:organization/nepal_govt/moha/department-of-immigration"
+            == "entity:organization/government/federal/department-of-immigration"
         )
-        assert entity["entity_prefix"] == "organization/nepal_govt/moha"
+        assert entity["entity_prefix"] == "organization/government/federal"
 
 
 # ---------------------------------------------------------------------------
@@ -220,19 +211,14 @@ class TestApiEntityPrefixValidation:
     @pytest.mark.asyncio
     async def test_valid_prefix_not_in_db_returns_200_empty(self, client):
         """A valid (known) prefix with no matching entities returns 200 with empty list."""
-        # "organization" is in ALLOWED_ENTITY_PREFIXES but no exact-match entities
-        # (the moha/mol entities have "organization/nepal_govt/..." prefixes, not bare "organization")
-        ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/moe")
-        try:
-            response = await client.get(
-                "/api/entities",
-                params={"entity_prefix": "organization/nepal_govt/moe"},
-            )
-            assert response.status_code == 200
-            data = response.json()
-            assert data["entities"] == []
-        finally:
-            ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/moe")
+        # "organization/ngo" is in ALLOWED_ENTITY_PREFIXES but no entities with that prefix exist
+        response = await client.get(
+            "/api/entities",
+            params={"entity_prefix": "organization/ngo"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["entities"] == []
 
 
 # ---------------------------------------------------------------------------
@@ -253,7 +239,8 @@ class TestApiEntityPrefixBackwardCompat:
         ids = [e["id"] for e in data["entities"]]
         assert "entity:person/rabi-lamichhane" in ids
         assert (
-            "entity:organization/nepal_govt/moha/department-of-immigration" not in ids
+            "entity:organization/government/federal/department-of-immigration"
+            not in ids
         )
 
     @pytest.mark.asyncio
@@ -269,5 +256,6 @@ class TestApiEntityPrefixBackwardCompat:
         ids = [e["id"] for e in data["entities"]]
         assert "entity:organization/political_party/nepali-congress" in ids
         assert (
-            "entity:organization/nepal_govt/moha/department-of-immigration" not in ids
+            "entity:organization/government/federal/department-of-immigration"
+            not in ids
         )

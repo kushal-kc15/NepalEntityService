@@ -506,14 +506,38 @@ def create_org_with_prefix(
     slug: str, full_name: str, entity_prefix: str
 ) -> Organization:
     """Helper to create an Organization entity with a given entity_prefix."""
+    from nes.core.models.entity import EntitySubType
+    from nes.core.models.organization import GovernmentBody, Hospital
+
     entity_id = f"entity:{entity_prefix}/{slug}"
-    return Organization(
-        slug=slug,
-        entity_prefix=entity_prefix,
-        names=[Name(kind=NameKind.PRIMARY, en={"full": full_name})],
-        version_summary=create_version_summary(entity_id, VersionType.ENTITY),
-        created_at=datetime.now(UTC),
-    )
+
+    # Determine the correct class and sub_type based on entity_prefix
+    if entity_prefix.startswith("organization/government"):
+        return GovernmentBody(
+            slug=slug,
+            entity_prefix=entity_prefix,
+            sub_type=EntitySubType.GOVERNMENT_BODY,
+            names=[Name(kind=NameKind.PRIMARY, en={"full": full_name})],
+            version_summary=create_version_summary(entity_id, VersionType.ENTITY),
+            created_at=datetime.now(UTC),
+        )
+    elif entity_prefix == "organization/hospital":
+        return Hospital(
+            slug=slug,
+            entity_prefix=entity_prefix,
+            sub_type=EntitySubType.HOSPITAL,
+            names=[Name(kind=NameKind.PRIMARY, en={"full": full_name})],
+            version_summary=create_version_summary(entity_id, VersionType.ENTITY),
+            created_at=datetime.now(UTC),
+        )
+    else:
+        return Organization(
+            slug=slug,
+            entity_prefix=entity_prefix,
+            names=[Name(kind=NameKind.PRIMARY, en={"full": full_name})],
+            version_summary=create_version_summary(entity_id, VersionType.ENTITY),
+            created_at=datetime.now(UTC),
+        )
 
 
 class TestSearchEntitiesEntityPrefix:
@@ -522,168 +546,130 @@ class TestSearchEntitiesEntityPrefix:
     @pytest.mark.asyncio
     async def test_exact_three_level_prefix_returns_matching_entity(self, temp_db_path):
         """search_entities(entity_prefix=exact) returns only entities with that prefix."""
-        ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/moha")
-        ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/mol")
-        try:
-            underlying_db = FileDatabase(base_path=str(temp_db_path))
+        underlying_db = FileDatabase(base_path=str(temp_db_path))
 
-            moha_dept = create_org_with_prefix(
-                "department-of-immigration",
-                "Department of Immigration",
-                "organization/nepal_govt/moha",
-            )
-            mol_section = create_org_with_prefix(
-                "legal-aid-section",
-                "Legal Aid Section",
-                "organization/nepal_govt/mol",
-            )
-            await underlying_db.put_entity(moha_dept)
-            await underlying_db.put_entity(mol_section)
+        federal_dept = create_org_with_prefix(
+            "department-of-immigration",
+            "Department of Immigration",
+            "organization/government/federal",
+        )
+        hospital = create_org_with_prefix(
+            "bir-hospital",
+            "Bir Hospital",
+            "organization/hospital",
+        )
+        await underlying_db.put_entity(federal_dept)
+        await underlying_db.put_entity(hospital)
 
-            cached_db = InMemoryCachedReadDatabase(underlying_db)
-            results = await cached_db.search_entities(
-                entity_prefix="organization/nepal_govt/moha"
-            )
+        cached_db = InMemoryCachedReadDatabase(underlying_db)
+        results = await cached_db.search_entities(
+            entity_prefix="organization/government/federal"
+        )
 
-            ids = [e.id for e in results]
-            assert (
-                "entity:organization/nepal_govt/moha/department-of-immigration" in ids
-            )
-            assert "entity:organization/nepal_govt/mol/legal-aid-section" not in ids
-        finally:
-            ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/moha")
-            ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/mol")
+        ids = [e.id for e in results]
+        assert "entity:organization/government/federal/department-of-immigration" in ids
+        assert "entity:organization/hospital/bir-hospital" not in ids
 
     @pytest.mark.asyncio
     async def test_partial_prefix_returns_all_children(self, temp_db_path):
         """search_entities(entity_prefix=partial) returns all children via startswith match."""
-        ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/moha")
-        ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/mol")
-        try:
-            underlying_db = FileDatabase(base_path=str(temp_db_path))
+        underlying_db = FileDatabase(base_path=str(temp_db_path))
 
-            moha_dept = create_org_with_prefix(
-                "department-of-immigration",
-                "Department of Immigration",
-                "organization/nepal_govt/moha",
-            )
-            mol_section = create_org_with_prefix(
-                "legal-aid-section",
-                "Legal Aid Section",
-                "organization/nepal_govt/mol",
-            )
-            politician = create_person("rabi-lamichhane", "Rabi Lamichhane")
+        federal_dept = create_org_with_prefix(
+            "department-of-immigration",
+            "Department of Immigration",
+            "organization/government/federal",
+        )
+        hospital = create_org_with_prefix(
+            "bir-hospital",
+            "Bir Hospital",
+            "organization/hospital",
+        )
+        politician = create_person("rabi-lamichhane", "Rabi Lamichhane")
 
-            await underlying_db.put_entity(moha_dept)
-            await underlying_db.put_entity(mol_section)
-            await underlying_db.put_entity(politician)
+        await underlying_db.put_entity(federal_dept)
+        await underlying_db.put_entity(hospital)
+        await underlying_db.put_entity(politician)
 
-            cached_db = InMemoryCachedReadDatabase(underlying_db)
-            results = await cached_db.search_entities(
-                entity_prefix="organization/nepal_govt"
-            )
+        cached_db = InMemoryCachedReadDatabase(underlying_db)
+        results = await cached_db.search_entities(
+            entity_prefix="organization/government"
+        )
 
-            ids = {e.id for e in results}
-            assert (
-                "entity:organization/nepal_govt/moha/department-of-immigration" in ids
-            )
-            assert "entity:organization/nepal_govt/mol/legal-aid-section" in ids
-            assert "entity:person/rabi-lamichhane" not in ids
-        finally:
-            ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/moha")
-            ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/mol")
+        ids = {e.id for e in results}
+        assert "entity:organization/government/federal/department-of-immigration" in ids
+        assert "entity:organization/hospital/bir-hospital" not in ids
+        assert "entity:person/rabi-lamichhane" not in ids
 
     @pytest.mark.asyncio
     async def test_entity_prefix_excludes_unrelated_entities(self, temp_db_path):
         """entity_prefix filter does not return entities outside the prefix subtree."""
-        ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/moha")
-        try:
-            underlying_db = FileDatabase(base_path=str(temp_db_path))
+        underlying_db = FileDatabase(base_path=str(temp_db_path))
 
-            moha_dept = create_org_with_prefix(
-                "department-of-immigration",
-                "Department of Immigration",
-                "organization/nepal_govt/moha",
-            )
-            party = create_political_party("nepali-congress", "Nepali Congress")
-            politician = create_person("rabi-lamichhane", "Rabi Lamichhane")
+        federal_dept = create_org_with_prefix(
+            "department-of-immigration",
+            "Department of Immigration",
+            "organization/government/federal",
+        )
+        party = create_political_party("nepali-congress", "Nepali Congress")
+        politician = create_person("rabi-lamichhane", "Rabi Lamichhane")
 
-            await underlying_db.put_entity(moha_dept)
-            await underlying_db.put_entity(party)
-            await underlying_db.put_entity(politician)
+        await underlying_db.put_entity(federal_dept)
+        await underlying_db.put_entity(party)
+        await underlying_db.put_entity(politician)
 
-            cached_db = InMemoryCachedReadDatabase(underlying_db)
-            results = await cached_db.search_entities(
-                entity_prefix="organization/nepal_govt/moha"
-            )
+        cached_db = InMemoryCachedReadDatabase(underlying_db)
+        results = await cached_db.search_entities(
+            entity_prefix="organization/government/federal"
+        )
 
-            ids = [e.id for e in results]
-            assert (
-                "entity:organization/nepal_govt/moha/department-of-immigration" in ids
-            )
-            assert "entity:organization/political_party/nepali-congress" not in ids
-            assert "entity:person/rabi-lamichhane" not in ids
-        finally:
-            ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/moha")
+        ids = [e.id for e in results]
+        assert "entity:organization/government/federal/department-of-immigration" in ids
+        assert "entity:organization/political_party/nepali-congress" not in ids
+        assert "entity:person/rabi-lamichhane" not in ids
 
     @pytest.mark.asyncio
     async def test_entity_prefix_no_match_returns_empty_list(self, temp_db_path):
         """entity_prefix with no matching entities returns an empty list."""
-        ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/moha")
-        ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/moe")
-        try:
-            underlying_db = FileDatabase(base_path=str(temp_db_path))
+        underlying_db = FileDatabase(base_path=str(temp_db_path))
 
-            moha_dept = create_org_with_prefix(
-                "department-of-immigration",
-                "Department of Immigration",
-                "organization/nepal_govt/moha",
-            )
-            await underlying_db.put_entity(moha_dept)
+        federal_dept = create_org_with_prefix(
+            "department-of-immigration",
+            "Department of Immigration",
+            "organization/government/federal",
+        )
+        await underlying_db.put_entity(federal_dept)
 
-            cached_db = InMemoryCachedReadDatabase(underlying_db)
-            # Ministry of Education — exists in registry but no entities in DB
-            results = await cached_db.search_entities(
-                entity_prefix="organization/nepal_govt/moe"
-            )
+        cached_db = InMemoryCachedReadDatabase(underlying_db)
+        # organization/ngo exists in registry but no entities in DB
+        results = await cached_db.search_entities(entity_prefix="organization/ngo")
 
-            assert results == []
-        finally:
-            ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/moha")
-            ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/moe")
+        assert results == []
 
     @pytest.mark.asyncio
     async def test_entity_prefix_combined_with_text_query(self, temp_db_path):
         """entity_prefix and text query apply AND logic in the cached database."""
-        ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/moha")
-        ALLOWED_ENTITY_PREFIXES.add("organization/nepal_govt/mol")
-        try:
-            underlying_db = FileDatabase(base_path=str(temp_db_path))
+        underlying_db = FileDatabase(base_path=str(temp_db_path))
 
-            moha_dept = create_org_with_prefix(
-                "department-of-immigration",
-                "Department of Immigration",
-                "organization/nepal_govt/moha",
-            )
-            mol_section = create_org_with_prefix(
-                "legal-aid-section",
-                "Legal Aid Section",
-                "organization/nepal_govt/mol",
-            )
-            await underlying_db.put_entity(moha_dept)
-            await underlying_db.put_entity(mol_section)
+        federal_dept = create_org_with_prefix(
+            "department-of-immigration",
+            "Department of Immigration",
+            "organization/government/federal",
+        )
+        hospital = create_org_with_prefix(
+            "bir-hospital",
+            "Bir Hospital",
+            "organization/hospital",
+        )
+        await underlying_db.put_entity(federal_dept)
+        await underlying_db.put_entity(hospital)
 
-            cached_db = InMemoryCachedReadDatabase(underlying_db)
-            results = await cached_db.search_entities(
-                entity_prefix="organization/nepal_govt",
-                query="immigration",
-            )
+        cached_db = InMemoryCachedReadDatabase(underlying_db)
+        results = await cached_db.search_entities(
+            entity_prefix="organization/government",
+            query="immigration",
+        )
 
-            ids = [e.id for e in results]
-            assert (
-                "entity:organization/nepal_govt/moha/department-of-immigration" in ids
-            )
-            assert "entity:organization/nepal_govt/mol/legal-aid-section" not in ids
-        finally:
-            ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/moha")
-            ALLOWED_ENTITY_PREFIXES.discard("organization/nepal_govt/mol")
+        ids = [e.id for e in results]
+        assert "entity:organization/government/federal/department-of-immigration" in ids
+        assert "entity:organization/hospital/bir-hospital" not in ids

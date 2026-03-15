@@ -47,15 +47,9 @@ def entity_from_dict(data: Dict[str, Any]) -> Entity:
     entity_class = ENTITY_PREFIX_MAP.get(entity_prefix)
 
     if entity_class is None:
-        # If exact match not found, try matching just the first segment (base type)
-        prefix_parts = entity_prefix.split("/")
-        base_type = prefix_parts[0]
-        entity_class = ENTITY_PREFIX_MAP.get(base_type)
-
-        if entity_class is None:
-            raise ValueError(
-                f"Unknown entity_prefix: '{entity_prefix}'. "
-                f"Supported prefixes: {', '.join(sorted(ALLOWED_ENTITY_PREFIXES))}"
-            )
+        raise ValueError(
+            f"Unknown entity_prefix: '{entity_prefix}'. "
+            f"Supported prefixes: {', '.join(sorted(ALLOWED_ENTITY_PREFIXES))}"
+        )
 
     return entity_class.model_validate(data)

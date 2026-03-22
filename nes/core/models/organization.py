@@ -76,6 +76,7 @@ class GovernmentBody(Organization):
     )
     address: Optional[Address] = Field(None, description="Government body address")
 
+
 class Hospital(Organization):
     """Hospital organization."""
 

@@ -13,7 +13,9 @@ from nes.services.migration.context import MigrationContext
 # Migration metadata
 AUTHOR = "Kushal KC"
 DATE = "2026-03-22"
-DESCRIPTION = "Import constitutional commissions and government bodies with 4-depth prefixes"
+DESCRIPTION = (
+    "Import constitutional commissions and government bodies with 4-depth prefixes"
+)
 CHANGE_DESCRIPTION = "Initial sourcing of constitutional commissions"
 
 
@@ -53,11 +55,21 @@ async def migrate(context: MigrationContext) -> None:
     for entity_data in entities:
         # Extract entity_prefix from the data
         entity_prefix = entity_data.get("entity_prefix")
-        
+
         # Remove fields that shouldn't be in entity_data for creation
-        entity_data_clean = {k: v for k, v in entity_data.items() 
-                            if k not in ["entity_prefix", "type", "sub_type", "created_at", "version_summary"]}
-        
+        entity_data_clean = {
+            k: v
+            for k, v in entity_data.items()
+            if k
+            not in [
+                "entity_prefix",
+                "type",
+                "sub_type",
+                "created_at",
+                "version_summary",
+            ]
+        }
+
         # Create entity using the publication service
         entity = await context.publication.create_entity(
             entity_type=EntityType.ORGANIZATION,
@@ -67,11 +79,11 @@ async def migrate(context: MigrationContext) -> None:
             change_description=CHANGE_DESCRIPTION,
             entity_prefix=entity_prefix,
         )
-        
+
         # Count by prefix
         if entity_prefix in prefix_counts:
             prefix_counts[entity_prefix] += 1
-        
+
         context.log(f"Created entity {entity.id} with prefix {entity_prefix}")
         count += 1
 
@@ -84,6 +96,8 @@ async def migrate(context: MigrationContext) -> None:
     entities_in_db = await context.db.list_entities(
         limit=200, entity_type="organization", sub_type="government_body"
     )
-    context.log(f"\nVerified: {len(entities_in_db)} government_body entities in database")
+    context.log(
+        f"\nVerified: {len(entities_in_db)} government_body entities in database"
+    )
 
     context.log("Migration completed successfully")

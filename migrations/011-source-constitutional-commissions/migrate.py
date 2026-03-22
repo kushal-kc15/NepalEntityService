@@ -5,7 +5,6 @@ Author: Kushal KC
 Date: 2026-03-22
 """
 
-from nes.core.models.entity import EntitySubType, EntityType
 from nes.core.models.version import Author
 from nes.core.utils.slug_helper import text_to_slug
 from nes.services.migration.context import MigrationContext
@@ -72,12 +71,10 @@ async def migrate(context: MigrationContext) -> None:
 
         # Create entity using the publication service
         entity = await context.publication.create_entity(
-            entity_type=EntityType.ORGANIZATION,
-            entity_subtype=EntitySubType.GOVERNMENT_BODY,
+            entity_prefix=entity_prefix,
             entity_data=entity_data_clean,
             author_id=author_id,
             change_description=CHANGE_DESCRIPTION,
-            entity_prefix=entity_prefix,
         )
 
         # Count by prefix
